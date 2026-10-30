@@ -1,0 +1,15 @@
+# qmake und Paket
+Makefile
+o.le-v7/
+*.bar
+assets/.assets.index
+
+# Bibliotheken und Symbole
+*.so
+*.so.*
+*.sym
+
+# Sitzung und Schlüssel
+*.conf
+id_rsa*
+*.age

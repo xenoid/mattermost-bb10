@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<qnx xmlns="http://www.qnx.com/schemas/application/1.0">
+    <id>com.hollweck.mattermost</id>
+    <name>Mattermost</name>
+    <versionNumber>1.0.0</versionNumber>
+    <buildId>58</buildId>
+    <description>Mattermost client for BlackBerry 10.</description>
+    <author>hollweck</author>
+    <initialWindow>
+        <autoOrients>true</autoOrients>
+        <systemChrome>none</systemChrome>
+        <transparent>false</transparent>
+    </initialWindow>
+    <env var="LD_LIBRARY_PATH" value="app/native/lib:/usr/lib/qt4/lib"/>
+    <action system="true">run_native</action>
+    <permission>access_internet</permission>
+    <permission>access_shared</permission>
+    <permission>post_notification</permission>
+    <permission system="true">_sys_run_headless</permission>
+    <invoke-target id="com.hollweck.mattermost.open">
+        <entry-point-id>Mattermost</entry-point-id>
+        <type>application</type>
+        <filter>
+            <action>bb.action.OPEN</action>
+            <mime-type>text/plain</mime-type>
+        </filter>
+    </invoke-target>
+    <invoke-target id="com.hollweck.mattermost.hub">
+        <entry-point-id>MattermostHub</entry-point-id>
+        <type>application.headless</type>
+        <filter>
+            <action>bb.action.system.TIMER_FIRED</action>
+            <mime-type>application/vnd.blackberry.system.event.TIMER_FIRED</mime-type>
+        </filter>
+    </invoke-target>
+    <entryPoint id="Mattermost">
+        <name>Mattermost</name>
+    </entryPoint>
+    <entryPoint id="MattermostHub">
+        <name>Mattermost Hub</name>
+        <entryPointType>Qnx/Elf</entryPointType>
+    </entryPoint>
+    <configuration name="Device-Release">
+        <entryPointType>Qnx/Cascades</entryPointType>
+        <platformArchitecture>armle-v7</platformArchitecture>
+        <asset path="o.le-v7/Mattermost.so" entry="true" type="Qnx/Cascades">Mattermost.so</asset>
+        <asset entryPointId="MattermostHub" path="o.le-v7/MattermostHub" type="Qnx/Elf">MattermostHub</asset>
+    </configuration>
+    <asset path="assets">assets</asset>
+    <asset path="icon.png">icon.png</asset>
+    <icon>
+        <image>icon.png</image>
+    </icon>
+</qnx>
