@@ -10,6 +10,7 @@
 #include <QNetworkReply>
 #include <QObject>
 #include <QSet>
+#include <QSslError>
 #include <QStringList>
 #include <QTimer>
 #include <QVariantList>
@@ -135,6 +136,7 @@ private slots:
     void onFinished(QNetworkReply *reply);
     void onTick();
     void abortTimedOut();
+    void noteSsl(const QList<QSslError> &errs);
     void onInvoked(const bb::system::InvokeRequest &request);
     void flushInbox();
     void bootHeadless();

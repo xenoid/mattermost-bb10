@@ -32,6 +32,9 @@
 #include <QSslSocket>
 #include <QUrl>
 #include <QtAlgorithms>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
 
 using bb::data::JsonDataAccess;
 
@@ -468,14 +471,36 @@ void MmClient::enterHeadless()
             loadMe();
         }
     }
+    qDebug("mm-hub trust %d", g_trust.size());
     qDebug("mm-hub start");
     if (m_token.isEmpty() || m_serverUrl.isEmpty())
         quitIfHeadless();
 }
 
+static QString exeDir()
+{
+    char exe[256];
+    int fd;
+    int slash;
+    memset(exe, 0, sizeof(exe));
+    fd = open("/proc/self/exefile", O_RDONLY);
+    if (fd < 0)
+        return QString();
+    read(fd, exe, sizeof(exe) - 1);
+    close(fd);
+    const QString path = QString::fromLocal8Bit(exe);
+    slash = path.lastIndexOf(QLatin1Char('/'));
+    if (slash <= 0)
+        return QString();
+    return path.left(slash);
+}
+
 void MmClient::loadTrust()
 {
     QStringList paths;
+    const QString dir = exeDir();
+    if (!dir.isEmpty())
+        paths << dir + "/assets/cacert.pem";
     paths << QCoreApplication::applicationDirPath() + "/assets/cacert.pem";
     paths << QCoreApplication::applicationDirPath() + "/../assets/cacert.pem";
     paths << QString("app/native/assets/cacert.pem");
@@ -522,6 +547,14 @@ void MmClient::quitIfHeadless()
         return;
     qDebug("mm-hub done");
     QTimer::singleShot(300, QCoreApplication::instance(), SLOT(quit()));
+}
+
+void MmClient::noteSsl(const QList<QSslError> &errs)
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    if (!reply || errs.isEmpty())
+        return;
+    reply->setProperty("ssl", int(errs.at(0).error()));
 }
 
 void MmClient::abortTimedOut()
@@ -1007,6 +1040,8 @@ QNetworkReply *MmClient::start(Step step, const QString &path, const QByteArray 
         reply = m_net.get(request);
     reply->setProperty("step", int(step));
     reply->setProperty("silent", silent);
+    reply->setProperty("ssl", 0);
+    connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(noteSsl(QList<QSslError>)));
     armAbort(reply, timeoutMs);
     return reply;
 }
@@ -1960,6 +1995,9 @@ void MmClient::onFinished(QNetworkReply *reply)
     const QString root = reply->property("root").toString();
     if (m_debugLog)
         qDebug("mm-net step %d http %d net %d", int(step), http, netCode);
+    if (m_headless && netCode != 0)
+        qDebug("mm-hub fail step %d net %d ssl %d trust %d",
+               int(step), netCode, reply->property("ssl").toInt(), g_trust.size());
     reply->deleteLater();
 
     if (step == StepFile) {
