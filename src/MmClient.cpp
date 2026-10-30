@@ -26,12 +26,14 @@
 #include <QRegExp>
 #include <QSet>
 #include <QSettings>
+#include <QNetworkProxy>
 #include <QSslCertificate>
 #include <QSslConfiguration>
 #include <QSslError>
 #include <QSslSocket>
 #include <QUrl>
 #include <QtAlgorithms>
+#include <dlfcn.h>
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
@@ -123,6 +125,7 @@ void applyTrust(QNetworkRequest &request)
 {
     QSslConfiguration ssl = QSslConfiguration::defaultConfiguration();
     ssl.setPeerVerifyMode(QSslSocket::VerifyPeer);
+    ssl.setSslOption(QSsl::SslOptionDisableServerNameIndication, false);
     if (!g_trust.isEmpty())
         ssl.setCaCertificates(g_trust);
     request.setSslConfiguration(ssl);
@@ -466,12 +469,24 @@ void MmClient::enterHeadless()
         m_userId = settings.value("userId").toString();
         m_showPreview = settings.value("showPreview", true).toBool();
         m_debugLog = settings.value("debugLog", false).toBool();
+        m_net.setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
         if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
             setLoggedIn(true);
             loadMe();
         }
     }
-    qDebug("mm-hub trust %d", g_trust.size());
+    QSslSocket::supportsSsl();
+    void *sslLib = dlopen("libssl.so.2", RTLD_NOW);
+    typedef const char *(*SslVerFn)(int);
+    SslVerFn sslVerFn = 0;
+    if (sslLib)
+        sslVerFn = (SslVerFn)dlsym(sslLib, "OpenSSL_version");
+    if (sslLib && !sslVerFn)
+        sslVerFn = (SslVerFn)dlsym(sslLib, "SSLeay_version");
+    const char *sslVer = sslVerFn ? sslVerFn(0) : "none";
+    qDebug("mm-hub trust %d ssl %d ciphers %d ver %s", g_trust.size(),
+           QSslSocket::supportsSsl() ? 1 : 0, QSslSocket::supportedCiphers().size(),
+           sslVer);
     qDebug("mm-hub start");
     if (m_token.isEmpty() || m_serverUrl.isEmpty())
         quitIfHeadless();
@@ -1995,9 +2010,22 @@ void MmClient::onFinished(QNetworkReply *reply)
     const QString root = reply->property("root").toString();
     if (m_debugLog)
         qDebug("mm-net step %d http %d net %d", int(step), http, netCode);
-    if (m_headless && netCode != 0)
-        qDebug("mm-hub fail step %d net %d ssl %d trust %d",
-               int(step), netCode, reply->property("ssl").toInt(), g_trust.size());
+    if (m_headless && netCode != 0) {
+        QString why = reply->errorString();
+        why.replace(QRegExp("https?://\\S+"), "");
+        const QByteArray whyBytes = why.left(72).toLatin1();
+        const QSslCertificate peer = reply->sslConfiguration().peerCertificate();
+        void *crypto = dlopen("libcrypto.so", RTLD_NOW);
+        typedef unsigned long (*ErrGetFn)();
+        typedef const char *(*ErrStrFn)(unsigned long);
+        ErrGetFn errGet = crypto ? (ErrGetFn)dlsym(crypto, "ERR_get_error") : 0;
+        ErrStrFn errStr = crypto ? (ErrStrFn)dlsym(crypto, "ERR_reason_error_string") : 0;
+        const unsigned long err = errGet ? errGet() : 0;
+        const char *reason = (err && errStr && errStr(err)) ? errStr(err) : "none";
+        qDebug("mm-hub fail step %d net %d ssl %d trust %d peer %d err %s why %s",
+               int(step), netCode, reply->property("ssl").toInt(), g_trust.size(),
+               peer.isNull() ? 0 : 1, reason, whyBytes.constData());
+    }
     reply->deleteLater();
 
     if (step == StepFile) {
