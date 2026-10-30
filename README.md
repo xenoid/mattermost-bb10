@@ -18,46 +18,46 @@ The interface source strings are English (`qsTr` and `tr`). At startup the app l
 
 ## What is in the client
 
-Three states, from a rooted Classic SQC100-1 on OS 10.3.3:
+Checked on a rooted Classic SQC100-1, OS 10.3.3, unsigned package 1.0.0.60.
 
-| State | Meaning |
+| | |
 | --- | --- |
-| **Phone** | Used on that Classic with the unsigned release package. |
-| **Source** | Implemented in this tree. Not yet shown end to end on the device. |
-| **Absent** | Not part of this client. |
+| 🟢 | Seen on that Classic. |
+| 🟡 | In the program. Not confirmed on the phone yet. |
+| 🔴 | Not in this client. |
 
-| Capability | State |
+| | Capability |
 | --- | --- |
-| Sign in with server, name, and password | Phone |
-| Keep the session across an update | Phone |
-| Ask for an MFA code when the server demands one | Source |
-| Choose a team when the account has more than one | Source |
-| Channel list | Phone |
-| Public, private, and direct channels, with unread and mention marks | Source |
-| Hide the channel subtitle | Source |
-| Open a channel and read posts | Phone |
-| Load older and newer posts | Source |
-| Send a message | Phone |
-| Keep an unsent message until the phone is online again | Source |
-| Search and open the channel at the hit | Source |
-| Threads and replies | Source |
-| Reactions | Source |
-| Bold, italic, code, quote, and links | Source |
-| Emoji panel | Source |
-| Images and other attachments | Source |
-| Upload a file under its original name | Source |
-| A row in the BlackBerry Hub per channel, without the message text | Source |
-| Wake a headless process every six minutes | Phone |
-| Finish that headless sync and exit | Absent on 1.0.0.56. Build 58 moves the heavy startup onto the event loop. The next timer fire is the test. |
-| TLS checked against a current Mozilla CA bundle | Phone, against a normal public certificate |
-| Refuse a certificate that is not in that bundle | Source |
-| Settings for account, channel preview, and a protocol log | Phone |
-| English and German interface | Source |
-| Edit, delete, pins, slash commands | Absent |
-| Calls, screen share, boards, playbooks | Absent |
-| More than one account at a time | Absent |
+| 🟢 | Sign in with server, name, and password |
+| 🟢 | Keep the session across an update |
+| 🟡 | Ask for an MFA code when the server demands one |
+| 🟡 | Choose a team when the account has more than one |
+| 🟢 | Channel list |
+| 🟡 | Public, private, and direct channels, with unread and mention marks |
+| 🟡 | Hide the channel subtitle |
+| 🟢 | Open a channel and read posts |
+| 🟡 | Load older and newer posts |
+| 🟢 | Send a message |
+| 🟡 | Keep an unsent message until the phone is online again |
+| 🟡 | Search and open the channel at the hit |
+| 🟡 | Threads and replies |
+| 🟡 | Reactions |
+| 🟡 | Bold, italic, code, quote, and links |
+| 🟡 | Emoji panel |
+| 🟡 | Images and other attachments |
+| 🟡 | Upload a file under its original name |
+| 🟡 | A row in the BlackBerry Hub per channel, without the message text |
+| 🟢 | Wake a headless process every six minutes |
+| 🟡 | Finish that headless sync and exit |
+| 🟢 | TLS checked against a current Mozilla CA bundle, on a normal public certificate |
+| 🟡 | Refuse a certificate that is not in that bundle |
+| 🟢 | Settings for account, channel preview, and a protocol log |
+| 🟡 | English and German interface |
+| 🔴 | Edit, delete, pins, slash commands |
+| 🔴 | Calls, screen share, boards, playbooks |
+| 🔴 | More than one account at a time |
 
-The headless row is the one that still fails in the way that matters. The timer is registered and the navigator starts `MattermostHub`. On 1.0.0.56 that process never connected to app control and was stopped after six seconds, so the hub did not sync. Build 58 is on the phone to change that. Until a later log shows `mm-hub start` and `mm-hub done`, the hub does not count as done.
+The headless sync is the yellow row that matters. The timer fires and the navigator starts `MattermostHub`. On 1.0.0.56 that process was stopped after six seconds, before it connected. Later builds connect and then leave again before a channel sync finishes. It counts as green only after a log shows `mm-hub start`, a successful request, and `mm-hub done`.
 
 Markdown is drawn with the small HTML subset Cascades accepts: `b`, `i`, `a`, `font color`, `br`. A `font face` makes Cascades drop the whole label, so code is a color, not a monospace face.
 
