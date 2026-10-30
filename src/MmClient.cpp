@@ -20,6 +20,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QLocale>
 #include <QHttpMultiPart>
 #include <QMap>
 #include <QRegExp>
@@ -74,16 +75,16 @@ QString netText(int code)
 {
     switch (code) {
     case QNetworkReply::ConnectionRefusedError:
-        return QString::fromUtf8("Server lehnt die Verbindung ab");
+        return QCoreApplication::translate("MmClient", "Server refused the connection");
     case QNetworkReply::HostNotFoundError:
-        return QString::fromUtf8("Server nicht gefunden");
+        return QCoreApplication::translate("MmClient", "Server not found");
     case QNetworkReply::TimeoutError:
     case QNetworkReply::OperationCanceledError:
-        return QString::fromUtf8("Zeitüberschreitung");
+        return QCoreApplication::translate("MmClient", "Timed out");
     case QNetworkReply::SslHandshakeFailedError:
-        return QString::fromUtf8("Zertifikat nicht vertrauenswürdig");
+        return QCoreApplication::translate("MmClient", "Certificate not trusted");
     default:
-        return QString::fromUtf8("Keine Verbindung");
+        return QCoreApplication::translate("MmClient", "No connection");
     }
 }
 
@@ -232,7 +233,7 @@ QString MmClient::shortWhen(qint64 ms) const
     if (dt.date() == today)
         return dt.toString("HH:mm");
     if (dt.date() == today.addDays(-1))
-        return QString::fromUtf8("Gestern");
+        return tr("Yesterday");
     if (dt.date().year() == today.year())
         return dt.toString("dd.MM.");
     return dt.toString("dd.MM.yy");
@@ -240,30 +241,22 @@ QString MmClient::shortWhen(qint64 ms) const
 
 QString MmClient::dayLabel(const QDate &day) const
 {
-    static const char *days[] = { "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa.", "So." };
-    static const char *months[] = {
-        "Januar", "Februar", "M\xC3\xA4rz", "April", "Mai", "Juni", "Juli",
-        "August", "September", "Oktober", "November", "Dezember"
-    };
     const QDate today = QDate::currentDate();
     if (day == today)
-        return QString::fromUtf8("Heute");
+        return tr("Today");
     if (day == today.addDays(-1))
-        return QString::fromUtf8("Gestern");
-    QString text = QString::fromUtf8(days[day.dayOfWeek() - 1]) + ", "
-        + QString::number(day.day()) + ". " + QString::fromUtf8(months[day.month() - 1]);
-    if (day.year() != today.year())
-        text += " " + QString::number(day.year());
-    return text;
+        return tr("Yesterday");
+    return QLocale::system().toString(day, QLocale::LongFormat);
 }
 
 QString MmClient::sizeText(qint64 bytes) const
 {
     if (bytes < 1024)
         return QString("%1 B").arg(bytes);
+    const QLocale loc = QLocale::system();
     if (bytes < 1024 * 1024)
-        return QString("%1 KB").arg(QString::number(bytes / 1024.0, 'f', 0));
-    return QString("%1 MB").arg(QString::number(bytes / 1048576.0, 'f', 1).replace('.', ','));
+        return QString("%1 KB").arg(loc.toString(bytes / 1024.0, 'f', 0));
+    return QString("%1 MB").arg(loc.toString(bytes / 1048576.0, 'f', 1));
 }
 
 QString MmClient::normalizeUrl(QString url) const
@@ -329,7 +322,7 @@ QString MmClient::channelTitle(const QString &id) const
         if (row.value("channelId").toString() == id)
             return row.value("title").toString();
     }
-    return QString::fromUtf8("Kanal");
+    return tr("Channel");
 }
 
 QString MmClient::personLabel(const QVariantMap &user) const
@@ -344,7 +337,7 @@ QString MmClient::personLabel(const QVariantMap &user) const
     const QString username = user.value("username").toString().trimmed();
     if (!username.isEmpty())
         return repairText(username);
-    return QString("Unbekannt");
+    return tr("Unknown");
 }
 
 QString MmClient::nameOf(const QString &userId) const
@@ -353,7 +346,7 @@ QString MmClient::nameOf(const QString &userId) const
         return m_users.value(userId).label;
     if (userId == m_userId && !m_username.isEmpty())
         return m_username;
-    return QString("Unbekannt");
+    return tr("Unknown");
 }
 
 // ---------------------------------------------------------------- Status
@@ -594,7 +587,7 @@ void MmClient::offerTeams(const QVariantList &teams)
     }
     emit sessionChanged();
     if (m_teamChoices.isEmpty()) {
-        setStatus(QString::fromUtf8("Kein Team auf diesem Konto"));
+        setStatus(tr("No team on this account"));
         quitIfHeadless();
         return;
     }
@@ -614,7 +607,7 @@ void MmClient::offerTeams(const QVariantList &teams)
         applyTeam(savedId, savedName);
         return;
     }
-    setStatus(QString::fromUtf8("Team wählen"));
+    setStatus(tr("Choose a team"));
     emit chooseTeam();
 }
 
@@ -627,11 +620,11 @@ void MmClient::login(const QString &serverUrl, const QString &user, const QStrin
     emit sessionChanged();
 
     if (m_serverUrl.isEmpty() || m_username.isEmpty() || password.isEmpty()) {
-        setStatus(QString::fromUtf8("Server, Name und Passwort fehlen"));
+        setStatus(tr("Server, name, and password are missing"));
         return;
     }
     if (!m_trustReady) {
-        setStatus(QString::fromUtf8("Vertrauensspeicher fehlt"));
+        setStatus(tr("Trust store missing"));
         return;
     }
     m_mfaPassword = password;
@@ -641,7 +634,7 @@ void MmClient::login(const QString &serverUrl, const QString &user, const QStrin
     QByteArray bytes;
     JsonDataAccess json;
     json.saveToBuffer(body, &bytes);
-    setStatus(QString::fromUtf8("Melde an…"));
+    setStatus(tr("Signing in…"));
     start(StepLogin, "/api/v4/users/login", bytes, "POST");
 }
 
@@ -649,11 +642,11 @@ void MmClient::submitMfa(const QString &code)
 {
     const QString token = code.trimmed();
     if (m_mfaPassword.isEmpty() || m_username.isEmpty() || m_serverUrl.isEmpty()) {
-        setStatus(QString::fromUtf8("Anmeldung abgebrochen"));
+        setStatus(tr("Sign-in cancelled"));
         return;
     }
     if (token.isEmpty()) {
-        setStatus(QString::fromUtf8("Code fehlt"));
+        setStatus(tr("Code missing"));
         emit mfaRequired();
         return;
     }
@@ -664,14 +657,14 @@ void MmClient::submitMfa(const QString &code)
     QByteArray bytes;
     JsonDataAccess json;
     json.saveToBuffer(body, &bytes);
-    setStatus(QString::fromUtf8("Melde an…"));
+    setStatus(tr("Signing in…"));
     start(StepLogin, "/api/v4/users/login", bytes, "POST");
 }
 
 void MmClient::cancelMfa()
 {
     m_mfaPassword.clear();
-    setStatus(QString::fromUtf8("Anmeldung abgebrochen"));
+    setStatus(tr("Sign-in cancelled"));
 }
 
 void MmClient::selectTeam(const QString &id)
@@ -807,7 +800,7 @@ void MmClient::search(const QString &terms)
     if (query.isEmpty() || m_teamId.isEmpty())
         return;
     m_searchRows.clear();
-    setStatus(QString::fromUtf8("Suche…"));
+    setStatus(tr("Searching…"));
     QVariantMap body;
     body["terms"] = query;
     body["is_or_search"] = false;
@@ -926,15 +919,15 @@ void MmClient::postInbox(const QString &channelId, const QString &title, int unr
     note.setTitle(title.isEmpty() ? QString("Mattermost") : title);
     QString body;
     if (mentions > 0 && unread > mentions)
-        body = QString::fromUtf8("%1 neue Nachrichten, %2 Erwähnungen").arg(unread).arg(mentions);
+        body = tr("%1 new messages, %2 mentions").arg(unread).arg(mentions);
     else if (mentions > 1)
-        body = QString::fromUtf8("%1 Erwähnungen").arg(mentions);
+        body = tr("%1 mentions").arg(mentions);
     else if (mentions == 1)
-        body = QString::fromUtf8("Erwähnung");
+        body = tr("Mention");
     else if (unread <= 1)
-        body = QString::fromUtf8("Neue Nachricht");
+        body = tr("New message");
     else
-        body = QString::fromUtf8("%1 neue Nachrichten").arg(unread);
+        body = tr("%1 new messages").arg(unread);
     note.setBody(body);
     note.setType(alert ? bb::platform::NotificationType::Default
                        : bb::platform::NotificationType::AllAlertsOff);
@@ -1022,9 +1015,9 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
 {
     QString text;
     if (http < 0)
-        text = QString::fromUtf8("Ungültige Antwort vom Server");
+        text = tr("Invalid response from the server");
     else if (http >= 400)
-        text = QString::fromUtf8("Serverfehler (HTTP %1)").arg(http);
+        text = tr("Server error (HTTP %1)").arg(http);
     else
         text = netText(netCode);
 
@@ -1045,7 +1038,8 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
     case StepThread:
         m_threadBusy = false;
         if (!silent && !m_replyRows.isEmpty()) {
-            setStatus(QString::fromUtf8("Offline. Gespeicherter Thread."));
+            setStatus(tr("Offline. Saved thread."));
+            quitIfHeadless();
             return;
         }
         break;
@@ -1055,14 +1049,16 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
     case StepChannels:
         m_chansBusy = false;
         if (!silent && !m_store.channels().isEmpty()) {
-            setStatus(QString::fromUtf8("Offline. Gespeicherte Kanäle."));
+            setStatus(tr("Offline. Saved channels."));
+            quitIfHeadless();
             return;
         }
         break;
     case StepPosts:
         m_postsBusy = false;
         if (!silent && !m_postRows.isEmpty()) {
-            setStatus(QString::fromUtf8("Offline. Gespeicherte Nachrichten."));
+            setStatus(tr("Offline. Saved messages."));
+            quitIfHeadless();
             return;
         }
         break;
@@ -1076,7 +1072,7 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
 
 void MmClient::loadMe()
 {
-    setStatus(QString::fromUtf8("Lade Konto…"));
+    setStatus(tr("Loading account…"));
     start(StepMe, "/api/v4/users/me");
 }
 
@@ -1108,7 +1104,7 @@ void MmClient::loadChannels(bool silent)
     m_chansBusy = true;
     m_chansSilent = silent;
     if (!silent)
-        setStatus(QString::fromUtf8("Lade Kanäle…"));
+        setStatus(tr("Loading channels…"));
     start(StepChannels, "/api/v4/users/me/teams/" + m_teamId + "/channels",
           QByteArray(), "GET", silent);
 }
@@ -1134,7 +1130,7 @@ void MmClient::loadPosts(bool silent)
         m_rawOrder.clear();
         m_rawPosts.clear();
         setHistory(false, false);
-        setStatus(QString::fromUtf8("Lade Nachrichten…"));
+        setStatus(tr("Loading messages…"));
     }
     QNetworkReply *reply = start(StepPosts,
         QString("/api/v4/channels/%1/posts?per_page=%2").arg(m_channelId).arg(kPerPage),
@@ -1151,7 +1147,7 @@ void MmClient::loadOlder()
     if (oldest.isEmpty())
         return;
     m_postsBusy = true;
-    setStatus(QString::fromUtf8("Lade ältere Nachrichten…"));
+    setStatus(tr("Loading older messages…"));
     QNetworkReply *reply = start(StepPosts,
         QString("/api/v4/channels/%1/posts?per_page=%2&before=%3")
             .arg(m_channelId).arg(kPerPage).arg(oldest),
@@ -1189,7 +1185,7 @@ void MmClient::loadAround(const QString &postId)
     m_idsBefore.clear();
     m_rawOrder.clear();
     m_rawPosts.clear();
-    setStatus(QString::fromUtf8("Lade Nachrichten…"));
+    setStatus(tr("Loading messages…"));
     QNetworkReply *self = start(StepPost, "/api/v4/posts/" + postId, QByteArray(), "GET", true);
     self->setProperty("chan", m_channelId);
     self->setProperty("page", QString("self"));
@@ -1342,7 +1338,7 @@ void MmClient::finishAround()
     if (order.isEmpty()) {
         m_aroundPosts.clear();
         postsIdle();
-        setStatus(QString::fromUtf8("Nachricht nicht geladen"));
+        setStatus(tr("Message not loaded"));
         return;
     }
     m_rawOrder = order;
@@ -1527,7 +1523,7 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["imagePath2"] = QString();
     row["imgW2"] = showW2;
     row["imgH2"] = showH2;
-    row["extraImages"] = images > 2 ? QString::fromUtf8("+%1 weitere Bilder").arg(images - 2) : QString();
+    row["extraImages"] = images > 2 ? tr("+%1 more images").arg(images - 2) : QString();
     row["attachId"] = attachId;
     row["attachName"] = attachName;
     row["attachMime"] = attachMime;
@@ -1558,9 +1554,9 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
             snippet = snippet.left(70) + QString::fromUtf8("…");
         row["quoteBody"] = snippet;
     } else if (!inThread && rootId.isEmpty() && replyCount == 1) {
-        row["threadMark"] = QString("1 Antwort");
+        row["threadMark"] = tr("1 reply");
     } else if (!inThread && rootId.isEmpty() && replyCount > 1) {
-        row["threadMark"] = QString("%1 Antworten").arg(replyCount);
+        row["threadMark"] = tr("%1 replies").arg(replyCount);
     }
     return row;
 }
@@ -1572,7 +1568,7 @@ void MmClient::decorate(QVariantMap &row) const
         return;
     const bool mine = row.value("mine").toBool();
     const QString label = nameOf(uid);
-    row["title"] = mine ? QString("Du") : label;
+    row["title"] = mine ? tr("You") : label;
     row["initial"] = label.left(1).toUpper();
     row["avatar"] = ImageStore::avatarUrl(uid);
     row["disc"] = ImageStore::disc(ImageStore::colorFor(uid));
@@ -1582,10 +1578,10 @@ void MmClient::decorate(QVariantMap &row) const
         const QString to = row.value("replyTo").toString();
         QString who;
         if (!to.isEmpty())
-            who = (to == m_userId) ? QString("dich") : nameOf(to);
-        QString quote = QString::fromUtf8("Antwort");
-        if (!who.isEmpty() && who != "Unbekannt")
-            quote += " an " + who;
+            who = (to == m_userId) ? tr("you") : nameOf(to);
+        QString quote = tr("Reply");
+        if (!who.isEmpty() && who != tr("Unknown"))
+            quote = tr("Reply to %1").arg(who);
         if (!body.isEmpty())
             quote += ": " + body;
         row["quote"] = quote;
@@ -1730,10 +1726,10 @@ void MmClient::finishFile(int kind, const QString &id, const QString &name, cons
         queueJob(retry, true);
     } else if (kind == FileFull && id == m_pendingFull) {
         m_pendingFull.clear();
-        setStatus(QString::fromUtf8("Bild konnte nicht geladen werden"));
+        setStatus(tr("Image could not be loaded"));
     } else if (kind == FileAttach && id == m_pendingAttach) {
         m_pendingAttach.clear();
-        setStatus(QString::fromUtf8("Anhang konnte nicht geladen werden"));
+        setStatus(tr("Attachment could not be loaded"));
     }
     Q_UNUSED(name);
     pumpFiles();
@@ -1787,7 +1783,7 @@ void MmClient::openImage(const QString &fileId)
         return;
     }
     m_pendingFull = fileId;
-    setStatus(QString::fromUtf8("Lade Bild…"));
+    setStatus(tr("Loading image…"));
     FileJob job;
     job.kind = FileFull;
     job.id = fileId;
@@ -1806,7 +1802,7 @@ void MmClient::openAttachment(const QString &fileId, const QString &name, const 
         return;
     }
     m_pendingAttach = fileId;
-    setStatus(QString::fromUtf8("Lade Anhang…"));
+    setStatus(tr("Loading attachment…"));
     FileJob job;
     job.kind = FileAttach;
     job.id = fileId;
@@ -1842,7 +1838,7 @@ void MmClient::finishChannels()
 
         if (kind == "D") {
             const QString who = peer.isEmpty() ? m_userId : peer;
-            QString title = peer.isEmpty() ? QString::fromUtf8("Notiz an mich") : nameOf(peer);
+            QString title = peer.isEmpty() ? tr("Note to self") : nameOf(peer);
             row["title"] = title;
             row["subtitle"] = (m_users.contains(who) && !m_users.value(who).username.isEmpty())
                 ? "@" + m_users.value(who).username : QString();
@@ -1873,7 +1869,7 @@ void MmClient::finishChannels()
     if (!channels.isEmpty()) {
         QVariantMap header;
         header["type"] = QString("header");
-        header["title"] = QString::fromUtf8("KANÄLE");
+        header["title"] = tr("CHANNELS");
         view.append(header);
         for (int i = 0; i < channels.size(); ++i)
             view.append(channels.at(i));
@@ -1881,7 +1877,7 @@ void MmClient::finishChannels()
     if (!directs.isEmpty()) {
         QVariantMap header;
         header["type"] = QString("header");
-        header["title"] = QString("DIREKT");
+        header["title"] = tr("DIRECT");
         view.append(header);
         for (int i = 0; i < directs.size(); ++i)
             view.append(directs.at(i));
@@ -1981,16 +1977,16 @@ void MmClient::onFinished(QNetworkReply *reply)
             const bool needCode = body.contains("mfa");
             const bool badCode = body.contains("invalid_credentials_mfa") || body.contains("bad_code");
             if (needCode && !m_mfaPassword.isEmpty()) {
-                setStatus(badCode ? QString::fromUtf8("Code stimmt nicht")
-                                  : QString::fromUtf8("Einmalcode nötig"));
+                setStatus(badCode ? tr("Code is wrong")
+                                  : tr("One-time code required"));
                 emit mfaRequired();
                 return;
             }
             m_mfaPassword.clear();
-            setStatus(QString::fromUtf8("Name oder Passwort stimmt nicht"));
+            setStatus(tr("Name or password is wrong"));
         } else {
             logout();
-            setStatus(QString::fromUtf8("Sitzung abgelaufen. Bitte neu anmelden."));
+            setStatus(tr("Session expired. Please sign in again."));
         }
         return;
     }
@@ -2037,7 +2033,7 @@ void MmClient::onFinished(QNetworkReply *reply)
 
     if (step == StepLogin) {
         if (tokenHeader.isEmpty()) {
-            setStatus(QString::fromUtf8("Kein Token in der Antwort"));
+            setStatus(tr("No token in the response"));
             return;
         }
         m_mfaPassword.clear();
@@ -2079,7 +2075,7 @@ void MmClient::onFinished(QNetworkReply *reply)
     if (step == StepTeams) {
         const QVariantList teams = parsed.toList();
         if (teams.isEmpty()) {
-            setStatus(QString::fromUtf8("Kein Team auf diesem Konto"));
+            setStatus(tr("No team on this account"));
             quitIfHeadless();
             return;
         }
@@ -2109,7 +2105,7 @@ void MmClient::onFinished(QNetworkReply *reply)
             } else if (title.isEmpty()) {
                 title = channel.value("name").toString();
                 if (title.contains("__"))
-                    title = QString("Unterhaltung");
+                    title = tr("Conversation");
             }
             QString subtitle = channel.value("purpose").toString().simplified();
             if (subtitle.isEmpty())
@@ -2422,7 +2418,7 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["mine"] = true;
     row["plain"] = item.message;
     row["message"] = Markdown::html(Emoji::apply(item.message));
-    row["whenTime"] = QString::fromUtf8("Senden…");
+    row["whenTime"] = tr("Sending…");
     row["whenFull"] = row["whenTime"];
     row["createAt"] = QDateTime::currentMSecsSinceEpoch();
     row["title"] = QString("Du");
@@ -2468,7 +2464,7 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
         const bool image = ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "webp";
         row["attachName"] = item.fileName.isEmpty()
             ? QFileInfo(item.filePath).fileName() : item.fileName;
-        row["attachInfo"] = QString::fromUtf8("Wird gesendet");
+        row["attachInfo"] = tr("Sending");
         if (image) {
             row["imageId"] = QString("local");
             row["imagePath"] = ImageStore::fileUrl(item.filePath);
@@ -2572,7 +2568,7 @@ bool MmClient::attachFile(const QString &path, const QString &message, const QSt
     if (dest.isEmpty() || !QFileInfo(dest).isFile()) {
         if (!text.isEmpty())
             emit sendFailed(text);
-        setStatus(QString::fromUtf8("Datei nicht lesbar"));
+        setStatus(tr("File is not readable"));
         return false;
     }
     QString name = displayName.trimmed();
@@ -2586,7 +2582,7 @@ QString MmClient::stageFile(const QString &path)
 {
     const QString dest = copyIntoCache(path);
     if (dest.isEmpty())
-        setStatus(QString::fromUtf8("Datei nicht lesbar"));
+        setStatus(tr("File is not readable"));
     return dest;
 }
 
@@ -2744,7 +2740,7 @@ void MmClient::outgoingDone(const QString &localId, bool ok, bool network, const
         return;
     }
     if (network) {
-        setStatus(QString::fromUtf8("Keine Verbindung. Wird gesendet, sobald du online bist."));
+        setStatus(tr("No connection. It will be sent when you are online."));
         if (!m_channelId.isEmpty())
             publishPosts();
         if (!m_threadRoot.isEmpty())
@@ -2754,7 +2750,7 @@ void MmClient::outgoingDone(const QString &localId, bool ok, bool network, const
     m_store.remove(localId);
     if (!message.isEmpty())
         emit sendFailed(message);
-    setStatus(QString::fromUtf8("Nicht gesendet"));
+    setStatus(tr("Not sent"));
     if (!m_channelId.isEmpty())
         publishPosts();
     if (!m_threadRoot.isEmpty())
@@ -2792,7 +2788,7 @@ void MmClient::loadThread(bool silent)
     }
     m_threadBusy = true;
     if (!silent)
-        setStatus(QString::fromUtf8("Lade Thread…"));
+        setStatus(tr("Loading thread…"));
     QNetworkReply *reply = start(StepThread, "/api/v4/posts/" + m_threadRoot + "/thread",
                                  QByteArray(), "GET", silent);
     reply->setProperty("root", m_threadRoot);

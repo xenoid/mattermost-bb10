@@ -2,19 +2,19 @@
 
 A Mattermost client for BlackBerry 10. It is built for the Classic, the square 720 screen, and a world in which BlackBerry no longer signs applications.
 
-On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source. Version in the tree: **1.0.0**, build **58**.
+On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source. Version in the tree: **1.0.0**, build **60**.
 
 <p>
 <img src="icon.png" width="96" alt="App icon">
 </p>
 
-The client talks to any Mattermost server you can reach over HTTPS, with the API v4. Posts, names, and emoji are UTF-8, in whatever language the team writes. The buttons and dialogs on the phone are German.
+The client talks to any Mattermost server you can reach over HTTPS, with the API v4. Posts, names, and emoji are UTF-8, in whatever language the team writes. The buttons and dialogs follow the phone language: German and English ship with the app.
 
 ## Languages
 
-The server content is shown as stored. A German team, an English team, and a mixed team all come through the same client. Emoji are drawn from the color font on the device, without flags, skin tones, or ZWJ sequences.
+Server text is shown as stored. A German team, an English team, and a mixed team all come through the same client. Dates and file sizes use the phone locale. Emoji are drawn from the color font on the device, without flags, skin tones, or ZWJ sequences.
 
-The interface language is German. At startup the app reads the phone locale and, if a file `app/native/qm/Mattermost_<locale>.qm` is present, installs that catalog. No catalog is shipped, and the strings in QML and C++ are written out in German rather than marked for translation. A second language is a catalog plus `qsTr`, not a switch that already exists.
+The interface source strings are English (`qsTr` and `tr`). At startup the app loads `app/native/qm/Mattermost_<language>.qm`. A phone set to German (`de`, `de_DE`, `de_AT`, …) gets `Mattermost_de`. Every other language gets `Mattermost_en` until a catalog for that language exists. Both catalogs are in this tree, finished, and packed into the BAR.
 
 ## What is in the client
 
@@ -52,7 +52,7 @@ Three states, from a rooted Classic SQC100-1 on OS 10.3.3:
 | TLS checked against a current Mozilla CA bundle | Phone, against a normal public certificate |
 | Refuse a certificate that is not in that bundle | Source |
 | Settings for account, channel preview, and a protocol log | Phone |
-| Another interface language | Absent |
+| English and German interface | Source |
 | Edit, delete, pins, slash commands | Absent |
 | Calls, screen share, boards, playbooks | Absent |
 | More than one account at a time | Absent |
@@ -87,7 +87,15 @@ The Classic is 720 by 720 at 294 dpi. The accent is `#1c58d9`, pressed `#1544a8`
 
 ## Contributing
 
-Translations start by marking the German strings and adding a catalog. The loader is already in `src/main.cpp`.
+Another interface language is a catalog. Copy the English file, translate it, and send it:
+
+```sh
+lupdate -codecfortr UTF-8 src/*.cpp src/*.hpp assets/*.qml -ts translations/Mattermost_fr.ts
+# translate translations/Mattermost_fr.ts
+lrelease translations/Mattermost_fr.ts
+```
+
+Add `<asset path="translations">qm</asset>` already covers every `Mattermost_*.qm` in that folder. The loader uses the language code in the phone locale (`fr` from `fr_FR`). English stays the fallback.
 
 Keep the diff small, and keep secrets out of commits. A token from a test server does not belong in an issue.
 
@@ -97,4 +105,6 @@ No license file yet. Until there is one, the usual open-source grants are not in
 
 ## Support
 
-The app is free. There is no public donation page yet, so this file does not point at a guessed PayPal, Ko-fi, or GitHub Sponsors account. When a real link exists, it replaces this paragraph.
+The app is free. If it keeps a Classic in use, a tip helps:
+
+[PayPal — paypal.me/lhollweck](https://www.paypal.com/paypalme/lhollweck)

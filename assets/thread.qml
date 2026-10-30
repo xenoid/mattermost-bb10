@@ -27,7 +27,7 @@ Page {
     // Falls die Plattform den Zurück-Pfad trotzdem auslöst: erst die Tafel, dann die Seite.
     paneProperties: NavigationPaneProperties {
         backButton: ActionItem {
-            title: "Zurück"
+            title: qsTr("Back")
             onTriggered: goBack()
         }
     }
@@ -52,7 +52,7 @@ Page {
 
         Label {
             visible: rootId == "" && _mm.hasOlder
-            text: "Ältere Nachrichten"
+            text: qsTr("Older messages")
             horizontalAlignment: HorizontalAlignment.Center
             topMargin: 8
             bottomMargin: 4
@@ -66,7 +66,7 @@ Page {
         }
         Label {
             visible: rootId == "" && _mm.hasNewer
-            text: "Neuere Nachrichten"
+            text: qsTr("Newer messages")
             horizontalAlignment: HorizontalAlignment.Center
             topMargin: 4
             bottomMargin: 4
@@ -145,39 +145,39 @@ Page {
                         dividerVisible: false
                         contextActions: [
                             ActionSet {
-                                title: "Nachricht"
+                                title: qsTr("Message")
                                 ActionItem {
-                                    title: "Antworten"
+                                    title: qsTr("Reply")
                                     enabled: ListItemData.inThread != "1" && ListItemData.pending != "1"
                                     onTriggered: _mm.askReplies(ListItemData.threadRoot)
                                 }
                                 ActionItem {
-                                    title: "Reagieren"
+                                    title: qsTr("React")
                                     enabled: ListItemData.pending != "1"
                                     onTriggered: _mm.askReact(ListItemData.id)
                                 }
                                 ActionItem {
-                                    title: "Bild öffnen"
+                                    title: qsTr("Open image")
                                     enabled: ListItemData.imageId != "" && ListItemData.imageId != "local"
                                     onTriggered: _mm.openImage(ListItemData.imageId)
                                 }
                                 ActionItem {
-                                    title: "Bild 2"
+                                    title: qsTr("Image 2")
                                     enabled: ListItemData.imageId2 != ""
                                     onTriggered: _mm.openImage(ListItemData.imageId2)
                                 }
                                 ActionItem {
-                                    title: "Anhang öffnen"
+                                    title: qsTr("Open attachment")
                                     enabled: ListItemData.attachId != "" && ListItemData.attachId != "local"
                                     onTriggered: _mm.openAttachment(ListItemData.attachId, ListItemData.attachName, ListItemData.attachMime)
                                 }
                                 ActionItem {
-                                    title: "Anhang 2"
+                                    title: qsTr("Attachment 2")
                                     enabled: ListItemData.attachId2 != ""
                                     onTriggered: _mm.openAttachment(ListItemData.attachId2, ListItemData.attachName2, ListItemData.attachMime2)
                                 }
                                 ActionItem {
-                                    title: "Link öffnen"
+                                    title: qsTr("Open link")
                                     enabled: ListItemData.link != ""
                                     onTriggered: _mm.openLink(ListItemData.link)
                                 }
@@ -293,7 +293,7 @@ Page {
                                     }
                                     Label {
                                         visible: ListItemData.imagePath == ""
-                                        text: "Bild lädt"
+                                        text: qsTr("Image loading")
                                         textFormat: TextFormat.Plain
                                         horizontalAlignment: HorizontalAlignment.Center
                                         verticalAlignment: VerticalAlignment.Center
@@ -423,7 +423,7 @@ Page {
             }
             TextField {
                 id: emojiSearch
-                hintText: "Emoji suchen"
+                hintText: qsTr("Search emoji")
                 leftMargin: 12
                 rightMargin: 12
                 topMargin: 8
@@ -512,7 +512,7 @@ Page {
                     }
                 }
                 Label {
-                    text: "Entfernen"
+                    text: qsTr("Remove")
                     verticalAlignment: VerticalAlignment.Center
                     leftMargin: 12
                     textStyle.color: Color.create("#1c58d9")
@@ -549,7 +549,7 @@ Page {
                 }
                 TextField {
                     id: composer
-                    hintText: rootId == "" ? "Nachricht schreiben" : "Antwort schreiben"
+                    hintText: rootId == "" ? qsTr("Write a message") : qsTr("Write a reply")
                     verticalAlignment: VerticalAlignment.Center
                     input.submitKey: SubmitKey.Send
                     layoutProperties: StackLayoutProperties {

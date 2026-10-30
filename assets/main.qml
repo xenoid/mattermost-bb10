@@ -26,7 +26,7 @@ NavigationPane {
         },
         SystemListDialog {
             id: reactDialog
-            title: "Reagieren"
+            title: qsTr("React")
             dismissOnSelection: true
             onFinished: {
                 if (value == SystemUiResult.ItemSelection && selectedIndices.length > 0)
@@ -35,7 +35,7 @@ NavigationPane {
         },
         SystemListDialog {
             id: teamDialog
-            title: "Team"
+            title: qsTr("Team")
             dismissOnSelection: true
             onFinished: {
                 if (value == SystemUiResult.ItemSelection && selectedIndices.length > 0)
@@ -44,10 +44,10 @@ NavigationPane {
         },
         SystemPrompt {
             id: mfaPrompt
-            title: "Einmalcode"
-            body: "Code aus der Authenticator-App"
-            confirmButton.label: "Anmelden"
-            cancelButton.label: "Abbrechen"
+            title: qsTr("One-time code")
+            body: qsTr("Code from the authenticator app")
+            confirmButton.label: qsTr("Sign in")
+            cancelButton.label: qsTr("Cancel")
             onFinished: {
                 if (value == SystemUiResult.ConfirmButtonSelection)
                     _mm.submitMfa(inputFieldTextEntry())
@@ -127,7 +127,7 @@ NavigationPane {
         actionBarVisibility: ChromeVisibility.Hidden
 
         titleBar: TitleBar {
-            title: !_mm.loggedIn ? "Mattermost" : (_mm.teamName == "" ? "Mattermost" : _mm.teamName)
+            title: !_mm.loggedIn ? qsTr("Mattermost") : (_mm.teamName == "" ? qsTr("Mattermost") : _mm.teamName)
         }
 
         Container {
@@ -167,13 +167,13 @@ NavigationPane {
                     Container {
                         verticalAlignment: VerticalAlignment.Center
                         Label {
-                            text: "Mattermost"
+                            text: qsTr("Mattermost")
                             textStyle.color: Color.create("#1544a8")
                             textStyle.fontSize: FontSize.XLarge
                             textStyle.fontWeight: FontWeight.Bold
                         }
                         Label {
-                            text: "Anmeldung am Server"
+                            text: qsTr("Sign in to a server")
                             textStyle.color: Color.create("#6b747d")
                             textStyle.fontSize: FontSize.Small
                         }
@@ -181,28 +181,28 @@ NavigationPane {
                 }
                 TextField {
                     id: serverField
-                    hintText: "Server, z. B. https://chat.example.de"
+                    hintText: qsTr("Server, for example https://chat.example.com")
                     text: _mm.serverUrl
                     inputMode: TextFieldInputMode.Url
                     input.submitKey: SubmitKey.Next
                 }
                 TextField {
                     id: userField
-                    hintText: "Name oder E-Mail"
+                    hintText: qsTr("Name or email")
                     text: _mm.username
                     topMargin: 6
                     input.submitKey: SubmitKey.Next
                 }
                 TextField {
                     id: passField
-                    hintText: "Passwort"
+                    hintText: qsTr("Password")
                     inputMode: TextFieldInputMode.Password
                     topMargin: 6
                     input.submitKey: SubmitKey.Go
                     input.onSubmitted: _mm.login(serverField.text, userField.text, passField.text)
                 }
                 Button {
-                    text: "Anmelden"
+                    text: qsTr("Sign in")
                     color: Color.create("#1c58d9")
                     horizontalAlignment: HorizontalAlignment.Fill
                     topMargin: 20
@@ -245,7 +245,7 @@ NavigationPane {
                         }
                         TextField {
                             id: searchField
-                            hintText: "Nachrichten suchen"
+                            hintText: qsTr("Search messages")
                             backgroundVisible: false
                             input.submitKey: SubmitKey.Search
                             verticalAlignment: VerticalAlignment.Center
@@ -508,8 +508,8 @@ NavigationPane {
         if (_mm.loggedIn) {
             data.push({
                 type: "settings",
-                title: "Einstellungen",
-                subtitle: "Konto, Anzeige, Diagnose",
+                title: qsTr("Settings"),
+                subtitle: qsTr("Account, display, diagnostics"),
                 channelId: "",
                 when: "",
                 unread: 0,

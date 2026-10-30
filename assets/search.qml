@@ -5,7 +5,7 @@ Page {
     property bool empty: false
 
     titleBar: TitleBar {
-        title: "Suche"
+        title: qsTr("Search")
     }
 
     actionBarVisibility: ChromeVisibility.Compact
@@ -19,7 +19,7 @@ Page {
 
         Label {
             visible: empty
-            text: "Keine Treffer"
+            text: qsTr("No results")
             horizontalAlignment: HorizontalAlignment.Center
             verticalAlignment: VerticalAlignment.Center
             textStyle.color: Color.create("#8a929a")

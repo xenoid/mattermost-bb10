@@ -7,7 +7,7 @@ Page {
     property variant navPane: null
 
     titleBar: TitleBar {
-        title: "Einstellungen"
+        title: qsTr("Settings")
     }
 
     actionBarVisibility: ChromeVisibility.Default
@@ -29,7 +29,7 @@ Page {
                 layout: DockLayout {
                 }
                 Label {
-                    text: "KONTO"
+                    text: qsTr("ACCOUNT")
                     verticalAlignment: VerticalAlignment.Center
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create("#6b747d")
@@ -46,7 +46,7 @@ Page {
                 layout: DockLayout {
                 }
                 Label {
-                    text: "Aktualisieren"
+                    text: qsTr("Refresh")
                     verticalAlignment: VerticalAlignment.Center
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create("#1c58d9")
@@ -68,7 +68,7 @@ Page {
                     orientation: LayoutOrientation.LeftToRight
                 }
                 Label {
-                    text: "Team wechseln"
+                    text: qsTr("Switch team")
                     verticalAlignment: VerticalAlignment.Center
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create("#1b1f23")
@@ -101,7 +101,7 @@ Page {
                 layout: DockLayout {
                 }
                 Label {
-                    text: "Abmelden"
+                    text: qsTr("Log out")
                     verticalAlignment: VerticalAlignment.Center
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create("#d6322e")
@@ -122,7 +122,7 @@ Page {
                 layout: DockLayout {
                 }
                 Label {
-                    text: "ANZEIGE"
+                    text: qsTr("DISPLAY")
                     verticalAlignment: VerticalAlignment.Center
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create("#6b747d")
@@ -145,13 +145,13 @@ Page {
                         spaceQuota: 1
                     }
                     Label {
-                        text: "Kanalvorschau"
+                        text: qsTr("Channel preview")
                         textFormat: TextFormat.Plain
                         textStyle.color: Color.create("#1b1f23")
                         textStyle.fontSize: FontSize.Medium
                     }
                     Label {
-                        text: "Zweck oder Thema unter dem Namen"
+                        text: qsTr("Purpose or topic under the name")
                         textFormat: TextFormat.Plain
                         textStyle.color: Color.create("#6b747d")
                         textStyle.fontSize: FontSize.XSmall
@@ -175,7 +175,7 @@ Page {
                 layout: DockLayout {
                 }
                 Label {
-                    text: "DIAGNOSE"
+                    text: qsTr("DIAGNOSTICS")
                     verticalAlignment: VerticalAlignment.Center
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create("#6b747d")
@@ -198,13 +198,13 @@ Page {
                         spaceQuota: 1
                     }
                     Label {
-                        text: "Protokoll"
+                        text: qsTr("Protocol log")
                         textFormat: TextFormat.Plain
                         textStyle.color: Color.create("#1b1f23")
                         textStyle.fontSize: FontSize.Medium
                     }
                     Label {
-                        text: "Schritt und HTTP-Status ins Systemlog"
+                        text: qsTr("Step and HTTP status in the system log")
                         textFormat: TextFormat.Plain
                         textStyle.color: Color.create("#6b747d")
                         textStyle.fontSize: FontSize.XSmall
@@ -227,7 +227,7 @@ Page {
                 topPadding: 8
                 bottomPadding: 28
                 Label {
-                    text: "Version " + _mm.appVersion
+                    text: qsTr("Version %1").arg(_mm.appVersion)
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create("#1b1f23")
                     textStyle.fontSize: FontSize.Small
@@ -246,19 +246,19 @@ Page {
                     textStyle.fontSize: FontSize.XSmall
                 }
                 Label {
-                    text: _mm.teamName == "" ? "kein Team" : _mm.teamName
+                    text: _mm.teamName == "" ? qsTr("No team") : _mm.teamName
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create("#6b747d")
                     textStyle.fontSize: FontSize.XSmall
                 }
                 Label {
-                    text: _mm.trustReady ? "Vertrauensspeicher bereit" : "Vertrauensspeicher fehlt"
+                    text: _mm.trustReady ? qsTr("Trust store ready") : qsTr("Trust store missing")
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create(_mm.trustReady ? "#6b747d" : "#d6322e")
                     textStyle.fontSize: FontSize.XSmall
                 }
                 Label {
-                    text: _mm.status == "" ? "Status ruhig" : _mm.status
+                    text: _mm.status == "" ? qsTr("Status idle") : _mm.status
                     textFormat: TextFormat.Plain
                     textStyle.color: Color.create("#6b747d")
                     textStyle.fontSize: FontSize.XSmall

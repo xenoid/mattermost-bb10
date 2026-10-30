@@ -13,5 +13,9 @@ hub.commands = $(LINK) -lang-c++ -Wl,-rpath-link,$(QNX_TARGET)/armle-v7/usr/lib/
 QMAKE_EXTRA_TARGETS += hub
 POST_TARGETDEPS += o.le-v7/MattermostHub
 
+CODECFORTR = UTF-8
+TRANSLATIONS += translations/Mattermost_de.ts \
+    translations/Mattermost_en.ts
+
 include(config.pri)
 INCLUDEPATH += $$[QT_INSTALL_HEADERS]/QtGui

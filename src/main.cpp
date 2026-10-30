@@ -18,7 +18,9 @@
 #include <QTimer>
 #include <QtDeclarative/qdeclarative.h>
 #include <QDeclarativeError>
+#include <QCoreApplication>
 #include <QLocale>
+#include <QStringList>
 #include <QTextCodec>
 #include <QTranslator>
 
@@ -90,8 +92,28 @@ Q_DECL_EXPORT int main(int argc, char **argv)
 
     QTranslator translator;
     const QString locale = QLocale().name();
-    if (translator.load("Mattermost_" + locale, "app/native/qm"))
-        app.installTranslator(&translator);
+    QString lang = locale;
+    const int underscore = locale.indexOf(QLatin1Char('_'));
+    if (underscore > 0)
+        lang = locale.left(underscore);
+    const QStringList catalogs = QStringList()
+        << ("Mattermost_" + locale)
+        << ("Mattermost_" + lang)
+        << QLatin1String("Mattermost_en");
+    const QStringList dirs = QStringList()
+        << QLatin1String("app/native/qm")
+        << (QCoreApplication::applicationDirPath() + "/qm")
+        << QLatin1String("qm");
+    bool catalogLoaded = false;
+    for (int c = 0; c < catalogs.size() && !catalogLoaded; ++c) {
+        for (int d = 0; d < dirs.size(); ++d) {
+            if (translator.load(catalogs.at(c), dirs.at(d))) {
+                app.installTranslator(&translator);
+                catalogLoaded = true;
+                break;
+            }
+        }
+    }
 
     qmlRegisterType<QTimer>("bb", 1, 0, "QTimer");
 
@@ -119,7 +141,8 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         if (root) {
             Application::instance()->setScene(root);
         } else {
-            QString text("Oberfl\xC3\xA4che konnte nicht erzeugt werden\n");
+            QString text = QCoreApplication::translate(
+                "main", "Could not create the interface") + "\n";
             const QList<QDeclarativeError> errors = qml->errors();
             for (int i = 0; i < errors.size(); ++i)
                 text += errors.at(i).toString() + "\n";

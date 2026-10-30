@@ -11,7 +11,7 @@ Page {
     property string replyRoot: ""
 
     titleBar: TitleBar {
-        title: "Senden"
+        title: qsTr("Send")
     }
 
     actionBarVisibility: ChromeVisibility.Default
@@ -21,14 +21,14 @@ Page {
             id: picturePicker
             type: FileType.Picture
             mode: FilePickerMode.Picker
-            title: "Bild"
+            title: qsTr("Image")
             onFileSelected: chosen(selectedFiles)
         },
         FilePicker {
             id: docPicker
             type: FileType.Document
             mode: FilePickerMode.Picker
-            title: "Datei"
+            title: qsTr("File")
             onFileSelected: chosen(selectedFiles)
         }
     ]
@@ -58,7 +58,7 @@ Page {
                 leftMargin: 32
             }
             Label {
-                text: "Bild"
+                text: qsTr("Image")
                 verticalAlignment: VerticalAlignment.Center
                 leftMargin: 32
                 textStyle.fontSize: FontSize.Large
@@ -91,7 +91,7 @@ Page {
                 leftMargin: 32
             }
             Label {
-                text: "Datei"
+                text: qsTr("File")
                 verticalAlignment: VerticalAlignment.Center
                 leftMargin: 32
                 textStyle.fontSize: FontSize.Large

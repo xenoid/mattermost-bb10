@@ -3,7 +3,7 @@
     <id>com.hollweck.mattermost</id>
     <name>Mattermost</name>
     <versionNumber>1.0.0</versionNumber>
-    <buildId>58</buildId>
+    <buildId>60</buildId>
     <description>Mattermost client for BlackBerry 10.</description>
     <author>hollweck</author>
     <initialWindow>
@@ -17,6 +17,7 @@
     <permission>access_shared</permission>
     <permission>post_notification</permission>
     <permission system="true">_sys_run_headless</permission>
+    <permission system="true">_sys_headless_nostop</permission>
     <invoke-target id="com.hollweck.mattermost.open">
         <entry-point-id>Mattermost</entry-point-id>
         <type>application</type>
@@ -47,6 +48,7 @@
         <asset entryPointId="MattermostHub" path="o.le-v7/MattermostHub" type="Qnx/Elf">MattermostHub</asset>
     </configuration>
     <asset path="assets">assets</asset>
+    <asset path="translations">qm</asset>
     <asset path="icon.png">icon.png</asset>
     <icon>
         <image>icon.png</image>

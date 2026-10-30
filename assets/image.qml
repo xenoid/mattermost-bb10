@@ -6,7 +6,7 @@ Page {
     property string imagePath
 
     titleBar: TitleBar {
-        title: "Bild"
+        title: qsTr("Image")
     }
 
     actionBarVisibility: ChromeVisibility.Compact
