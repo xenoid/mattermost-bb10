@@ -16,48 +16,51 @@ Server text is shown as stored. A German team, an English team, and a mixed team
 
 The interface source strings are English (`qsTr` and `tr`). At startup the app loads `app/native/qm/Mattermost_<language>.qm`. A phone set to German (`de`, `de_DE`, `de_AT`, …) gets `Mattermost_de`. Every other language gets `Mattermost_en` until a catalog for that language exists. Both catalogs are in this tree, finished, and packed into the BAR.
 
-## What is in the client
+## Toward the Android app
 
-Checked on a rooted Classic SQC100-1, OS 10.3.3, unsigned package 1.0.0.60.
+This list is the Mattermost Android client, scored by what this program already does. 15 rows are done, 6 are only part way, 12 are still missing.
 
 | | |
 | --- | --- |
-| 🟢 | Seen on that Classic. |
-| 🟡 | In the program. Not confirmed on the phone yet. |
-| 🔴 | Not in this client. |
+| 🟢 | Done. Same job as on Android. |
+| 🟡 | Started. Android does more, or this part does not finish. |
+| 🔴 | Not built. |
 
-| | Capability |
+| | |
 | --- | --- |
 | 🟢 | Sign in with server, name, and password |
-| 🟢 | Keep the session across an update |
-| 🟡 | Ask for an MFA code when the server demands one |
-| 🟡 | Choose a team when the account has more than one |
-| 🟢 | Channel list |
-| 🟡 | Public, private, and direct channels, with unread and mention marks |
-| 🟡 | Hide the channel subtitle |
-| 🟢 | Open a channel and read posts |
-| 🟡 | Load older and newer posts |
+| 🟢 | Keep the session |
+| 🟢 | Ask for an MFA code |
+| 🟢 | Pick a team |
+| 🟢 | Channel list: public, private, direct, unread, mentions |
+| 🟢 | Hide the channel subtitle |
+| 🟢 | Read posts, including older and newer pages |
 | 🟢 | Send a message |
-| 🟡 | Keep an unsent message until the phone is online again |
-| 🟡 | Search and open the channel at the hit |
-| 🟡 | Threads and replies |
-| 🟡 | Reactions |
-| 🟡 | Bold, italic, code, quote, and links |
-| 🟡 | Emoji panel |
-| 🟡 | Images and other attachments |
-| 🟡 | Upload a file under its original name |
-| 🟡 | A row in the BlackBerry Hub per channel, without the message text |
-| 🟢 | Wake a headless process every six minutes |
-| 🟡 | Finish that headless sync and exit |
-| 🟢 | TLS checked against a current Mozilla CA bundle, on a normal public certificate |
-| 🟡 | Refuse a certificate that is not in that bundle |
-| 🟢 | Settings for account, channel preview, and a protocol log |
-| 🟡 | English and German interface |
-| 🔴 | Edit, delete, pins, slash commands |
-| 🔴 | Calls, screen share, boards, playbooks |
-| 🔴 | More than one account at a time |
-
-The headless sync is the yellow row that matters. The timer fires and the navigator starts `MattermostHub`. On 1.0.0.56 that process was stopped after six seconds, before it connected. Later builds connect and then leave again before a channel sync finishes. It counts as green only after a log shows `mm-hub start`, a successful request, and `mm-hub done`.
+| 🟢 | Send later when the phone is offline |
+| 🟢 | Search and open the hit |
+| 🟢 | Threads and replies |
+| 🟢 | Reactions |
+| 🟢 | Open images and other files |
+| 🟢 | Upload a file under its original name |
+| 🟢 | Check the server certificate against a current CA bundle |
+| 🟡 | Markdown: bold, italic, code, quote, link |
+| 🟡 | Emoji panel, without custom emoji, flags, or skin tones |
+| 🟡 | A Hub row per channel, with a count, not the message text |
+| 🟡 | Background refresh every six minutes. The run does not finish a channel sync yet |
+| 🟡 | Settings: refresh, switch team, log out, preview, protocol log |
+| 🟡 | English and German. Further languages are a catalog |
+| 🔴 | Edit and delete a message |
+| 🔴 | Pin and save a post |
+| 🔴 | Slash commands |
+| 🔴 | Typing indicator |
+| 🔴 | SSO |
+| 🔴 | Notification settings per channel |
+| 🔴 | Create a channel, show its members |
+| 🔴 | Custom status |
+| 🔴 | Calls and screen share |
+| 🔴 | Boards and playbooks |
+| 🔴 | More than one account |
+| 🔴 | Dark theme |
 
 Markdown is drawn with the small HTML subset Cascades accepts: `b`, `i`, `a`, `font color`, `br`. A `font face` makes Cascades drop the whole label, so code is a color, not a monospace face.
 
