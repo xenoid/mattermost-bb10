@@ -732,26 +732,30 @@ Page {
 
     // Während reload() feuert das Layout für jede Zeile. Das darf den
     // Sprung nicht verbrauchen, bevor die Liste steht. atEnd ist direkt
-    // nach dem Aufbau oft schon wahr, obwohl die Fundstelle noch unten liegt.
+    // nach dem Aufbau oft schon wahr. Nur wenn unten kein Platz mehr ist,
+    // bleibt die Fundstelle stehen.
     function jumpToFocus() {
         if (focusPost == "" || focusHold)
             return
-        if (postLayout.layoutFrame.height <= 0)
+        if (postLayout.layoutFrame.height <= 0) {
+            _mm.nudgeFocus()
             return
+        }
         var index = focusIndex()
         if (index < 0)
             return
         var visible = scrollState.firstVisibleItem
         var at = (visible && visible.length > 0) ? Number(visible[0]) : -1
         var gap = index - at
-        if (at == index || (focusTries > 0 && scrollState.atEnd && at >= 0 && gap >= 0 && gap <= 8)) {
+        var room = postModel.size() - 1 - at
+        if (at == index || (focusTries > 0 && scrollState.atEnd && at >= 0 && gap >= 0 && room <= 8)) {
             focusPost = ""
             focusTries = 0
             return
         }
         postList.scrollToItem([index], ScrollAnimation.None)
         focusTries = focusTries + 1
-        if (focusTries > 12) {
+        if (focusTries > 20) {
             focusPost = ""
             focusTries = 0
             return
