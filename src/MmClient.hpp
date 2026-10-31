@@ -315,6 +315,7 @@ private:
     bool m_showPreview;
     bool m_debugLog;
     bool m_focusNudged;
+    bool m_mfaSent;
 
     QString m_mfaPassword;
     QString m_focusPost;

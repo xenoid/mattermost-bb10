@@ -200,7 +200,8 @@ MmClient::MmClient(QObject *parent)
       m_trustReady(false),
       m_showPreview(true),
       m_debugLog(false),
-      m_focusNudged(false)
+      m_focusNudged(false),
+      m_mfaSent(false)
 {
     loadTrust();
     ImageStore::sweepLegacy();
@@ -418,6 +419,7 @@ void MmClient::setLoggedIn(bool on)
 void MmClient::resetSession()
 {
     m_mfaPassword.clear();
+    m_mfaSent = false;
     m_token.clear();
     m_userId.clear();
     m_teamId.clear();
@@ -692,6 +694,7 @@ void MmClient::login(const QString &serverUrl, const QString &user, const QStrin
         return;
     }
     m_mfaPassword = password;
+    m_mfaSent = false;
     QVariantMap body;
     body["login_id"] = m_username;
     body["password"] = password;
@@ -718,6 +721,7 @@ void MmClient::submitMfa(const QString &code)
     body["login_id"] = m_username;
     body["password"] = m_mfaPassword;
     body["token"] = token;
+    m_mfaSent = true;
     QByteArray bytes;
     JsonDataAccess json;
     json.saveToBuffer(body, &bytes);
@@ -728,6 +732,7 @@ void MmClient::submitMfa(const QString &code)
 void MmClient::cancelMfa()
 {
     m_mfaPassword.clear();
+    m_mfaSent = false;
     setStatus(tr("Sign-in cancelled"));
 }
 
@@ -2092,7 +2097,9 @@ void MmClient::onFinished(QNetworkReply *reply)
         if (step == StepLogin) {
             const QString body = QString::fromUtf8(payload);
             const bool needCode = body.contains("mfa");
-            const bool badCode = body.contains("invalid_credentials_mfa") || body.contains("bad_code");
+            // Dieselbe Marke bad_code kommt auch, wenn noch kein Code gesendet wurde.
+            const bool badCode = m_mfaSent
+                && (body.contains("invalid_credentials_mfa") || body.contains("bad_code"));
             if (needCode && !m_mfaPassword.isEmpty()) {
                 setStatus(badCode ? tr("Code is wrong")
                                   : tr("One-time code required"));
@@ -2100,6 +2107,7 @@ void MmClient::onFinished(QNetworkReply *reply)
                 return;
             }
             m_mfaPassword.clear();
+            m_mfaSent = false;
             setStatus(tr("Name or password is wrong"));
         } else {
             logout();
@@ -2161,6 +2169,7 @@ void MmClient::onFinished(QNetworkReply *reply)
             return;
         }
         m_mfaPassword.clear();
+        m_mfaSent = false;
         m_token = QString::fromUtf8(tokenHeader);
         const QVariantMap user = json.loadFromBuffer(payload).toMap();
         m_userId = user.value("id").toString();
