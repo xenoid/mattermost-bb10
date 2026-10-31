@@ -110,6 +110,21 @@ Page {
                     return data.type
                 return "post"
             }
+            function askReact(postId) {
+                _mm.askReact(postId)
+            }
+            function askReplies(rootId) {
+                _mm.askReplies(rootId)
+            }
+            function openImage(imageId) {
+                _mm.openImage(imageId)
+            }
+            function openAttachment(fileId, name, mime) {
+                _mm.openAttachment(fileId, name, mime)
+            }
+            function openLink(url) {
+                _mm.openLink(url)
+            }
             function openRow(item) {
                 if (!item || item.type != "post" || item.pending == "1")
                     return
@@ -156,37 +171,37 @@ Page {
                                 ActionItem {
                                     title: qsTr("Reply")
                                     enabled: ListItemData.inThread != "1" && ListItemData.pending != "1"
-                                    onTriggered: _mm.askReplies(ListItemData.threadRoot)
+                                    onTriggered: ListItem.view.askReplies(ListItemData.threadRoot)
                                 }
                                 ActionItem {
                                     title: qsTr("React")
                                     enabled: ListItemData.pending != "1"
-                                    onTriggered: _mm.askReact(ListItemData.id)
+                                    onTriggered: ListItem.view.askReact(ListItemData.id)
                                 }
                                 ActionItem {
                                     title: qsTr("Open image")
                                     enabled: ListItemData.imageId != "" && ListItemData.imageId != "local"
-                                    onTriggered: _mm.openImage(ListItemData.imageId)
+                                    onTriggered: ListItem.view.openImage(ListItemData.imageId)
                                 }
                                 ActionItem {
                                     title: qsTr("Image 2")
                                     enabled: ListItemData.imageId2 != ""
-                                    onTriggered: _mm.openImage(ListItemData.imageId2)
+                                    onTriggered: ListItem.view.openImage(ListItemData.imageId2)
                                 }
                                 ActionItem {
                                     title: qsTr("Open attachment")
                                     enabled: ListItemData.attachId != "" && ListItemData.attachId != "local"
-                                    onTriggered: _mm.openAttachment(ListItemData.attachId, ListItemData.attachName, ListItemData.attachMime)
+                                    onTriggered: ListItem.view.openAttachment(ListItemData.attachId, ListItemData.attachName, ListItemData.attachMime)
                                 }
                                 ActionItem {
                                     title: qsTr("Attachment 2")
                                     enabled: ListItemData.attachId2 != ""
-                                    onTriggered: _mm.openAttachment(ListItemData.attachId2, ListItemData.attachName2, ListItemData.attachMime2)
+                                    onTriggered: ListItem.view.openAttachment(ListItemData.attachId2, ListItemData.attachName2, ListItemData.attachMime2)
                                 }
                                 ActionItem {
                                     title: qsTr("Open link")
                                     enabled: ListItemData.link != ""
-                                    onTriggered: _mm.openLink(ListItemData.link)
+                                    onTriggered: ListItem.view.openLink(ListItemData.link)
                                 }
                             }
                         ]

@@ -2,7 +2,7 @@
 
 A Mattermost client for BlackBerry 10. It is built for the Classic, the square 720 screen, and a world in which BlackBerry no longer signs applications.
 
-On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **121**.
+On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **122**.
 
 <p>
 <img src="icon.png" width="96" alt="App icon">
@@ -39,7 +39,7 @@ This list is the Mattermost Android client, scored by what this program already 
 | 🟢 | Send later when the phone is offline |
 | 🟢 | Search and open the hit |
 | 🟢 | Threads and replies |
-| 🟡 | Reactions: twelve fixed emoji, four shown, no tap on the row |
+| 🟡 | Reactions: twelve fixed emoji, four shown, no tap on the row. The swipe did not open the list until build 122, and that build is not confirmed by a finger yet |
 | 🟢 | Open images and other files |
 | 🟢 | Upload a file under its original name |
 | 🟢 | Check the server certificate against a current CA bundle |
@@ -64,7 +64,7 @@ This list is the Mattermost Android client, scored by what this program already 
 
 Markdown uses the tags the Cascades text reader matches: `b`, `strong`, `i`, `em`, `u`, `a`, `br`. It has no `span` and no `font`. Code is underlined. A quote is an italic line with a bar.
 
-A reaction is a swipe, then one of twelve names. The row under the post shows at most four, as a glyph and a count. Tapping that row does nothing. A custom emoji is the shortcode in colons. The phone font has no flags, skin tones, or the red heart, so `heart` is the sparkling one.
+A reaction is a swipe, then one of twelve names. On build 121 that swipe did nothing: the post row cannot see `_mm`, and the phone logged `Can't find variable: _mm` at the React action. The list never opened and nothing was sent. Build 122 calls the action through the list (`ListItem.view`). A finger on the phone still has to confirm it. The row under the post shows at most four, as a glyph and a count. Tapping that row does nothing. A custom emoji is the shortcode in colons. The phone font has no flags, skin tones, or the red heart, so `heart` is the sparkling one.
 
 ## Install in 2026
 
