@@ -14,6 +14,7 @@ Page {
     property string heldName: ""
     property bool heldImage: false
     property string focusPost: ""
+    property int focusTries: 0
 
     onRootIdChanged: objectName = rootId == "" ? "thread" : "replies"
 
@@ -96,6 +97,7 @@ Page {
                 },
                 ListScrollStateHandler {
                     id: scrollState
+                    onFirstVisibleItemChanged: jumpToFocus()
                 }
             ]
             function itemType(data, indexPath) {
@@ -593,6 +595,10 @@ Page {
         var p = path
         if (p.indexOf("file://") == 0)
             p = p.substring(7)
+        try {
+            p = decodeURIComponent(p)
+        } catch (e) {
+        }
         var cut = p.lastIndexOf("/")
         return cut >= 0 ? p.substring(cut + 1) : p
     }
@@ -707,25 +713,38 @@ Page {
             postList.scrollToPosition(ScrollPosition.End, ScrollAnimation.None)
     }
 
-    function scrollToId(id) {
+    function focusIndex() {
         for (var i = 0; i < postModel.size(); ++i) {
             var row = postModel.data([i])
-            if (row && row.id == id) {
-                postList.scrollToItem([i], ScrollAnimation.None)
-                return true
-            }
+            if (row && row.id == focusPost)
+                return i
         }
-        return false
+        return -1
     }
 
-    // ListView hat das Signal nicht. LayoutUpdateHandler meldet die Höhe.
+    // Erst loslassen, wenn die Fundstelle oben in der Liste steht.
+    // Ein früher Treffer im Modell reicht nicht: das Layout kommt danach.
     function jumpToFocus() {
         if (focusPost == "")
             return
         if (postLayout.layoutFrame.height <= 0)
             return
-        if (scrollToId(focusPost))
+        var index = focusIndex()
+        if (index < 0)
+            return
+        var visible = scrollState.firstVisibleItem
+        if (visible && visible.length > 0 && visible[0] == index) {
             focusPost = ""
+            focusTries = 0
+            return
+        }
+        focusTries = focusTries + 1
+        if (focusTries > 12) {
+            focusPost = ""
+            focusTries = 0
+            return
+        }
+        postList.scrollToItem([index], ScrollAnimation.None)
     }
 
     // Neue Zeilen anhängen, geänderte ersetzen. Nur ans Ende springen,
@@ -745,6 +764,7 @@ Page {
     function applyRows(rows) {
         var size = postModel.size()
         if (focusPost != "") {
+            focusTries = 0
             reload(rows, false)
             jumpToFocus()
             return
