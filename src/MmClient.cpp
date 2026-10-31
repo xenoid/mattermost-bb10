@@ -758,7 +758,8 @@ void MmClient::nudgeFocus()
     if (m_focusNudged)
         return;
     m_focusNudged = true;
-    QTimer::singleShot(100, this, SLOT(emitFocusNudge()));
+    // Der Puffer braucht die Zeilen, bevor der Sprung sitzt. 100 ms hat ihn abgebrochen.
+    QTimer::singleShot(400, this, SLOT(emitFocusNudge()));
 }
 
 void MmClient::emitFocusNudge()
