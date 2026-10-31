@@ -62,7 +62,7 @@ This list is the Mattermost Android client, scored by what this program already 
 | 🔴 | More than one account |
 | 🔴 | Dark theme |
 
-Markdown uses the tags the Cascades text reader matches: `b`, `strong`, `i`, `em`, `u`, `a`, `br`. It has no `span` and no `font`. Code is underlined. A quote is italic.
+Markdown uses the tags the Cascades text reader matches: `b`, `strong`, `i`, `em`, `u`, `a`, `br`. It has no `span` and no `font`. Code is underlined. A quote is an italic line with a bar.
 
 ## Install in 2026
 

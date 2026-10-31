@@ -129,7 +129,8 @@ QString Markdown::html(const QString &plain)
             QString body = line.mid(4);
             if (body.startsWith(" "))
                 body = body.mid(1);
-            out.append(QString("<i>%1</i>").arg(inlineFormat(body)));
+            // Der Leser hat keinen Balken. Der Strich ist das Zeichen, das er zeichnet.
+            out.append(QString("<i>| %1</i>").arg(inlineFormat(body)));
             continue;
         }
         out.append(inlineFormat(line));
