@@ -93,7 +93,7 @@ QString inlineFormat(const QString &input)
 
     for (int i = 0; i < codes.size(); ++i) {
         text.replace(QString("\x01%1\x01").arg(i),
-                     QString("<span style='font-family:monospace'>%1</span>").arg(codes.at(i)));
+                     QString("<span style='font-family:\"courier new\"'>%1</span>").arg(codes.at(i)));
     }
     return text;
 }
@@ -121,14 +121,14 @@ QString Markdown::html(const QString &plain)
             continue;
         }
         if (code) {
-            out.append(QString("<span style='font-family:monospace'>%1</span>").arg(line));
+            out.append(QString("<span style='font-family:\"courier new\"'>%1</span>").arg(line));
             continue;
         }
         if (line.startsWith("&gt;")) {
             QString body = line.mid(4);
             if (body.startsWith(" "))
                 body = body.mid(1);
-            out.append(QString("<span style='background-color:rgb(244,246,248)'><i>%1</i></span>")
+            out.append(QString("<span style='background-color:rgb(214,220,226)'><i>%1</i></span>")
                        .arg(inlineFormat(body)));
             continue;
         }
