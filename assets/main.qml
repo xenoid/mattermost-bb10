@@ -46,6 +46,8 @@ NavigationPane {
             id: mfaPrompt
             title: qsTr("One-time code")
             body: qsTr("Code from the authenticator app")
+            inputField.inputMode: SystemUiInputMode.Default
+            inputOptions: SystemUiInputOption.None
             confirmButton.label: qsTr("Sign in")
             cancelButton.label: qsTr("Cancel")
             onFinished: {
