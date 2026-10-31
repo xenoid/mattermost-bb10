@@ -2,7 +2,7 @@
 
 A Mattermost client for BlackBerry 10. It is built for the Classic, the square 720 screen, and a world in which BlackBerry no longer signs applications.
 
-On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **125**.
+On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **126**.
 
 <p>
 <img src="icon.png" width="96" alt="App icon">
@@ -18,7 +18,7 @@ The interface source strings are English (`qsTr` and `tr`). At startup the app l
 
 ## Toward the Android app
 
-This list is the Mattermost Android client, scored by what this program already does. 16 rows are done, 5 are only part way, 12 are still missing.
+This list is the Mattermost Android client, scored by what this program already does. 18 rows are done, 3 are only part way, 12 are still missing.
 
 | | |
 | --- | --- |
@@ -44,8 +44,8 @@ This list is the Mattermost Android client, scored by what this program already 
 | 🟢 | Upload a file under its original name |
 | 🟢 | Check the server certificate against a current CA bundle |
 | 🟢 | Markdown: bold, italic, code, quote, link. A heading is bold. A list, a table, and a strike are readable text |
-| 🟡 | Emoji panel, without custom emoji, flags, or skin tones |
-| 🟡 | A Hub row per channel, with a count, not the message text |
+| 🟢 | Emoji panel, including the server's own emoji. Flags and skin tones are not in the phone font |
+| 🟢 | A Hub row per channel. The body is the latest message when that post has text |
 | 🟢 | Background refresh every six minutes |
 | 🟡 | Settings: refresh, switch team, log out, preview, protocol log |
 | 🟡 | English and German. Further languages are a catalog |
@@ -65,6 +65,10 @@ This list is the Mattermost Android client, scored by what this program already 
 Markdown uses the tags the Cascades text reader matches: `b`, `strong`, `i`, `em`, `u`, `a`, `br`. It has no `span` and no `font`. Code is underlined. A quote is an italic line with a bar. A heading is bold. A bullet or a number stays a line of text. A table is cells separated by a dot. A strike loses the tildes and keeps the words.
 
 A reaction is a swipe, then one of twelve names. Choosing the same name again removes it. The row shows up to eight chips. Tapping a chip toggles that emoji. A server emoji is downloaded and shown as a picture. The phone font has no flags, skin tones, or the red heart, so `heart` is the sparkling one. Build 123 called the swipe through the post row. Whether that list opens has not been seen on a finger since then.
+
+The emoji panel lists the phone font and, after the panel opens, the server's own emoji. A font glyph is inserted as the character. A server emoji is inserted as `:name:` and shown as its picture once that picture has arrived.
+
+A Hub entry uses the channel name as the title. The body is the latest post, shortened, for up to eight channels that have something unread. A post with no text keeps the count.
 
 ## Install in 2026
 

@@ -202,7 +202,11 @@ MmClient::MmClient(QObject *parent)
       m_showPreview(true),
       m_debugLog(false),
       m_focusNudged(false),
-      m_mfaSent(false)
+      m_mfaSent(false),
+      m_emojiPage(0),
+      m_emojiListBusy(false),
+      m_emojiListedAt(0),
+      m_previewLeft(0)
 {
     loadTrust();
     ImageStore::sweepLegacy();
@@ -433,6 +437,11 @@ void MmClient::resetSession()
     m_fileQueue.clear();
     m_users.clear();
     m_avatarTried.clear();
+    m_emojiMiss.clear();
+    m_customEmoji.clear();
+    m_emojiPage = 0;
+    m_emojiListBusy = false;
+    m_emojiListedAt = 0;
     m_lastPostId.clear();
     m_postsSig.clear();
     m_threadRoot.clear();
@@ -861,7 +870,66 @@ QVariantList MmClient::emojiChoices() const
 
 QVariantList MmClient::emojiCatalog(const QString &query) const
 {
-    return Emoji::catalog(query);
+    QVariantList list = Emoji::catalog(query);
+    const QString needle = query.trimmed().toLower();
+    for (int i = 0; i < m_customEmoji.size(); ++i) {
+        const CustomEmoji &emoji = m_customEmoji.at(i);
+        if (!needle.isEmpty() && !emoji.name.toLower().contains(needle))
+            continue;
+        QVariantMap row;
+        row["name"] = emoji.name;
+        row["type"] = QString("emoji");
+        const QString path = ImageStore::dir() + "/e-" + emoji.id + ".img";
+        if (QFileInfo(path).size() > 32) {
+            row["glyph"] = QString();
+            row["image"] = ImageStore::fileUrl(path);
+        } else {
+            row["glyph"] = QString();
+            row["image"] = QString();
+        }
+        list.append(row);
+    }
+    return list;
+}
+
+void MmClient::loadCustomEmoji()
+{
+    if (!m_loggedIn || m_token.isEmpty() || m_emojiListBusy)
+        return;
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (m_emojiListedAt > 0 && now - m_emojiListedAt < 600000)
+        return;
+    m_emojiListBusy = true;
+    m_emojiPage = 0;
+    m_customEmoji.clear();
+    start(StepEmojiList, "/api/v4/emoji?page=0&per_page=200", QByteArray(), "GET", true);
+}
+
+void MmClient::takeEmojiPage(const QVariantList &list)
+{
+    for (int i = 0; i < list.size(); ++i) {
+        const QVariantMap emoji = list.at(i).toMap();
+        const QString id = emoji.value("id").toString();
+        const QString name = emoji.value("name").toString();
+        if (id.isEmpty() || name.isEmpty())
+            continue;
+        CustomEmoji row;
+        row.id = id;
+        row.name = name;
+        m_customEmoji.append(row);
+        queueEmoji(id, name);
+    }
+    if (list.size() >= 200 && m_emojiPage < 2) {
+        ++m_emojiPage;
+        start(StepEmojiList,
+              QString("/api/v4/emoji?page=%1&per_page=200").arg(m_emojiPage),
+              QByteArray(), "GET", true);
+        return;
+    }
+    m_emojiListBusy = false;
+    m_emojiListedAt = QDateTime::currentMSecsSinceEpoch();
+    emit customEmojiChanged();
+    pumpFiles();
 }
 
 void MmClient::showCached()
@@ -1007,17 +1075,27 @@ void MmClient::postInbox(const QString &channelId, const QString &title, int unr
     const QString key = QString("mm-") + channelId;
     bb::platform::Notification note(key);
     note.setTitle(title.isEmpty() ? QString("Mattermost") : title);
-    QString body;
-    if (mentions > 0 && unread > mentions)
-        body = tr("%1 new messages, %2 mentions").arg(unread).arg(mentions);
-    else if (mentions > 1)
-        body = tr("%1 mentions").arg(mentions);
-    else if (mentions == 1)
-        body = tr("Mention");
-    else if (unread <= 1)
-        body = tr("New message");
-    else
-        body = tr("%1 new messages").arg(unread);
+    QString preview;
+    for (int i = 0; i < m_channelRows.size(); ++i) {
+        const QVariantMap row = m_channelRows.at(i).toMap();
+        if (row.value("channelId").toString() == channelId) {
+            preview = row.value("preview").toString();
+            break;
+        }
+    }
+    QString body = preview;
+    if (body.isEmpty()) {
+        if (mentions > 0 && unread > mentions)
+            body = tr("%1 new messages, %2 mentions").arg(unread).arg(mentions);
+        else if (mentions > 1)
+            body = tr("%1 mentions").arg(mentions);
+        else if (mentions == 1)
+            body = tr("Mention");
+        else if (unread <= 1)
+            body = tr("New message");
+        else
+            body = tr("%1 new messages").arg(unread);
+    }
     note.setBody(body);
     note.setType(alert ? bb::platform::NotificationType::Default
                        : bb::platform::NotificationType::AllAlertsOff);
@@ -1068,7 +1146,63 @@ void MmClient::syncInbox()
     m_notesReady = true;
     if (!m_headless && !m_pendingInbox.isEmpty())
         flushInbox();
-    quitIfHeadless();
+    queuePreviews();
+    if (m_previewLeft <= 0)
+        quitIfHeadless();
+}
+
+void MmClient::queuePreviews()
+{
+    m_previewLeft = 0;
+    int queued = 0;
+    for (int i = 0; i < m_channelRows.size() && queued < 8; ++i) {
+        const QVariantMap row = m_channelRows.at(i).toMap();
+        const int unread = row.value("unread").toInt();
+        const int mentions = row.value("mentions").toInt();
+        if (unread <= 0 && mentions <= 0)
+            continue;
+        if (!row.value("preview").toString().isEmpty())
+            continue;
+        const QString id = row.value("channelId").toString();
+        if (id.isEmpty())
+            continue;
+        QNetworkReply *reply = start(StepPreview,
+            "/api/v4/channels/" + id + "/posts?per_page=1",
+            QByteArray(), "GET", true);
+        reply->setProperty("chan", id);
+        ++m_previewLeft;
+        ++queued;
+    }
+}
+
+void MmClient::applyPreview(const QString &channelId, const QVariant &parsed)
+{
+    const QVariantMap body = parsed.toMap();
+    const QVariantMap posts = body.value("posts").toMap();
+    const QVariantList order = body.value("order").toList();
+    QString text;
+    if (!order.isEmpty()) {
+        const QVariantMap post = posts.value(order.at(0).toString()).toMap();
+        text = Emoji::apply(repairText(post.value("message").toString())).simplified();
+    }
+    if (text.length() > 140)
+        text = text.left(140) + QString::fromUtf8("…");
+    if (!text.isEmpty()) {
+        for (int i = 0; i < m_channelRows.size(); ++i) {
+            QVariantMap row = m_channelRows.at(i).toMap();
+            if (row.value("channelId").toString() != channelId)
+                continue;
+            row["preview"] = text;
+            m_channelRows[i] = row;
+            postInbox(channelId, row.value("title").toString(),
+                      row.value("unread").toInt(), row.value("mentions").toInt(), false);
+            break;
+        }
+    }
+    if (m_previewLeft > 0)
+        --m_previewLeft;
+    if (m_previewLeft <= 0)
+        quitIfHeadless();
 }
 
 // ---------------------------------------------------------------- Netz
@@ -2252,6 +2386,34 @@ void MmClient::onFinished(QNetworkReply *reply)
         } else {
             logout();
             setStatus(tr("Session expired. Please sign in again."));
+        }
+        return;
+    }
+    if (step == StepEmojiList) {
+        if (http >= 400 || http == 0 || netCode != 0) {
+            m_emojiListBusy = false;
+            return;
+        }
+        JsonDataAccess emojiJson;
+        const QVariant emojiParsed = emojiJson.loadFromBuffer(payload);
+        if (emojiJson.hasError()) {
+            m_emojiListBusy = false;
+            return;
+        }
+        takeEmojiPage(emojiParsed.toList());
+        return;
+    }
+    if (step == StepPreview) {
+        const QString previewChan = chan;
+        if (http == 200 && netCode == 0) {
+            JsonDataAccess previewJson;
+            const QVariant previewParsed = previewJson.loadFromBuffer(payload);
+            if (!previewJson.hasError())
+                applyPreview(previewChan, previewParsed);
+            else
+                applyPreview(previewChan, QVariant());
+        } else {
+            applyPreview(previewChan, QVariant());
         }
         return;
     }

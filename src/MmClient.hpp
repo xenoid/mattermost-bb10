@@ -98,6 +98,7 @@ public:
     Q_INVOKABLE void showCached();
     Q_INVOKABLE QVariantList emojiChoices() const;
     Q_INVOKABLE QVariantList emojiCatalog(const QString &query) const;
+    Q_INVOKABLE void loadCustomEmoji();
     Q_INVOKABLE void refresh();
     Q_INVOKABLE void search(const QString &terms);
     Q_INVOKABLE void openFromSearch(const QString &id, const QString &name, const QString &postId);
@@ -129,6 +130,7 @@ signals:
     void historyChanged();
     void imageReady(const QString &fileId, const QString &path);
     void emojiReady(const QString &name, const QString &path);
+    void customEmojiChanged();
     void avatarReady(const QString &userId, const QString &path);
     void showImage(const QString &path);
     void sendFailed(const QString &text);
@@ -165,7 +167,9 @@ private:
         StepReact,
         StepUpload,
         StepFile,
-        StepPost
+        StepPost,
+        StepEmojiList,
+        StepPreview
     };
 
     enum FileKind {
@@ -175,6 +179,11 @@ private:
         FileAttach,        // sonstiger Anhang
         FileEmoji,         // Bild eines Server-Emoji
         FileEmojiName      // Name → Id, danach das Bild
+    };
+
+    struct CustomEmoji {
+        QString id;
+        QString name;
     };
 
     struct FileJob {
@@ -229,6 +238,8 @@ private:
     void finishChannels();
     void syncInbox();
     void postInbox(const QString &channelId, const QString &title, int unread, int mentions, bool alert);
+    void queuePreviews();
+    void applyPreview(const QString &channelId, const QVariant &parsed);
     void clearInbox(const QString &channelId);
     void finishPosts();
     void finishThread();
@@ -260,6 +271,7 @@ private:
     void queueAvatar(const QString &userId);
     void queueEmoji(const QString &emojiId, const QString &name);
     void queueEmojiName(const QString &name);
+    void takeEmojiPage(const QVariantList &list);
     void queueJob(const FileJob &job, bool front);
     void pumpFiles();
     void startJob(const FileJob &job);
@@ -356,6 +368,11 @@ private:
     QList<FileJob> m_fileQueue;
     QSet<QString> m_avatarTried;
     QSet<QString> m_emojiMiss;
+    QList<CustomEmoji> m_customEmoji;
+    int m_emojiPage;
+    bool m_emojiListBusy;
+    qint64 m_emojiListedAt;
+    int m_previewLeft;
     QHash<QString, UserInfo> m_users;
 };
 

@@ -832,21 +832,41 @@ Page {
                 listItemComponents: [
                     ListItemComponent {
                         type: "emoji"
-                        Label {
-                            text: ListItemData.glyph
-                            textFormat: TextFormat.Plain
+                        Container {
                             preferredWidth: 80
                             preferredHeight: 72
-                            textStyle.fontSize: FontSize.XLarge
-                            textStyle.color: Color.create("#1b1f23")
-                            textStyle.textAlign: TextAlign.Center
+                            layout: DockLayout {
+                            }
+                            ImageView {
+                                visible: ListItemData.image != ""
+                                imageSource: ListItemData.image
+                                preferredWidth: 64
+                                preferredHeight: 64
+                                horizontalAlignment: HorizontalAlignment.Center
+                                verticalAlignment: VerticalAlignment.Center
+                                scalingMethod: ScalingMethod.AspectFit
+                            }
+                            Label {
+                                visible: ListItemData.image == ""
+                                text: ListItemData.glyph != "" ? ListItemData.glyph : ListItemData.name
+                                textFormat: TextFormat.Plain
+                                horizontalAlignment: HorizontalAlignment.Center
+                                verticalAlignment: VerticalAlignment.Center
+                                textStyle.fontSize: ListItemData.glyph != "" ? FontSize.XLarge : FontSize.XSmall
+                                textStyle.color: Color.create("#1b1f23")
+                                textStyle.textAlign: TextAlign.Center
+                            }
                         }
                     }
                 ]
                 onTriggered: {
                     var item = emojiModel.data(indexPath)
-                    if (item && item.glyph)
+                    if (!item)
+                        return
+                    if (item.glyph)
                         insertEmoji(item.glyph)
+                    else if (item.name)
+                        insertEmoji(":" + item.name + ":")
                 }
             }
         }
@@ -1034,10 +1054,16 @@ Page {
         }
         emojiPanel.visible = true
         syncPeek()
+        _mm.loadCustomEmoji()
         if (emojiSearch.text != "")
             emojiSearch.text = ""
         else
             filterEmoji("")
+    }
+
+    function onCustomEmoji() {
+        if (emojiPanel.visible)
+            filterEmoji(emojiSearch.text)
     }
 
     function filterEmoji(query) {
@@ -1047,8 +1073,9 @@ Page {
         for (var i = 0; i < n; ++i) {
             emojiModel.append({
                 "type": "emoji",
-                "glyph": all[i].glyph,
-                "name": all[i].name
+                "glyph": all[i].glyph ? all[i].glyph : "",
+                "name": all[i].name ? all[i].name : "",
+                "image": all[i].image ? all[i].image : ""
             })
         }
     }
@@ -1283,6 +1310,15 @@ Page {
             if (changed)
                 postModel.replace(i, row)
         }
+        if (!emojiPanel.visible)
+            return
+        for (var e = 0; e < emojiModel.size(); ++e) {
+            var chip = emojiModel.data([e])
+            if (chip && chip.name == name && chip.image != path) {
+                chip.image = path
+                emojiModel.replace(e, chip)
+            }
+        }
     }
 
     function takeAvatar(userId, path) {
@@ -1302,6 +1338,7 @@ Page {
         _mm.repliesLoaded.disconnect(takeReplies)
         _mm.imageReady.disconnect(takeImage)
         _mm.emojiReady.disconnect(takeEmoji)
+        _mm.customEmojiChanged.disconnect(onCustomEmoji)
         _mm.avatarReady.disconnect(takeAvatar)
         _mm.sendFailed.disconnect(restoreText)
     }
@@ -1312,6 +1349,7 @@ Page {
         _mm.repliesLoaded.connect(takeReplies)
         _mm.imageReady.connect(takeImage)
         _mm.emojiReady.connect(takeEmoji)
+        _mm.customEmojiChanged.connect(onCustomEmoji)
         _mm.avatarReady.connect(takeAvatar)
         _mm.sendFailed.connect(restoreText)
     }
