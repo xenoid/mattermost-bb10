@@ -210,6 +210,7 @@ private:
     void applyTeam(const QString &id, const QString &name);
     void absorbAround(const QString &page, const QVariant &parsed);
     void finishAround();
+    bool aroundMatches(const QNetworkReply *reply) const;
     void postsIdle();
     void commitPosts(bool mark);
     void mergePosts(const QString &mode, const QVariantList &order, const QVariantMap &posts);
@@ -306,6 +307,7 @@ private:
     int m_listTick;
     int m_filesBusy;
     int m_aroundLeft;
+    int m_aroundGen;
     bool m_anchored;
 
     bool m_headless;

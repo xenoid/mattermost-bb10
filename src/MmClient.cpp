@@ -193,6 +193,7 @@ MmClient::MmClient(QObject *parent)
       m_listTick(0),
       m_filesBusy(0),
       m_aroundLeft(0),
+      m_aroundGen(0),
       m_anchored(false),
       m_headless(false),
       m_hasOlder(false),
@@ -458,6 +459,7 @@ void MmClient::resetSession()
     m_hasOlder = false;
     m_hasNewer = false;
     m_aroundLeft = 0;
+    m_aroundGen = 0;
     m_anchored = false;
     bb::platform::Notification::deleteAllFromInbox();
     m_store.clear();
@@ -796,6 +798,7 @@ void MmClient::openChannel(const QString &id, const QString &name)
     m_rawOrder.clear();
     m_rawPosts.clear();
     m_aroundLeft = 0;
+    ++m_aroundGen;
     m_aroundSelf.clear();
     setHistory(false, false);
     ensureStore();
@@ -1280,6 +1283,7 @@ void MmClient::loadAround(const QString &postId)
         return;
     m_postsBusy = true;
     m_anchored = true;
+    ++m_aroundGen;
     m_aroundLeft = 3;
     m_aroundSelf = postId;
     m_aroundChan = m_channelId;
@@ -1292,16 +1296,24 @@ void MmClient::loadAround(const QString &postId)
     QNetworkReply *self = start(StepPost, "/api/v4/posts/" + postId, QByteArray(), "GET", true);
     self->setProperty("chan", m_channelId);
     self->setProperty("page", QString("self"));
+    self->setProperty("gen", m_aroundGen);
     QNetworkReply *before = start(StepPosts,
         QString("/api/v4/channels/%1/posts?per_page=30&before=%2").arg(m_channelId, postId),
         QByteArray(), "GET", true);
     before->setProperty("chan", m_channelId);
     before->setProperty("page", QString("before"));
+    before->setProperty("gen", m_aroundGen);
     QNetworkReply *after = start(StepPosts,
         QString("/api/v4/channels/%1/posts?per_page=30&after=%2").arg(m_channelId, postId),
         QByteArray(), "GET", true);
     after->setProperty("chan", m_channelId);
     after->setProperty("page", QString("after"));
+    after->setProperty("gen", m_aroundGen);
+}
+
+bool MmClient::aroundMatches(const QNetworkReply *reply) const
+{
+    return reply && reply->property("gen").toInt() == m_aroundGen;
 }
 
 QString MmClient::edgePostId(bool newest) const
@@ -2119,6 +2131,8 @@ void MmClient::onFinished(QNetworkReply *reply)
     const bool around = (step == StepPosts || step == StepPost)
         && (page == "self" || page == "before" || page == "after");
     if (around && (http >= 400 || (http == 0 && netCode != 0) || chan != m_channelId)) {
+        if (!aroundMatches(reply))
+            return;
         if (--m_aroundLeft <= 0)
             finishAround();
         return;
@@ -2148,6 +2162,8 @@ void MmClient::onFinished(QNetworkReply *reply)
         parsed = json.loadFromBuffer(payload);
         if (json.hasError()) {
             if (around) {
+                if (!aroundMatches(reply))
+                    return;
                 if (--m_aroundLeft <= 0)
                     finishAround();
                 return;
@@ -2311,6 +2327,8 @@ void MmClient::onFinished(QNetworkReply *reply)
     }
 
     if (step == StepPost || (step == StepPosts && (page == "before" || page == "after"))) {
+        if (!aroundMatches(reply))
+            return;
         if (chan == m_channelId)
             absorbAround(page, parsed);
         if (--m_aroundLeft <= 0)
