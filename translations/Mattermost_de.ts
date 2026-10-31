@@ -584,6 +584,46 @@
         <translation>Reagieren</translation>
     </message>
     <message>
+        <location filename="../assets/thread.qml" line="16" />
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="17" />
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="24" />
+        <source>Delete message</source>
+        <translation>Nachricht löschen</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="25" />
+        <source>This cannot be undone.</source>
+        <translation>Das lässt sich nicht rückgängig machen.</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="27" />
+        <source>Delete</source>
+        <translation>Löschen</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="190" />
+        <source>Pin</source>
+        <translation>Anpinnen</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="190" />
+        <source>Unpin</source>
+        <translation>Lösen</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="195" />
+        <source>Unsave</source>
+        <translation>Nicht mehr speichern</translation>
+    </message>
+    <message>
         <location filename="../assets/thread.qml" line="160" />
         <source>Open image</source>
         <translation>Bild öffnen</translation>

@@ -584,6 +584,46 @@
         <translation>React</translation>
     </message>
     <message>
+        <location filename="../assets/thread.qml" line="16" />
+        <source>Edit</source>
+        <translation>Edit</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="17" />
+        <source>Save</source>
+        <translation>Save</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="24" />
+        <source>Delete message</source>
+        <translation>Delete message</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="25" />
+        <source>This cannot be undone.</source>
+        <translation>This cannot be undone.</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="27" />
+        <source>Delete</source>
+        <translation>Delete</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="190" />
+        <source>Pin</source>
+        <translation>Pin</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="190" />
+        <source>Unpin</source>
+        <translation>Unpin</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="195" />
+        <source>Unsave</source>
+        <translation>Unsave</translation>
+    </message>
+    <message>
         <location filename="../assets/thread.qml" line="160" />
         <source>Open image</source>
         <translation>Open image</translation>

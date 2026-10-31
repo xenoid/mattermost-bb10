@@ -106,6 +106,10 @@ public:
     Q_INVOKABLE void toggleReaction(const QString &postId, const QString &emojiName);
     Q_INVOKABLE void askReplies(const QString &rootId);
     Q_INVOKABLE void askReact(const QString &postId);
+    Q_INVOKABLE void editPost(const QString &postId, const QString &message);
+    Q_INVOKABLE void deletePost(const QString &postId);
+    Q_INVOKABLE void pinPost(const QString &postId);
+    Q_INVOKABLE void savePost(const QString &postId);
     Q_INVOKABLE void openThread(const QString &rootId);
     Q_INVOKABLE void closeThread();
     Q_INVOKABLE void showCached();
@@ -182,7 +186,9 @@ private:
         StepFile,
         StepPost,
         StepEmojiList,
-        StepPreview
+        StepPreview,
+        StepMutate,
+        StepFlagged
     };
 
     enum FileKind {
@@ -223,6 +229,11 @@ private:
 
     // Sitzung und Listen
     void loadMe();
+    void loadFlagged();
+    void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
+    bool flagOn(const QString &postId, const QString &key) const;
+    void paintFlag(const QString &postId, const QString &key, const QString &value);
+    void dropPost(const QString &postId);
     void loadTeams();
     void loadChannels(bool silent);
     void loadPosts(bool silent);
@@ -386,6 +397,7 @@ private:
     QList<FileJob> m_fileQueue;
     QSet<QString> m_avatarTried;
     QSet<QString> m_emojiMiss;
+    QSet<QString> m_saved;
     QList<CustomEmoji> m_customEmoji;
     int m_emojiPage;
     bool m_emojiListBusy;

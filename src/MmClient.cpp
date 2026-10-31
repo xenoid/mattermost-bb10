@@ -524,6 +524,7 @@ void MmClient::resetSession()
     m_avatarTried.clear();
     m_emojiMiss.clear();
     m_customEmoji.clear();
+    m_saved.clear();
     m_emojiPage = 0;
     m_emojiListBusy = false;
     m_emojiListedAt = 0;
@@ -1331,6 +1332,8 @@ QNetworkReply *MmClient::start(Step step, const QString &path, const QByteArray 
         reply = m_net.post(request, body);
     else if (verb == "DELETE")
         reply = m_net.deleteResource(request);
+    else if (verb == "PUT")
+        reply = m_net.put(request, body);
     else
         reply = m_net.get(request);
     reply->setProperty("step", int(step));
@@ -1905,6 +1908,8 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["threadMark"] = QString();
     row["inThread"] = inThread ? QString("1") : QString();
     row["pending"] = QString();
+    row["pinned"] = post.value("is_pinned").toBool() ? QString("1") : QString();
+    row["saved"] = m_saved.contains(postId) ? QString("1") : QString();
     row["react"] = reactBits.join(QString("   "));
     row["reactOwn"] = reactOwn.join(",");
     row["rmore"] = reactMore;
@@ -2521,6 +2526,26 @@ void MmClient::onFinished(QNetworkReply *reply)
         }
         return;
     }
+    if (step == StepFlagged) {
+        if (http == 200 && netCode == 0) {
+            JsonDataAccess flaggedJson;
+            const QVariant flaggedParsed = flaggedJson.loadFromBuffer(payload);
+            if (!flaggedJson.hasError()) {
+                m_saved.clear();
+                const QVariantList order = flaggedParsed.toMap().value("order").toList();
+                for (int i = 0; i < order.size(); ++i) {
+                    const QString id = order.at(i).toString();
+                    if (!id.isEmpty())
+                        m_saved.insert(id);
+                }
+                if (!m_postRows.isEmpty())
+                    publishPosts();
+                if (!m_replyRows.isEmpty())
+                    publishThread();
+            }
+        }
+        return;
+    }
     const QString page = reply->property("page").toString();
     const bool around = (step == StepPosts || step == StepPost)
         && (page == "self" || page == "before" || page == "after");
@@ -2531,13 +2556,13 @@ void MmClient::onFinished(QNetworkReply *reply)
             finishAround();
         return;
     }
-    if ((step == StepSend || step == StepUpload || step == StepReact)
+    if ((step == StepSend || step == StepUpload || step == StepReact || step == StepMutate)
             && (http >= 400 || http == 0 || netCode != 0)) {
         const bool network = http < 400;
         outgoingDone(localId, false, network, msg);
         return;
     }
-    if (step == StepReact) {
+    if (step == StepReact || step == StepMutate) {
         outgoingDone(localId, true, false, QString());
         return;
     }
@@ -2595,6 +2620,7 @@ void MmClient::onFinished(QNetworkReply *reply)
         emit sessionChanged();
         queueAvatar(m_userId);
         pumpFiles();
+        loadFlagged();
         loadTeams();
         return;
     }
@@ -2611,6 +2637,7 @@ void MmClient::onFinished(QNetworkReply *reply)
         settings.setValue("userId", m_userId);
         queueAvatar(m_userId);
         pumpFiles();
+        loadFlagged();
         loadTeams();
         return;
     }
@@ -2996,6 +3023,8 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["threadMark"] = QString();
     row["inThread"] = inThread ? QString("1") : QString();
     row["pending"] = QString("1");
+    row["pinned"] = QString();
+    row["saved"] = QString();
     row["react"] = QString();
     row["reactOwn"] = QString();
     row["rmore"] = QString();
@@ -3170,6 +3199,124 @@ bool MmClient::fileIsImage(const QString &path) const
     return ImageStore::isImage(file.read(12));
 }
 
+void MmClient::loadFlagged()
+{
+    if (m_userId.isEmpty() || m_token.isEmpty())
+        return;
+    start(StepFlagged, "/api/v4/users/" + m_userId + "/posts/flagged?page=0&per_page=200",
+          QByteArray(), "GET", true);
+}
+
+void MmClient::enqueueMutate(const QString &kind, const QString &postId, const QString &message)
+{
+    if (postId.isEmpty() || postId.startsWith(QLatin1String("local-")))
+        return;
+    ensureStore();
+    OutItem item;
+    item.id = "local-m-" + QString::number(QDateTime::currentMSecsSinceEpoch());
+    item.kind = kind;
+    item.postId = postId;
+    item.message = message;
+    item.channelId = m_channelId;
+    m_store.enqueue(item);
+    flushOutbox();
+}
+
+bool MmClient::flagOn(const QString &postId, const QString &key) const
+{
+    for (int pass = 0; pass < 2; ++pass) {
+        const QVariantList &rows = pass == 0 ? m_postRows : m_replyRows;
+        for (int i = 0; i < rows.size(); ++i) {
+            const QVariantMap row = rows.at(i).toMap();
+            if (row.value("id").toString() == postId)
+                return row.value(key).toString() == QLatin1String("1");
+        }
+    }
+    return false;
+}
+
+void MmClient::paintFlag(const QString &postId, const QString &key, const QString &value)
+{
+    for (int pass = 0; pass < 2; ++pass) {
+        QVariantList &rows = pass == 0 ? m_postRows : m_replyRows;
+        for (int i = 0; i < rows.size(); ++i) {
+            QVariantMap row = rows.at(i).toMap();
+            if (row.value("id").toString() != postId)
+                continue;
+            row[key] = value;
+            if (key == QLatin1String("plain"))
+                row["message"] = Markdown::html(Emoji::apply(value));
+            rows[i] = row;
+        }
+    }
+}
+
+void MmClient::dropPost(const QString &postId)
+{
+    for (int pass = 0; pass < 2; ++pass) {
+        QVariantList &rows = pass == 0 ? m_postRows : m_replyRows;
+        for (int i = rows.size() - 1; i >= 0; --i) {
+            if (rows.at(i).toMap().value("id").toString() == postId)
+                rows.removeAt(i);
+        }
+    }
+}
+
+void MmClient::editPost(const QString &postId, const QString &message)
+{
+    const QString text = message.trimmed();
+    if (postId.isEmpty() || text.isEmpty())
+        return;
+    paintFlag(postId, QLatin1String("plain"), text);
+    enqueueMutate(QLatin1String("edit"), postId, text);
+    if (!m_postRows.isEmpty())
+        publishPosts();
+    if (!m_replyRows.isEmpty())
+        publishThread();
+}
+
+void MmClient::deletePost(const QString &postId)
+{
+    if (postId.isEmpty())
+        return;
+    dropPost(postId);
+    enqueueMutate(QLatin1String("delete"), postId, QString());
+    if (!m_channelId.isEmpty())
+        publishPosts();
+    if (!m_threadRoot.isEmpty())
+        publishThread();
+}
+
+void MmClient::pinPost(const QString &postId)
+{
+    if (postId.isEmpty())
+        return;
+    const bool on = flagOn(postId, QLatin1String("pinned"));
+    paintFlag(postId, QLatin1String("pinned"), on ? QString() : QString("1"));
+    enqueueMutate(on ? QLatin1String("unpin") : QLatin1String("pin"), postId, QString());
+    if (!m_postRows.isEmpty())
+        publishPosts();
+    if (!m_replyRows.isEmpty())
+        publishThread();
+}
+
+void MmClient::savePost(const QString &postId)
+{
+    if (postId.isEmpty())
+        return;
+    const bool on = m_saved.contains(postId) || flagOn(postId, QLatin1String("saved"));
+    if (on)
+        m_saved.remove(postId);
+    else
+        m_saved.insert(postId);
+    paintFlag(postId, QLatin1String("saved"), on ? QString() : QString("1"));
+    enqueueMutate(on ? QLatin1String("unsave") : QLatin1String("save"), postId, QString());
+    if (!m_postRows.isEmpty())
+        publishPosts();
+    if (!m_replyRows.isEmpty())
+        publishThread();
+}
+
 void MmClient::toggleReaction(const QString &postId, const QString &emojiName)
 {
     if (postId.isEmpty() || emojiName.isEmpty() || postId.startsWith("local-"))
@@ -3200,6 +3347,42 @@ void MmClient::sendOut(const OutItem &item)
     m_inflight = item.id;
     if (item.kind == "file") {
         startUpload(item);
+        return;
+    }
+    if (item.kind == "edit" || item.kind == "delete" || item.kind == "pin"
+            || item.kind == "unpin" || item.kind == "save" || item.kind == "unsave") {
+        QNetworkReply *reply = 0;
+        if (item.kind == "edit") {
+            QVariantMap body;
+            body["message"] = item.message;
+            QByteArray bytes;
+            JsonDataAccess json;
+            json.saveToBuffer(body, &bytes);
+            reply = start(StepMutate, "/api/v4/posts/" + item.postId + "/patch", bytes, "PUT", true);
+        } else if (item.kind == "delete") {
+            reply = start(StepMutate, "/api/v4/posts/" + item.postId, QByteArray(), "DELETE", true);
+        } else if (item.kind == "pin" || item.kind == "unpin") {
+            const QString tail = item.kind == "pin" ? QString("/pin") : QString("/unpin");
+            reply = start(StepMutate, "/api/v4/posts/" + item.postId + tail, QByteArray(), "POST", true);
+        } else {
+            QVariantMap pref;
+            pref["user_id"] = m_userId;
+            pref["category"] = QString("flagged_post");
+            pref["name"] = item.postId;
+            pref["value"] = QString("true");
+            QVariantList prefs;
+            prefs.append(pref);
+            QByteArray bytes;
+            JsonDataAccess json;
+            json.saveToBuffer(prefs, &bytes);
+            QString path = "/api/v4/users/" + m_userId + "/preferences";
+            if (item.kind == "unsave")
+                path += "/delete";
+            reply = start(StepMutate, path, bytes, "POST", true);
+        }
+        reply->setProperty("localId", item.id);
+        reply->setProperty("chan", item.channelId);
+        reply->setProperty("msg", item.message);
         return;
     }
     if (item.kind == "react" || item.kind == "unreact") {

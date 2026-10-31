@@ -2,7 +2,7 @@
 
 A Mattermost client for BlackBerry 10. It is built for the Classic, the square 720 screen, and a world in which BlackBerry no longer signs applications.
 
-On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **127**.
+On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **128**.
 
 <p>
 <img src="icon.png" width="96" alt="App icon">
@@ -18,7 +18,7 @@ The interface source strings are English (`qsTr` and `tr`). At startup the app l
 
 ## Toward the Android app
 
-This list is the Mattermost Android client, scored by what this program already does. 19 rows are done, 2 are only part way, 12 are still missing.
+This list is the Mattermost Android client, scored by what this program already does. 21 rows are done, 2 are only part way, 10 are still missing.
 
 | | |
 | --- | --- |
@@ -49,8 +49,8 @@ This list is the Mattermost Android client, scored by what this program already 
 | 🟢 | Background refresh every six minutes |
 | 🟢 | Settings: refresh, team, log out, preview, 24-hour clock, images, hub alerts, mentions only, protocol log |
 | 🟡 | English and German. Further languages are a catalog |
-| 🔴 | Edit and delete a message |
-| 🔴 | Pin and save a post |
+| 🟢 | Edit and delete your own message from the swipe |
+| 🟢 | Pin and save a post from the swipe |
 | 🔴 | Slash commands |
 | 🔴 | Typing indicator |
 | 🔴 | SSO |
@@ -69,6 +69,8 @@ A reaction is a swipe, then one of twelve names. Choosing the same name again re
 The emoji panel lists the phone font and, after the panel opens, the server's own emoji. A font glyph is inserted as the character. A server emoji is inserted as `:name:` and shown as its picture once that picture has arrived.
 
 A Hub entry uses the channel name as the title. The body is the latest post, shortened, for up to eight channels that have something unread. A post with no text keeps the count.
+
+Edit opens the message in a prompt and sends the new text. Delete asks first, then removes the message. Pin and save toggle. A saved post is one you flagged. The server still decides whether you are allowed to edit, delete, or pin.
 
 ## Install in 2026
 

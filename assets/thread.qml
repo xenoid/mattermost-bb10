@@ -7,6 +7,35 @@ import bb.system 1.2
 Page {
     id: pageRoot
     objectName: "thread"
+    property string editId: ""
+    property string deleteId: ""
+    attachedObjects: [
+        SystemPrompt {
+            id: editPrompt
+            title: qsTr("Edit")
+            confirmButton.label: qsTr("Save")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.editPost(editId, inputFieldTextEntry())
+            }
+        },
+        SystemDialog {
+            id: deleteDialog
+            title: qsTr("Delete message")
+            body: qsTr("This cannot be undone.")
+            confirmButton.label: qsTr("Delete")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.deletePost(deleteId)
+            }
+        },
+        ComponentDefinition {
+            id: attachDef
+            source: "asset:///attach.qml"
+        }
+    ]
     property string rootId: ""
     property bool forceEnd: false
     property variant navPane: null
@@ -35,13 +64,6 @@ Page {
             onTriggered: goBack()
         }
     }
-
-    attachedObjects: [
-        ComponentDefinition {
-            id: attachDef
-            source: "asset:///attach.qml"
-        }
-    ]
 
     Container {
         background: Color.White
@@ -114,8 +136,23 @@ Page {
             function askReact(postId) {
                 _mm.askReact(postId)
             }
+            function beginEdit(postId, text) {
+                editId = postId
+                editPrompt.inputField.defaultText = text ? text : ""
+                editPrompt.show()
+            }
+            function beginDelete(postId) {
+                deleteId = postId
+                deleteDialog.show()
+            }
             function toggleReact(postId, name) {
                 _mm.toggleReaction(postId, name)
+            }
+            function pinPost(postId) {
+                _mm.pinPost(postId)
+            }
+            function savePost(postId) {
+                _mm.savePost(postId)
             }
             function askReplies(rootId) {
                 _mm.askReplies(rootId)
@@ -182,6 +219,26 @@ Page {
                                     title: qsTr("React")
                                     enabled: ListItemData.pending != "1"
                                     onTriggered: postItem.ListItem.view.askReact(ListItemData.id)
+                                }
+                                ActionItem {
+                                    title: qsTr("Edit")
+                                    enabled: ListItemData.mine && ListItemData.pending != "1" && ListItemData.plain != ""
+                                    onTriggered: postItem.ListItem.view.beginEdit(ListItemData.id, ListItemData.plain)
+                                }
+                                ActionItem {
+                                    title: qsTr("Delete")
+                                    enabled: ListItemData.mine && ListItemData.pending != "1"
+                                    onTriggered: postItem.ListItem.view.beginDelete(ListItemData.id)
+                                }
+                                ActionItem {
+                                    title: ListItemData.pinned == "1" ? qsTr("Unpin") : qsTr("Pin")
+                                    enabled: ListItemData.pending != "1"
+                                    onTriggered: postItem.ListItem.view.pinPost(ListItemData.id)
+                                }
+                                ActionItem {
+                                    title: ListItemData.saved == "1" ? qsTr("Unsave") : qsTr("Save")
+                                    enabled: ListItemData.pending != "1"
+                                    onTriggered: postItem.ListItem.view.savePost(ListItemData.id)
                                 }
                                 ActionItem {
                                     title: qsTr("Open image")
@@ -1114,7 +1171,7 @@ Page {
             && a.imagePath2 == b.imagePath2 && a.react == b.react && a.pending == b.pending
             && a.avatar == b.avatar && a.title == b.title && a.grouped == b.grouped
             && a.quote == b.quote && a.mark == b.mark && a.message == b.message
-            && a.whenTime == b.whenTime
+            && a.whenTime == b.whenTime && a.pinned == b.pinned && a.saved == b.saved
     }
 
     function reload(rows, stickEnd) {
