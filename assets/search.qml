@@ -133,7 +133,6 @@ Page {
                                         textFormat: TextFormat.Html
                                         multiline: true
                                         autoSize.maxLineCount: 3
-                                        textStyle.color: Color.create("#1b1f23")
                                         textStyle.fontSize: FontSize.Small
                                     }
                                 }
