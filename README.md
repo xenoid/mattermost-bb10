@@ -2,7 +2,7 @@
 
 A Mattermost client for BlackBerry 10. It is built for the Classic, the square 720 screen, and a world in which BlackBerry no longer signs applications.
 
-On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **126**.
+On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **127**.
 
 <p>
 <img src="icon.png" width="96" alt="App icon">
@@ -18,7 +18,7 @@ The interface source strings are English (`qsTr` and `tr`). At startup the app l
 
 ## Toward the Android app
 
-This list is the Mattermost Android client, scored by what this program already does. 18 rows are done, 3 are only part way, 12 are still missing.
+This list is the Mattermost Android client, scored by what this program already does. 19 rows are done, 2 are only part way, 12 are still missing.
 
 | | |
 | --- | --- |
@@ -47,7 +47,7 @@ This list is the Mattermost Android client, scored by what this program already 
 | 🟢 | Emoji panel, including the server's own emoji. Flags and skin tones are not in the phone font |
 | 🟢 | A Hub row per channel. The body is the latest message when that post has text |
 | 🟢 | Background refresh every six minutes |
-| 🟡 | Settings: refresh, switch team, log out, preview, protocol log |
+| 🟢 | Settings: refresh, team, log out, preview, 24-hour clock, images, hub alerts, mentions only, protocol log |
 | 🟡 | English and German. Further languages are a catalog |
 | 🔴 | Edit and delete a message |
 | 🔴 | Pin and save a post |

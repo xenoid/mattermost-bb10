@@ -4,6 +4,7 @@
 #include "LocalStore.hpp"
 
 #include <QDate>
+#include <QDateTime>
 #include <QHash>
 #include <QList>
 #include <QNetworkAccessManager>
@@ -40,6 +41,10 @@ class MmClient : public QObject
     Q_PROPERTY(bool hasOlder READ hasOlder NOTIFY historyChanged)
     Q_PROPERTY(bool hasNewer READ hasNewer NOTIFY historyChanged)
     Q_PROPERTY(bool showPreview READ showPreview WRITE setShowPreview NOTIFY prefsChanged)
+    Q_PROPERTY(bool showImages READ showImages WRITE setShowImages NOTIFY prefsChanged)
+    Q_PROPERTY(bool clock24 READ clock24 WRITE setClock24 NOTIFY prefsChanged)
+    Q_PROPERTY(bool notifyHub READ notifyHub WRITE setNotifyHub NOTIFY prefsChanged)
+    Q_PROPERTY(bool notifyMentions READ notifyMentions WRITE setNotifyMentions NOTIFY prefsChanged)
     Q_PROPERTY(bool debugLog READ debugLog WRITE setDebugLog NOTIFY prefsChanged)
     Q_PROPERTY(bool trustReady READ trustReady CONSTANT)
     Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
@@ -64,10 +69,18 @@ public:
     bool hasOlder() const { return m_hasOlder; }
     bool hasNewer() const { return m_hasNewer; }
     bool showPreview() const { return m_showPreview; }
+    bool showImages() const { return m_showImages; }
+    bool clock24() const { return m_clock24; }
+    bool notifyHub() const { return m_notifyHub; }
+    bool notifyMentions() const { return m_notifyMentions; }
     bool debugLog() const { return m_debugLog; }
     bool trustReady() const { return m_trustReady; }
     QString appVersion() const;
     void setShowPreview(bool on);
+    void setShowImages(bool on);
+    void setClock24(bool on);
+    void setNotifyHub(bool on);
+    void setNotifyMentions(bool on);
     void setDebugLog(bool on);
     bool headlessLaunch() const;
 
@@ -286,6 +299,7 @@ private:
     QString repairText(const QString &in) const;
     QString normalizeUrl(QString url) const;
     QString shortWhen(qint64 ms) const;
+    QString clockTime(const QDateTime &dt) const;
     QString dayLabel(const QDate &day) const;
     QString channelTitle(const QString &id) const;
     QString firstUrl(const QString &message, bool *linkOnly) const;
@@ -333,6 +347,10 @@ private:
     bool m_hasNewer;
     bool m_trustReady;
     bool m_showPreview;
+    bool m_showImages;
+    bool m_clock24;
+    bool m_notifyHub;
+    bool m_notifyMentions;
     bool m_debugLog;
     bool m_focusNudged;
     bool m_mfaSent;

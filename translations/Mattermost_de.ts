@@ -466,6 +466,51 @@
         <translation>Zweck oder Thema unter dem Namen</translation>
     </message>
     <message>
+        <location filename="../assets/settings.qml" line="186" />
+        <source>24-hour clock</source>
+        <translation>24-Stunden-Zeit</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="192" />
+        <source>Hours and minutes on messages</source>
+        <translation>Stunden und Minuten an Nachrichten</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="216" />
+        <source>Show images</source>
+        <translation>Bilder zeigen</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="222" />
+        <source>Pictures inside the message</source>
+        <translation>Bilder in der Nachricht</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="248" />
+        <source>NOTIFICATIONS</source>
+        <translation>BENACHRICHTIGUNG</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="271" />
+        <source>Hub alerts</source>
+        <translation>Hub-Hinweise</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="277" />
+        <source>Unread channels in the hub</source>
+        <translation>Ungelesene Kanäle im Hub</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="301" />
+        <source>Mentions only</source>
+        <translation>Nur Erwähnungen</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="307" />
+        <source>Skip channels that are only unread</source>
+        <translation>Kanäle ohne Erwähnung auslassen</translation>
+    </message>
+    <message>
         <location filename="../assets/settings.qml" line="178" />
         <source>DIAGNOSTICS</source>
         <translation>DIAGNOSE</translation>

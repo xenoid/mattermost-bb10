@@ -466,6 +466,51 @@
         <translation>Purpose or topic under the name</translation>
     </message>
     <message>
+        <location filename="../assets/settings.qml" line="186" />
+        <source>24-hour clock</source>
+        <translation>24-hour clock</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="192" />
+        <source>Hours and minutes on messages</source>
+        <translation>Hours and minutes on messages</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="216" />
+        <source>Show images</source>
+        <translation>Show images</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="222" />
+        <source>Pictures inside the message</source>
+        <translation>Pictures inside the message</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="248" />
+        <source>NOTIFICATIONS</source>
+        <translation>NOTIFICATIONS</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="271" />
+        <source>Hub alerts</source>
+        <translation>Hub alerts</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="277" />
+        <source>Unread channels in the hub</source>
+        <translation>Unread channels in the hub</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="301" />
+        <source>Mentions only</source>
+        <translation>Mentions only</translation>
+    </message>
+    <message>
+        <location filename="../assets/settings.qml" line="307" />
+        <source>Skip channels that are only unread</source>
+        <translation>Skip channels that are only unread</translation>
+    </message>
+    <message>
         <location filename="../assets/settings.qml" line="178" />
         <source>DIAGNOSTICS</source>
         <translation>DIAGNOSTICS</translation>

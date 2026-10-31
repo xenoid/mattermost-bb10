@@ -85,6 +85,7 @@ Page {
 
             ListView {
             id: postList
+            property bool showImages: true
             scrollRole: ScrollRole.Main
             // Ohne den Puffer springt None, bevor die Zeilenhöhen stehen.
             bufferedScrollingEnabled: true
@@ -317,7 +318,7 @@ Page {
                                 }
 
                                 Container {
-                                    visible: ListItemData.imageId != ""
+                                    visible: ListItemData.imageId != "" && postItem.ListItem.view.showImages
                                     topMargin: 8
                                     preferredWidth: ListItemData.imgW
                                     preferredHeight: ListItemData.imgH
@@ -741,7 +742,7 @@ Page {
                                     }
                                 }
                                 Container {
-                                    visible: ListItemData.imageId2 != ""
+                                    visible: ListItemData.imageId2 != "" && postItem.ListItem.view.showImages
                                     topMargin: 8
                                     preferredWidth: ListItemData.imgW2
                                     preferredHeight: ListItemData.imgH2
@@ -1113,6 +1114,7 @@ Page {
             && a.imagePath2 == b.imagePath2 && a.react == b.react && a.pending == b.pending
             && a.avatar == b.avatar && a.title == b.title && a.grouped == b.grouped
             && a.quote == b.quote && a.mark == b.mark && a.message == b.message
+            && a.whenTime == b.whenTime
     }
 
     function reload(rows, stickEnd) {
@@ -1331,8 +1333,13 @@ Page {
         }
     }
 
+    function applyDisplay() {
+        postList.showImages = _mm.showImages
+    }
+
     function dropSignals() {
         clearHeld()
+        _mm.prefsChanged.disconnect(applyDisplay)
         _mm.postsLoaded.disconnect(takePosts)
         _mm.focusNudge.disconnect(onFocusNudge)
         _mm.repliesLoaded.disconnect(takeReplies)
@@ -1344,6 +1351,8 @@ Page {
     }
 
     onCreationCompleted: {
+        applyDisplay()
+        _mm.prefsChanged.connect(applyDisplay)
         _mm.postsLoaded.connect(takePosts)
         _mm.focusNudge.connect(onFocusNudge)
         _mm.repliesLoaded.connect(takeReplies)

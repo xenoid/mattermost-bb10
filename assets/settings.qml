@@ -166,6 +166,167 @@ Page {
                     }
                 }
             }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                leftPadding: 20
+                rightPadding: 20
+                topPadding: 16
+                bottomPadding: 16
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Container {
+                    verticalAlignment: VerticalAlignment.Center
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                    Label {
+                        text: qsTr("24-hour clock")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#1b1f23")
+                        textStyle.fontSize: FontSize.Medium
+                    }
+                    Label {
+                        text: qsTr("Hours and minutes on messages")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#6b747d")
+                        textStyle.fontSize: FontSize.XSmall
+                    }
+                }
+                ToggleButton {
+                    verticalAlignment: VerticalAlignment.Center
+                    checked: _mm.clock24
+                    onCheckedChanged: {
+                        if (_mm.clock24 != checked)
+                            _mm.clock24 = checked
+                    }
+                }
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                leftPadding: 20
+                rightPadding: 20
+                topPadding: 16
+                bottomPadding: 16
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Container {
+                    verticalAlignment: VerticalAlignment.Center
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                    Label {
+                        text: qsTr("Show images")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#1b1f23")
+                        textStyle.fontSize: FontSize.Medium
+                    }
+                    Label {
+                        text: qsTr("Pictures inside the message")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#6b747d")
+                        textStyle.fontSize: FontSize.XSmall
+                    }
+                }
+                ToggleButton {
+                    verticalAlignment: VerticalAlignment.Center
+                    checked: _mm.showImages
+                    onCheckedChanged: {
+                        if (_mm.showImages != checked)
+                            _mm.showImages = checked
+                    }
+                }
+            }
+
+            Container {
+                background: Color.create("#f3f5f7")
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 56
+                leftPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("NOTIFICATIONS")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.XSmall
+                    textStyle.fontWeight: FontWeight.Bold
+                }
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                leftPadding: 20
+                rightPadding: 20
+                topPadding: 16
+                bottomPadding: 16
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Container {
+                    verticalAlignment: VerticalAlignment.Center
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                    Label {
+                        text: qsTr("Hub alerts")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#1b1f23")
+                        textStyle.fontSize: FontSize.Medium
+                    }
+                    Label {
+                        text: qsTr("Unread channels in the hub")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#6b747d")
+                        textStyle.fontSize: FontSize.XSmall
+                    }
+                }
+                ToggleButton {
+                    verticalAlignment: VerticalAlignment.Center
+                    checked: _mm.notifyHub
+                    onCheckedChanged: {
+                        if (_mm.notifyHub != checked)
+                            _mm.notifyHub = checked
+                    }
+                }
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                leftPadding: 20
+                rightPadding: 20
+                topPadding: 16
+                bottomPadding: 16
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Container {
+                    verticalAlignment: VerticalAlignment.Center
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                    Label {
+                        text: qsTr("Mentions only")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#1b1f23")
+                        textStyle.fontSize: FontSize.Medium
+                    }
+                    Label {
+                        text: qsTr("Skip channels that are only unread")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#6b747d")
+                        textStyle.fontSize: FontSize.XSmall
+                    }
+                }
+                ToggleButton {
+                    verticalAlignment: VerticalAlignment.Center
+                    checked: _mm.notifyMentions
+                    onCheckedChanged: {
+                        if (_mm.notifyMentions != checked)
+                            _mm.notifyMentions = checked
+                    }
+                }
+            }
 
             Container {
                 background: Color.create("#f3f5f7")

@@ -200,6 +200,10 @@ MmClient::MmClient(QObject *parent)
       m_hasNewer(false),
       m_trustReady(false),
       m_showPreview(true),
+      m_showImages(true),
+      m_clock24(true),
+      m_notifyHub(true),
+      m_notifyMentions(false),
       m_debugLog(false),
       m_focusNudged(false),
       m_mfaSent(false),
@@ -232,6 +236,10 @@ MmClient::MmClient(QObject *parent)
     m_token = settings.value("token").toString();
     m_userId = settings.value("userId").toString();
     m_showPreview = settings.value("showPreview", true).toBool();
+    m_showImages = settings.value("showImages", true).toBool();
+    m_clock24 = settings.value("clock24", true).toBool();
+    m_notifyHub = settings.value("notifyHub", true).toBool();
+    m_notifyMentions = settings.value("notifyMentions", false).toBool();
     m_debugLog = settings.value("debugLog", false).toBool();
     if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
         setLoggedIn(true);
@@ -241,12 +249,17 @@ MmClient::MmClient(QObject *parent)
 
 // ---------------------------------------------------------------- Hilfen
 
+QString MmClient::clockTime(const QDateTime &dt) const
+{
+    return dt.toString(m_clock24 ? QLatin1String("HH:mm") : QLatin1String("h:mm AP"));
+}
+
 QString MmClient::shortWhen(qint64 ms) const
 {
     const QDateTime dt = QDateTime::fromMSecsSinceEpoch(ms);
     const QDate today = QDate::currentDate();
     if (dt.date() == today)
-        return dt.toString("HH:mm");
+        return clockTime(dt);
     if (dt.date() == today.addDays(-1))
         return tr("Yesterday");
     if (dt.date().year() == today.year())
@@ -400,6 +413,78 @@ void MmClient::setShowPreview(bool on)
     emit prefsChanged();
 }
 
+void MmClient::setShowImages(bool on)
+{
+    if (m_showImages == on)
+        return;
+    m_showImages = on;
+    QSettings("hollweck", "mattermost").setValue("showImages", on);
+    emit prefsChanged();
+}
+
+void MmClient::setClock24(bool on)
+{
+    if (m_clock24 == on)
+        return;
+    m_clock24 = on;
+    QSettings("hollweck", "mattermost").setValue("clock24", on);
+    for (int i = 0; i < m_postRows.size(); ++i) {
+        QVariantMap row = m_postRows.at(i).toMap();
+        const qint64 created = row.value("createAt").toLongLong();
+        if (created <= 0)
+            continue;
+        const QDateTime when = QDateTime::fromMSecsSinceEpoch(created);
+        row["whenTime"] = clockTime(when);
+        row["whenFull"] = when.toString(m_clock24 ? "dd.MM. HH:mm" : "dd.MM. h:mm AP");
+        m_postRows[i] = row;
+    }
+    for (int i = 0; i < m_replyRows.size(); ++i) {
+        QVariantMap row = m_replyRows.at(i).toMap();
+        const qint64 created = row.value("createAt").toLongLong();
+        if (created <= 0)
+            continue;
+        const QDateTime when = QDateTime::fromMSecsSinceEpoch(created);
+        row["whenTime"] = clockTime(when);
+        row["whenFull"] = when.toString(m_clock24 ? "dd.MM. HH:mm" : "dd.MM. h:mm AP");
+        m_replyRows[i] = row;
+    }
+    for (int i = 0; i < m_channelRows.size(); ++i) {
+        QVariantMap row = m_channelRows.at(i).toMap();
+        const qint64 last = row.value("last").toLongLong();
+        row["when"] = last > 0 ? shortWhen(last) : QString();
+        m_channelRows[i] = row;
+    }
+    emit prefsChanged();
+    if (!m_postRows.isEmpty())
+        publishPosts();
+    if (!m_replyRows.isEmpty())
+        publishThread();
+    if (!m_channelRows.isEmpty())
+        emit channelsLoaded(m_channelRows);
+}
+
+void MmClient::setNotifyHub(bool on)
+{
+    if (m_notifyHub == on)
+        return;
+    m_notifyHub = on;
+    QSettings("hollweck", "mattermost").setValue("notifyHub", on);
+    emit prefsChanged();
+    if (m_loggedIn && !m_channelRows.isEmpty())
+        syncInbox();
+}
+
+void MmClient::setNotifyMentions(bool on)
+{
+    if (m_notifyMentions == on)
+        return;
+    m_notifyMentions = on;
+    QSettings("hollweck", "mattermost").setValue("notifyMentions", on);
+    emit prefsChanged();
+    if (m_loggedIn && !m_channelRows.isEmpty())
+        syncInbox();
+}
+
 void MmClient::setDebugLog(bool on)
 {
     if (m_debugLog == on)
@@ -497,6 +582,10 @@ void MmClient::enterHeadless()
         m_token = settings.value("token").toString();
         m_userId = settings.value("userId").toString();
         m_showPreview = settings.value("showPreview", true).toBool();
+        m_showImages = settings.value("showImages", true).toBool();
+        m_clock24 = settings.value("clock24", true).toBool();
+        m_notifyHub = settings.value("notifyHub", true).toBool();
+        m_notifyMentions = settings.value("notifyMentions", false).toBool();
         m_debugLog = settings.value("debugLog", false).toBool();
         m_net.setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
         if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
@@ -1114,6 +1203,19 @@ void MmClient::syncInbox()
     if (!m_notesReady && !m_headless)
         bb::platform::Notification::deleteAllFromInbox();
 
+    if (!m_notifyHub) {
+        const QStringList ids = m_noteKeys.keys();
+        for (int i = 0; i < ids.size(); ++i)
+            clearInbox(ids.at(i));
+        for (int i = 0; i < m_channelRows.size(); ++i)
+            clearInbox(m_channelRows.at(i).toMap().value("channelId").toString());
+        m_notesReady = true;
+        if (!m_headless && !m_pendingInbox.isEmpty())
+            flushInbox();
+        quitIfHeadless();
+        return;
+    }
+
     QSet<QString> live;
     for (int i = 0; i < m_channelRows.size(); ++i) {
         const QVariantMap row = m_channelRows.at(i).toMap();
@@ -1123,7 +1225,9 @@ void MmClient::syncInbox()
         live.insert(id);
         const int unread = row.value("unread").toInt();
         const int mentions = row.value("mentions").toInt();
-        const int attention = unread > mentions ? unread : mentions;
+        int attention = unread > mentions ? unread : mentions;
+        if (m_notifyMentions)
+            attention = mentions;
         const int seen = m_noteUnread.value(id, 0);
         if (attention <= 0)
             clearInbox(id);
@@ -1782,8 +1886,8 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["mine"] = !m_userId.isEmpty() && uid == m_userId;
     row["plain"] = source;
     row["message"] = Markdown::html(message);
-    row["whenTime"] = when.toString("HH:mm");
-    row["whenFull"] = when.toString("dd.MM. HH:mm");
+    row["whenTime"] = clockTime(when);
+    row["whenFull"] = when.toString(m_clock24 ? "dd.MM. HH:mm" : "dd.MM. h:mm AP");
     row["createAt"] = created;
     row["title"] = QString();
     row["initial"] = QString();
