@@ -737,12 +737,14 @@ Page {
     function jumpToFocus() {
         if (focusPost == "" || focusHold)
             return
-        if (postLayout.layoutFrame.height <= 0) {
-            _mm.nudgeFocus()
+        if (postLayout.layoutFrame.height <= 0)
             return
-        }
         var index = focusIndex()
+        // Solange die Liste leer ist, ist die Fundstelle noch unterwegs.
+        // Der Zähler darf sie nicht vorher verwerfen.
         if (index < 0) {
+            if (postModel.size() == 0)
+                return
             focusTries = focusTries + 1
             if (focusTries > 20) {
                 focusPost = ""
