@@ -17,6 +17,7 @@ Page {
     property string markedPost: ""
     property int focusTries: 0
     property bool focusHold: false
+    property bool focusSent: false
 
     onRootIdChanged: objectName = rootId == "" ? "thread" : "replies"
 
@@ -97,11 +98,11 @@ Page {
             attachedObjects: [
                 LayoutUpdateHandler {
                     id: postLayout
-                    onLayoutFrameChanged: jumpToFocus()
+                    onLayoutFrameChanged: jumpToFocus(false)
                 },
                 ListScrollStateHandler {
                     id: scrollState
-                    onFirstVisibleItemChanged: jumpToFocus()
+                    onFirstVisibleItemChanged: jumpToFocus(false)
                 }
             ]
             function itemType(data, indexPath) {
@@ -737,7 +738,11 @@ Page {
     // Sprung nicht verbrauchen, bevor die Liste steht. atEnd ist direkt
     // nach dem Aufbau oft schon wahr. Nur wenn unten kein Platz mehr ist,
     // bleibt die Fundstelle stehen.
-    function jumpToFocus() {
+    function onFocusNudge() {
+        jumpToFocus(true)
+    }
+
+    function jumpToFocus(fromTimer) {
         if (focusPost == "" || focusHold)
             return
         if (postLayout.layoutFrame.height <= 0) {
@@ -746,14 +751,18 @@ Page {
         }
         var index = focusIndex()
         // Solange die Liste leer ist, ist die Fundstelle noch unterwegs.
-        // Der Zähler darf sie nicht vorher verwerfen.
         if (index < 0) {
+            if (!fromTimer) {
+                _mm.nudgeFocus()
+                return
+            }
             if (postModel.size() == 0)
                 return
             focusTries = focusTries + 1
             if (focusTries > 20) {
                 focusPost = ""
                 focusTries = 0
+                focusSent = false
                 return
             }
             _mm.nudgeFocus()
@@ -763,17 +772,30 @@ Page {
         var at = (visible && visible.length > 0) ? Number(visible[0]) : -1
         var gap = index - at
         var room = postModel.size() - 1 - at
-        if (at == index || (focusTries > 0 && scrollState.atEnd && at >= 0 && gap >= 0 && room <= 8)) {
+        if (at == index || (focusSent && scrollState.atEnd && at >= 0 && gap >= 0 && room <= 8)) {
             focusPost = ""
             focusTries = 0
+            focusSent = false
             return
         }
-        // None ist 1. Das Enum als Argument kommt in dieser QML-Version nicht an.
-        postList.scrollToItem([index], 1)
+        // None wartet, bis die Zeilen im Puffer sind. Ein weiterer Aufruf
+        // fängt die Übertragung neu an. Nur der erste Sprung und ein Nachschlag.
+        if (!focusSent) {
+            postList.scrollToItem([index], 1)
+            focusSent = true
+            focusTries = 0
+            _mm.nudgeFocus()
+            return
+        }
+        if (!fromTimer)
+            return
         focusTries = focusTries + 1
-        if (focusTries > 20) {
+        if (focusTries == 8)
+            focusSent = false
+        if (focusTries > 16) {
             focusPost = ""
             focusTries = 0
+            focusSent = false
             return
         }
         _mm.nudgeFocus()
@@ -811,9 +833,10 @@ Page {
         if (focusPost != "") {
             focusHold = true
             focusTries = 0
+            focusSent = false
             reload(rows, false)
             focusHold = false
-            jumpToFocus()
+            jumpToFocus(false)
             return
         }
         if (size == 0 || rows.length == 0) {
@@ -885,7 +908,7 @@ Page {
     function dropSignals() {
         clearHeld()
         _mm.postsLoaded.disconnect(takePosts)
-        _mm.focusNudge.disconnect(jumpToFocus)
+        _mm.focusNudge.disconnect(onFocusNudge)
         _mm.repliesLoaded.disconnect(takeReplies)
         _mm.imageReady.disconnect(takeImage)
         _mm.avatarReady.disconnect(takeAvatar)
@@ -894,7 +917,7 @@ Page {
 
     onCreationCompleted: {
         _mm.postsLoaded.connect(takePosts)
-        _mm.focusNudge.connect(jumpToFocus)
+        _mm.focusNudge.connect(onFocusNudge)
         _mm.repliesLoaded.connect(takeReplies)
         _mm.imageReady.connect(takeImage)
         _mm.avatarReady.connect(takeAvatar)

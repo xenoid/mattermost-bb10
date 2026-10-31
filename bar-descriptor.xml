@@ -3,7 +3,7 @@
     <id>com.hollweck.mattermost</id>
     <name>Mattermost</name>
     <versionNumber>1.0.0</versionNumber>
-    <buildId>103</buildId>
+    <buildId>104</buildId>
     <description>Mattermost client for BlackBerry 10.</description>
     <author>hollweck</author>
     <initialWindow>
