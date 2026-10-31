@@ -116,6 +116,7 @@ public:
     Q_INVOKABLE QVariantList emojiChoices() const;
     Q_INVOKABLE QVariantList emojiCatalog(const QString &query) const;
     Q_INVOKABLE void loadCustomEmoji();
+    Q_INVOKABLE QVariantList slashMatches(const QString &text);
     Q_INVOKABLE void refresh();
     Q_INVOKABLE void search(const QString &terms);
     Q_INVOKABLE void openFromSearch(const QString &id, const QString &name, const QString &postId);
@@ -148,6 +149,7 @@ signals:
     void imageReady(const QString &fileId, const QString &path);
     void emojiReady(const QString &name, const QString &path);
     void customEmojiChanged();
+    void commandsChanged();
     void avatarReady(const QString &userId, const QString &path);
     void showImage(const QString &path);
     void sendFailed(const QString &text);
@@ -188,7 +190,8 @@ private:
         StepEmojiList,
         StepPreview,
         StepMutate,
-        StepFlagged
+        StepFlagged,
+        StepCommands
     };
 
     enum FileKind {
@@ -203,6 +206,12 @@ private:
     struct CustomEmoji {
         QString id;
         QString name;
+    };
+
+    struct SlashCmd {
+        QString trigger;
+        QString hint;
+        QString desc;
     };
 
     struct FileJob {
@@ -296,6 +305,8 @@ private:
     void queueEmoji(const QString &emojiId, const QString &name);
     void queueEmojiName(const QString &name);
     void takeEmojiPage(const QVariantList &list);
+    void loadCommands();
+    void takeCommands(const QString &teamId, const QVariantList &list);
     void queueJob(const FileJob &job, bool front);
     void pumpFiles();
     void startJob(const FileJob &job);
@@ -399,9 +410,13 @@ private:
     QSet<QString> m_emojiMiss;
     QSet<QString> m_saved;
     QList<CustomEmoji> m_customEmoji;
+    QList<SlashCmd> m_commands;
     int m_emojiPage;
     bool m_emojiListBusy;
     qint64 m_emojiListedAt;
+    bool m_commandsBusy;
+    qint64 m_commandsAt;
+    QString m_commandsTeam;
     int m_previewLeft;
     QHash<QString, UserInfo> m_users;
 };

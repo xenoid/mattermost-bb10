@@ -929,6 +929,70 @@ Page {
             }
         }
 
+        // ------------------------------------------------ Slash, über der Eingabe
+        Container {
+            id: slashPanel
+            visible: false
+            preferredHeight: 288
+            background: Color.create("#f4f6f8")
+            horizontalAlignment: HorizontalAlignment.Fill
+            layout: DockLayout {
+            }
+            Container {
+                preferredHeight: 1
+                background: Color.create("#dfe3e7")
+                horizontalAlignment: HorizontalAlignment.Fill
+                verticalAlignment: VerticalAlignment.Top
+            }
+            ListView {
+                id: slashList
+                horizontalAlignment: HorizontalAlignment.Fill
+                verticalAlignment: VerticalAlignment.Fill
+                dataModel: ArrayDataModel {
+                    id: slashModel
+                }
+                layout: StackListLayout {
+                    headerMode: ListHeaderMode.None
+                }
+                function itemType(data, indexPath) {
+                    return "slash"
+                }
+                listItemComponents: [
+                    ListItemComponent {
+                        type: "slash"
+                        Container {
+                            preferredWidth: 720
+                            preferredHeight: 96
+                            leftPadding: 16
+                            rightPadding: 16
+                            layout: StackLayout {
+                                orientation: LayoutOrientation.TopToBottom
+                            }
+                            Label {
+                                text: "/" + ListItemData.trigger + (ListItemData.hint != "" ? ("  " + ListItemData.hint) : "")
+                                textFormat: TextFormat.Plain
+                                textStyle.color: Color.create("#1b1f23")
+                                textStyle.fontSize: FontSize.Small
+                                textStyle.fontWeight: FontWeight.Bold
+                            }
+                            Label {
+                                visible: ListItemData.desc != ""
+                                text: ListItemData.desc
+                                textFormat: TextFormat.Plain
+                                textStyle.color: Color.create("#6b747d")
+                                textStyle.fontSize: FontSize.XSmall
+                            }
+                        }
+                    }
+                ]
+                onTriggered: {
+                    var item = slashModel.data(indexPath)
+                    if (item && item.trigger)
+                        pickSlash(item.trigger)
+                }
+            }
+        }
+
         // ------------------------------------------------ Eingabe
         Container {
             background: Color.White
@@ -1019,6 +1083,7 @@ Page {
                         spaceQuota: 1
                     }
                     input.onSubmitted: send()
+                    onTextChanging: refreshSlash(text)
                     onFocusedChanged: {
                         if (focused)
                             emojiPanel.visible = false
@@ -1108,9 +1173,11 @@ Page {
         if (emojiPanel.visible) {
             emojiPanel.visible = false
             syncPeek()
+            refreshSlash(composer.text)
             return
         }
         emojiPanel.visible = true
+        slashPanel.visible = false
         syncPeek()
         _mm.loadCustomEmoji()
         if (emojiSearch.text != "")
@@ -1122,6 +1189,32 @@ Page {
     function onCustomEmoji() {
         if (emojiPanel.visible)
             filterEmoji(emojiSearch.text)
+    }
+
+    function onCommands() {
+        refreshSlash(composer.text)
+    }
+
+    function refreshSlash(text) {
+        var all = _mm.slashMatches(text ? text : "")
+        slashModel.clear()
+        var n = (all && all.length) ? all.length : 0
+        for (var i = 0; i < n; ++i) {
+            slashModel.append({
+                "type": "slash",
+                "trigger": all[i].trigger ? all[i].trigger : "",
+                "hint": all[i].hint ? all[i].hint : "",
+                "desc": all[i].desc ? all[i].desc : ""
+            })
+        }
+        slashPanel.preferredHeight = n > 3 ? 288 : Math.max(n, 1) * 96
+        slashPanel.visible = n > 0 && !emojiPanel.visible
+    }
+
+    function pickSlash(trigger) {
+        composer.text = "/" + trigger + " "
+        composer.focused = true
+        refreshSlash(composer.text)
     }
 
     function filterEmoji(query) {
@@ -1403,6 +1496,7 @@ Page {
         _mm.imageReady.disconnect(takeImage)
         _mm.emojiReady.disconnect(takeEmoji)
         _mm.customEmojiChanged.disconnect(onCustomEmoji)
+        _mm.commandsChanged.disconnect(onCommands)
         _mm.avatarReady.disconnect(takeAvatar)
         _mm.sendFailed.disconnect(restoreText)
     }
@@ -1416,6 +1510,7 @@ Page {
         _mm.imageReady.connect(takeImage)
         _mm.emojiReady.connect(takeEmoji)
         _mm.customEmojiChanged.connect(onCustomEmoji)
+        _mm.commandsChanged.connect(onCommands)
         _mm.avatarReady.connect(takeAvatar)
         _mm.sendFailed.connect(restoreText)
     }

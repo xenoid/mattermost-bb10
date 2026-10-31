@@ -210,6 +210,8 @@ MmClient::MmClient(QObject *parent)
       m_emojiPage(0),
       m_emojiListBusy(false),
       m_emojiListedAt(0),
+      m_commandsBusy(false),
+      m_commandsAt(0),
       m_previewLeft(0)
 {
     loadTrust();
@@ -524,10 +526,14 @@ void MmClient::resetSession()
     m_avatarTried.clear();
     m_emojiMiss.clear();
     m_customEmoji.clear();
+    m_commands.clear();
     m_saved.clear();
     m_emojiPage = 0;
     m_emojiListBusy = false;
     m_emojiListedAt = 0;
+    m_commandsBusy = false;
+    m_commandsAt = 0;
+    m_commandsTeam.clear();
     m_lastPostId.clear();
     m_postsSig.clear();
     m_threadRoot.clear();
@@ -719,6 +725,11 @@ void MmClient::applyTeam(const QString &id, const QString &name)
         return;
     m_teamId = id;
     m_teamName = name;
+    if (m_commandsTeam != id) {
+        m_commands.clear();
+        m_commandsAt = 0;
+        m_commandsTeam.clear();
+    }
     QSettings settings("hollweck", "mattermost");
     settings.setValue("teamId", id);
     m_channelId.clear();
@@ -1020,6 +1031,72 @@ void MmClient::takeEmojiPage(const QVariantList &list)
     m_emojiListedAt = QDateTime::currentMSecsSinceEpoch();
     emit customEmojiChanged();
     pumpFiles();
+}
+
+void MmClient::loadCommands()
+{
+    if (!m_loggedIn || m_token.isEmpty() || m_teamId.isEmpty() || m_commandsBusy)
+        return;
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (m_commandsTeam == m_teamId && m_commandsAt > 0 && now - m_commandsAt < 600000)
+        return;
+    m_commandsBusy = true;
+    QNetworkReply *reply = start(StepCommands,
+        "/api/v4/teams/" + m_teamId + "/commands/autocomplete",
+        QByteArray(), "GET", true);
+    if (reply)
+        reply->setProperty("team", m_teamId);
+}
+
+QVariantList MmClient::slashMatches(const QString &text)
+{
+    QVariantList list;
+    if (!text.startsWith(QLatin1String("/")))
+        return list;
+    loadCommands();
+    if (text.indexOf(QLatin1Char(' ')) >= 0)
+        return list;
+    const QString token = text.mid(1).toLower();
+    for (int i = 0; i < m_commands.size() && list.size() < 8; ++i) {
+        const SlashCmd &cmd = m_commands.at(i);
+        if (!token.isEmpty() && !cmd.trigger.toLower().startsWith(token))
+            continue;
+        QVariantMap row;
+        row["trigger"] = cmd.trigger;
+        row["hint"] = cmd.hint;
+        row["desc"] = cmd.desc;
+        list.append(row);
+    }
+    return list;
+}
+
+void MmClient::takeCommands(const QString &teamId, const QVariantList &list)
+{
+    if (teamId != m_teamId) {
+        m_commandsBusy = false;
+        emit commandsChanged();
+        return;
+    }
+    m_commands.clear();
+    for (int i = 0; i < list.size(); ++i) {
+        const QVariantMap cmd = list.at(i).toMap();
+        if (cmd.contains("auto_complete") && !cmd.value("auto_complete").toBool())
+            continue;
+        const QString trigger = cmd.value("trigger").toString().trimmed();
+        if (trigger.isEmpty())
+            continue;
+        SlashCmd row;
+        row.trigger = trigger.startsWith(QLatin1String("/")) ? trigger.mid(1) : trigger;
+        row.hint = cmd.value("auto_complete_hint").toString();
+        row.desc = cmd.value("auto_complete_desc").toString();
+        if (row.desc.isEmpty())
+            row.desc = cmd.value("display_name").toString();
+        m_commands.append(row);
+    }
+    m_commandsBusy = false;
+    m_commandsTeam = m_teamId;
+    m_commandsAt = QDateTime::currentMSecsSinceEpoch();
+    emit commandsChanged();
 }
 
 void MmClient::showCached()
@@ -2544,6 +2621,25 @@ void MmClient::onFinished(QNetworkReply *reply)
                     publishThread();
             }
         }
+        return;
+    }
+    if (step == StepCommands) {
+        const QString team = reply->property("team").toString();
+        if (http >= 400 || http == 0 || netCode != 0) {
+            m_commandsBusy = false;
+            m_commandsTeam = team;
+            m_commandsAt = QDateTime::currentMSecsSinceEpoch() - 540000;
+            return;
+        }
+        JsonDataAccess commandJson;
+        const QVariant commandParsed = commandJson.loadFromBuffer(payload);
+        if (commandJson.hasError()) {
+            m_commandsBusy = false;
+            m_commandsTeam = team;
+            m_commandsAt = QDateTime::currentMSecsSinceEpoch() - 540000;
+            return;
+        }
+        takeCommands(team, commandParsed.toList());
         return;
     }
     const QString page = reply->property("page").toString();
