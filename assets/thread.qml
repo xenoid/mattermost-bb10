@@ -718,7 +718,7 @@ Page {
         for (var i = 0; i < rows.length; ++i)
             postModel.append(rows[i])
         if (stickEnd && rows.length > 0)
-            postList.scrollToPosition(ScrollPosition.End, ScrollAnimation.None)
+            postList.scrollToPosition(1, 1)
     }
 
     function focusIndex() {
@@ -742,8 +742,16 @@ Page {
             return
         }
         var index = focusIndex()
-        if (index < 0)
+        if (index < 0) {
+            focusTries = focusTries + 1
+            if (focusTries > 20) {
+                focusPost = ""
+                focusTries = 0
+                return
+            }
+            _mm.nudgeFocus()
             return
+        }
         var visible = scrollState.firstVisibleItem
         var at = (visible && visible.length > 0) ? Number(visible[0]) : -1
         var gap = index - at
@@ -753,7 +761,8 @@ Page {
             focusTries = 0
             return
         }
-        postList.scrollToItem([index], ScrollAnimation.None)
+        // None ist 1. Das Enum als Argument kommt in dieser QML-Version nicht an.
+        postList.scrollToItem([index], 1)
         focusTries = focusTries + 1
         if (focusTries > 20) {
             focusPost = ""
@@ -837,7 +846,7 @@ Page {
             added = true
         }
         if (added && follow) {
-            postList.scrollToPosition(ScrollPosition.End, ScrollAnimation.Smooth)
+            postList.scrollToPosition(1, 2)
             forceEnd = false
         }
     }
