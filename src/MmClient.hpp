@@ -79,6 +79,7 @@ public:
     Q_INVOKABLE QVariantList teamChoices() const;
     Q_INVOKABLE void openChannel(const QString &id, const QString &name);
     Q_INVOKABLE void openAt(const QString &id, const QString &name, const QString &postId);
+    Q_INVOKABLE void nudgeFocus();
     Q_INVOKABLE void loadOlder();
     Q_INVOKABLE void loadNewer();
     Q_INVOKABLE void closeChannel();
@@ -122,6 +123,7 @@ signals:
     void repliesRequested(const QString &rootId);
     void reactRequested(const QString &postId);
     void threadRequested(const QString &id, const QString &name, const QString &postId);
+    void focusNudge();
     void mfaRequired();
     void chooseTeam();
     void historyChanged();
@@ -140,6 +142,7 @@ private slots:
     void onInvoked(const bb::system::InvokeRequest &request);
     void flushInbox();
     void bootHeadless();
+    void emitFocusNudge();
 
 private:
     enum Step {
@@ -310,6 +313,7 @@ private:
     bool m_trustReady;
     bool m_showPreview;
     bool m_debugLog;
+    bool m_focusNudged;
 
     QString m_mfaPassword;
     QString m_focusPost;

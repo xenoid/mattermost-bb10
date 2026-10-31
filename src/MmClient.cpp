@@ -26,6 +26,7 @@
 #include <QRegExp>
 #include <QSet>
 #include <QSettings>
+#include <QTimer>
 #include <QNetworkProxy>
 #include <QSslCertificate>
 #include <QSslConfiguration>
@@ -197,7 +198,8 @@ MmClient::MmClient(QObject *parent)
       m_hasNewer(false),
       m_trustReady(false),
       m_showPreview(true),
-      m_debugLog(false)
+      m_debugLog(false),
+      m_focusNudged(false)
 {
     loadTrust();
     ImageStore::sweepLegacy();
@@ -749,6 +751,20 @@ void MmClient::openAt(const QString &id, const QString &name, const QString &pos
 {
     m_focusPost = postId;
     openChannel(id, name);
+}
+
+void MmClient::nudgeFocus()
+{
+    if (m_focusNudged)
+        return;
+    m_focusNudged = true;
+    QTimer::singleShot(100, this, SLOT(emitFocusNudge()));
+}
+
+void MmClient::emitFocusNudge()
+{
+    m_focusNudged = false;
+    emit focusNudge();
 }
 
 void MmClient::openChannel(const QString &id, const QString &name)

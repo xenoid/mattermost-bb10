@@ -751,10 +751,12 @@ Page {
         }
         postList.scrollToItem([index], ScrollAnimation.None)
         focusTries = focusTries + 1
-        if (focusTries > 8) {
+        if (focusTries > 12) {
             focusPost = ""
             focusTries = 0
+            return
         }
+        _mm.nudgeFocus()
     }
 
     // Neue Zeilen anhängen, geänderte ersetzen. Nur ans Ende springen,
@@ -863,6 +865,7 @@ Page {
     function dropSignals() {
         clearHeld()
         _mm.postsLoaded.disconnect(takePosts)
+        _mm.focusNudge.disconnect(jumpToFocus)
         _mm.repliesLoaded.disconnect(takeReplies)
         _mm.imageReady.disconnect(takeImage)
         _mm.avatarReady.disconnect(takeAvatar)
@@ -871,6 +874,7 @@ Page {
 
     onCreationCompleted: {
         _mm.postsLoaded.connect(takePosts)
+        _mm.focusNudge.connect(jumpToFocus)
         _mm.repliesLoaded.connect(takeReplies)
         _mm.imageReady.connect(takeImage)
         _mm.avatarReady.connect(takeAvatar)
