@@ -90,15 +90,56 @@ QString inlineFormat(const QString &input)
         ++guard;
     }
 
-    // Die Klammer der Adresse darf nicht die Klammer des Links sein.
-    QRegExp mdlink("\\[([^\\]]+)\\]\\((https?://[^\\s]+)\\)");
+    // Die schließende Klammer des Links ist die bei Tiefe 0, nicht die letzte der Zeile.
+    int linkAt = 0;
     guard = 0;
-    while (text.indexOf(mdlink) >= 0 && guard < 20) {
-        const QString href = safeHref(trimHref(mdlink.cap(2)));
-        QString replacement = mdlink.cap(1);
+    while (linkAt < text.size() && guard < 20) {
+        const int lb = text.indexOf(QLatin1Char('['), linkAt);
+        if (lb < 0)
+            break;
+        const int rb = text.indexOf(QLatin1Char(']'), lb + 1);
+        if (rb < 0)
+            break;
+        if (rb == lb + 1 || rb + 1 >= text.size() || text.at(rb + 1) != QLatin1Char('(')) {
+            linkAt = lb + 1;
+            ++guard;
+            continue;
+        }
+        const int urlAt = rb + 2;
+        const QString rest = text.mid(urlAt);
+        if (!rest.startsWith(QLatin1String("https://"))
+                && !rest.startsWith(QLatin1String("http://"))) {
+            linkAt = lb + 1;
+            ++guard;
+            continue;
+        }
+        int depth = 0;
+        int end = -1;
+        for (int j = urlAt; j < text.size(); ++j) {
+            const QChar c = text.at(j);
+            if (c.isSpace())
+                break;
+            if (c == QLatin1Char('(')) {
+                ++depth;
+                continue;
+            }
+            if (c == QLatin1Char(')') && --depth < 0) {
+                end = j;
+                break;
+            }
+        }
+        if (end < 0) {
+            linkAt = lb + 1;
+            ++guard;
+            continue;
+        }
+        const QString label = text.mid(lb + 1, rb - lb - 1);
+        const QString href = safeHref(trimHref(text.mid(urlAt, end - urlAt)));
+        QString replacement = label;
         if (!href.isEmpty())
-            replacement = QString("<a href=\"%1\">%2</a>").arg(href, mdlink.cap(1));
-        text.replace(mdlink.pos(0), mdlink.matchedLength(), replacement);
+            replacement = QString("<a href=\"%1\">%2</a>").arg(href, label);
+        text.replace(lb, end - lb + 1, replacement);
+        linkAt = lb + replacement.size();
         ++guard;
     }
 
