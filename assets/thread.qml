@@ -783,21 +783,20 @@ Page {
         if (!focusSent) {
             postList.scrollToItem([index], 1)
             focusSent = true
-            focusTries = 0
             _mm.nudgeFocus()
             return
         }
         if (!fromTimer)
             return
         focusTries = focusTries + 1
-        if (focusTries == 8)
-            focusSent = false
         if (focusTries > 16) {
             focusPost = ""
             focusTries = 0
             focusSent = false
             return
         }
+        if (focusTries == 8)
+            focusSent = false
         _mm.nudgeFocus()
     }
 
