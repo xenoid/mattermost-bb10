@@ -2,7 +2,7 @@
 
 A Mattermost client for BlackBerry 10. It is built for the Classic, the square 720 screen, and a world in which BlackBerry no longer signs applications.
 
-On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source. Version in the tree: **1.0.0**, build **60**.
+On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **121**.
 
 <p>
 <img src="icon.png" width="96" alt="App icon">
