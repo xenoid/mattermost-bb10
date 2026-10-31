@@ -82,9 +82,11 @@ Page {
             ]
         }
 
-        ListView {
+            ListView {
             id: postList
             scrollRole: ScrollRole.Main
+            // Ohne den Puffer springt None, bevor die Zeilenhöhen stehen.
+            bufferedScrollingEnabled: true
             horizontalAlignment: HorizontalAlignment.Fill
             layoutProperties: StackLayoutProperties {
                 spaceQuota: 1
