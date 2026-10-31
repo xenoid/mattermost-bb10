@@ -16,6 +16,28 @@ QString safeHref(const QString &url)
     return url;
 }
 
+// Nach dem Escapen steht aus <https://example.com> die Folge &gt; in der Adresse.
+QString trimHref(QString href)
+{
+    for (;;) {
+        if (href.endsWith(QLatin1String("&gt;")) || href.endsWith(QLatin1String("&lt;"))) {
+            href.chop(4);
+            continue;
+        }
+        if (href.endsWith(QLatin1String("&quot;"))) {
+            href.chop(6);
+            continue;
+        }
+        if (href.isEmpty())
+            break;
+        const QChar tail = href.at(href.size() - 1);
+        if (tail != '.' && tail != ',' && tail != ')' && tail != ']' && tail != ';' && tail != ':')
+            break;
+        href.chop(1);
+    }
+    return href;
+}
+
 QString inlineFormat(const QString &input)
 {
     QString text = input;
@@ -59,7 +81,7 @@ QString inlineFormat(const QString &input)
     QRegExp mdlink("\\[([^\\]]+)\\]\\((https?://[^\\s\\)]+)\\)");
     guard = 0;
     while (text.indexOf(mdlink) >= 0 && guard < 20) {
-        const QString href = safeHref(mdlink.cap(2));
+        const QString href = safeHref(trimHref(mdlink.cap(2)));
         QString replacement = mdlink.cap(1);
         if (!href.isEmpty())
             replacement = QString("<a href=\"%1\">%2</a>").arg(href, mdlink.cap(1));
@@ -79,14 +101,15 @@ QString inlineFormat(const QString &input)
             ++guard;
             continue;
         }
-        const QString href = safeHref(raw.cap(1));
+        const QString body = trimHref(raw.cap(1));
+        const QString href = safeHref(body);
         if (href.isEmpty()) {
             from = at + raw.matchedLength();
             ++guard;
             continue;
         }
-        const QString replacement = QString("<a href=\"%1\">%2</a>").arg(href, raw.cap(1));
-        text.replace(at, raw.matchedLength(), replacement);
+        const QString replacement = QString("<a href=\"%1\">%2</a>").arg(href, body);
+        text.replace(at, body.size(), replacement);
         from = at + replacement.size();
         ++guard;
     }
