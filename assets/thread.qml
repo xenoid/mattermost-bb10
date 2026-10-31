@@ -288,7 +288,7 @@ Page {
                                     visible: ListItemData.message != ""
                                     text: ListItemData.message
                                     textFormat: TextFormat.Html
-                                    content.flags: TextContentFlag.EmoticonsOff
+                                    content.flags: TextContentFlag.ActiveTextOff | TextContentFlag.EmoticonsOff
                                     multiline: true
                                     horizontalAlignment: HorizontalAlignment.Fill
                                 }
@@ -710,7 +710,7 @@ Page {
         return a.type == b.type && a.rev == b.rev && a.imagePath == b.imagePath
             && a.imagePath2 == b.imagePath2 && a.react == b.react && a.pending == b.pending
             && a.avatar == b.avatar && a.title == b.title && a.grouped == b.grouped
-            && a.quote == b.quote
+            && a.quote == b.quote && a.mark == b.mark
     }
 
     function reload(rows, stickEnd) {
@@ -731,7 +731,8 @@ Page {
     }
 
     // Während reload() feuert das Layout für jede Zeile. Das darf den
-    // Sprung nicht verbrauchen, bevor die Liste steht.
+    // Sprung nicht verbrauchen, bevor die Liste steht. atEnd ist direkt
+    // nach dem Aufbau oft schon wahr, obwohl die Fundstelle noch unten liegt.
     function jumpToFocus() {
         if (focusPost == "" || focusHold)
             return
@@ -742,7 +743,8 @@ Page {
             return
         var visible = scrollState.firstVisibleItem
         var at = (visible && visible.length > 0) ? Number(visible[0]) : -1
-        if (at == index || (scrollState.atEnd && at >= 0 && index >= at)) {
+        var gap = index - at
+        if (at == index || (focusTries > 0 && scrollState.atEnd && at >= 0 && gap >= 0 && gap <= 8)) {
             focusPost = ""
             focusTries = 0
             return

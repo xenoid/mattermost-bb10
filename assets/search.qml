@@ -131,7 +131,7 @@ Page {
                                     Label {
                                         text: ListItemData.message
                                         textFormat: TextFormat.Html
-                                        content.flags: TextContentFlag.EmoticonsOff
+                                        content.flags: TextContentFlag.ActiveTextOff | TextContentFlag.EmoticonsOff
                                         multiline: true
                                         autoSize.maxLineCount: 3
                                     }
