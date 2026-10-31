@@ -3,7 +3,7 @@
     <id>com.hollweck.mattermost</id>
     <name>Mattermost</name>
     <versionNumber>1.0.0</versionNumber>
-    <buildId>68</buildId>
+    <buildId>72</buildId>
     <description>Mattermost client for BlackBerry 10.</description>
     <author>hollweck</author>
     <initialWindow>
@@ -47,6 +47,8 @@
         <asset path="o.le-v7/Mattermost.so" entry="true" type="Qnx/Cascades">Mattermost.so</asset>
         <asset entryPointId="MattermostHub" path="o.le-v7/MattermostHub" type="Qnx/Elf">MattermostHub</asset>
     </configuration>
+    <asset path="lib/libssl.so.2">lib/libssl.so.2</asset>
+    <asset path="lib/libsslmm.so">lib/libsslmm.so</asset>
     <asset path="assets">assets</asset>
     <asset path="translations">qm</asset>
     <asset path="icon.png">icon.png</asset>

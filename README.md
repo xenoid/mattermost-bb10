@@ -18,7 +18,7 @@ The interface source strings are English (`qsTr` and `tr`). At startup the app l
 
 ## Toward the Android app
 
-This list is the Mattermost Android client, scored by what this program already does. 15 rows are done, 6 are only part way, 12 are still missing.
+This list is the Mattermost Android client, scored by what this program already does. 16 rows are done, 5 are only part way, 12 are still missing.
 
 | | |
 | --- | --- |
@@ -46,7 +46,7 @@ This list is the Mattermost Android client, scored by what this program already 
 | 🟡 | Markdown: bold, italic, code, quote, link |
 | 🟡 | Emoji panel, without custom emoji, flags, or skin tones |
 | 🟡 | A Hub row per channel, with a count, not the message text |
-| 🟡 | Background refresh every six minutes. The run does not finish a channel sync yet |
+| 🟢 | Background refresh every six minutes |
 | 🟡 | Settings: refresh, switch team, log out, preview, protocol log |
 | 🟡 | English and German. Further languages are a catalog |
 | 🔴 | Edit and delete a message |
