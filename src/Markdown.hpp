@@ -3,8 +3,9 @@
 
 #include <QString>
 
-// Kleines, festes HTML für Cascades-Labels. Erst escapen, dann fett, kursiv,
-// Code, Zitat und http(s)-Links. Kein Skript, keine fremden Schemes.
+// Kleines, festes HTML für Cascades-Labels. Fett, kursiv, Code, Zitat, Link.
+// Überschriften werden fett. Listen, Tabellen und Durchgestrichenes bleiben
+// lesbarer Text. Kein Skript, keine fremden Schemes.
 namespace Markdown {
 QString html(const QString &plain);
 }

@@ -64,6 +64,8 @@ QString inlineFormat(const QString &input)
         ++guard;
     }
 
+    // Das Textfeld kennt kein Durchstreichen. Die Wörter bleiben, die Tilden nicht.
+    text.replace(QRegExp("~~([^~\\n]+)~~"), "\\1");
     text.replace(QRegExp("\\*\\*([^*]+)\\*\\*"), "<b>\\1</b>");
     text.replace(QRegExp("__([^_]+)__"), "<b>\\1</b>");
     text.replace(QRegExp("\\*([^*\\n]+)\\*"), "<i>\\1</i>");
@@ -207,6 +209,41 @@ QString Markdown::html(const QString &plain)
             // Der Leser hat keinen Balken. Der Strich ist das Zeichen, das er zeichnet.
             out.append(QString("<i>| %1</i>").arg(inlineFormat(body)));
             continue;
+        }
+        QRegExp heading("^(#{1,6})\\s+(\\S.*)$");
+        if (heading.exactMatch(line)) {
+            out.append(QString("<b>%1</b>").arg(inlineFormat(heading.cap(2))));
+            continue;
+        }
+        QRegExp bullet("^\\s*[-*+]\\s+(\\S.*)$");
+        if (bullet.exactMatch(line)) {
+            out.append(QString("\u2022 %1").arg(inlineFormat(bullet.cap(1))));
+            continue;
+        }
+        QRegExp numbered("^\\s*(\\d+)\\.\\s+(\\S.*)$");
+        if (numbered.exactMatch(line)) {
+            out.append(QString("%1. %2").arg(numbered.cap(1), inlineFormat(numbered.cap(2))));
+            continue;
+        }
+        if (line.count(QLatin1Char('|')) >= 2) {
+            QString probe = line;
+            probe.remove(QLatin1Char(' '));
+            probe.remove(QLatin1Char('|'));
+            probe.remove(QLatin1Char('-'));
+            probe.remove(QLatin1Char(':'));
+            if (probe.isEmpty() && line.contains(QLatin1Char('-')))
+                continue;
+            QStringList cells = line.split(QLatin1Char('|'));
+            QStringList kept;
+            for (int c = 0; c < cells.size(); ++c) {
+                const QString cell = cells.at(c).trimmed();
+                if (!cell.isEmpty())
+                    kept.append(inlineFormat(cell));
+            }
+            if (kept.size() >= 2) {
+                out.append(kept.join(QString(" \u00b7 ")));
+                continue;
+            }
         }
         out.append(inlineFormat(line));
     }

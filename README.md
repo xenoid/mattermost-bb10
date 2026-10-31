@@ -2,7 +2,7 @@
 
 A Mattermost client for BlackBerry 10. It is built for the Classic, the square 720 screen, and a world in which BlackBerry no longer signs applications.
 
-On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **123**.
+On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **125**.
 
 <p>
 <img src="icon.png" width="96" alt="App icon">
@@ -18,7 +18,7 @@ The interface source strings are English (`qsTr` and `tr`). At startup the app l
 
 ## Toward the Android app
 
-This list is the Mattermost Android client, scored by what this program already does. 15 rows are done, 6 are only part way, 12 are still missing.
+This list is the Mattermost Android client, scored by what this program already does. 16 rows are done, 5 are only part way, 12 are still missing.
 
 | | |
 | --- | --- |
@@ -39,11 +39,11 @@ This list is the Mattermost Android client, scored by what this program already 
 | 🟢 | Send later when the phone is offline |
 | 🟢 | Search and open the hit |
 | 🟢 | Threads and replies |
-| 🟡 | Reactions: twelve fixed emoji, four shown, no tap on the row |
+| 🟡 | Reactions: swipe opens twelve names, up to eight chips, a tap toggles that one, a server emoji is its image |
 | 🟢 | Open images and other files |
 | 🟢 | Upload a file under its original name |
 | 🟢 | Check the server certificate against a current CA bundle |
-| 🟡 | Markdown: bold, italic, code, quote, link |
+| 🟢 | Markdown: bold, italic, code, quote, link. A heading is bold. A list, a table, and a strike are readable text |
 | 🟡 | Emoji panel, without custom emoji, flags, or skin tones |
 | 🟡 | A Hub row per channel, with a count, not the message text |
 | 🟢 | Background refresh every six minutes |
@@ -62,9 +62,9 @@ This list is the Mattermost Android client, scored by what this program already 
 | 🔴 | More than one account |
 | 🔴 | Dark theme |
 
-Markdown uses the tags the Cascades text reader matches: `b`, `strong`, `i`, `em`, `u`, `a`, `br`. It has no `span` and no `font`. Code is underlined. A quote is an italic line with a bar.
+Markdown uses the tags the Cascades text reader matches: `b`, `strong`, `i`, `em`, `u`, `a`, `br`. It has no `span` and no `font`. Code is underlined. A quote is an italic line with a bar. A heading is bold. A bullet or a number stays a line of text. A table is cells separated by a dot. A strike loses the tildes and keeps the words.
 
-A reaction is a swipe, then one of twelve names. The post row cannot see `_mm`. On 121 the swipe logged `Can't find variable: _mm`. On 122 `ListItem.view` inside the action was null, so the list still did not open. Build 123 calls the list through the row (`postItem.ListItem.view`). The row under the post shows at most four, as a glyph and a count. Tapping that row does nothing. A custom emoji is the shortcode in colons. The phone font has no flags, skin tones, or the red heart, so `heart` is the sparkling one.
+A reaction is a swipe, then one of twelve names. Choosing the same name again removes it. The row shows up to eight chips. Tapping a chip toggles that emoji. A server emoji is downloaded and shown as a picture. The phone font has no flags, skin tones, or the red heart, so `heart` is the sparkling one. Build 123 called the swipe through the post row. Whether that list opens has not been seen on a finger since then.
 
 ## Install in 2026
 
