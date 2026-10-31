@@ -274,6 +274,7 @@ NavigationPane {
 
                 ListView {
                     id: channelList
+                    property bool showPreview: true
                     scrollRole: ScrollRole.Main
                     horizontalAlignment: HorizontalAlignment.Fill
                     layoutProperties: StackLayoutProperties {
@@ -314,6 +315,7 @@ NavigationPane {
                         ListItemComponent {
                             type: "channel"
                             CustomListItem {
+                                id: channelItem
                                 dividerVisible: true
                                 Container {
                                     preferredHeight: 112
@@ -369,7 +371,7 @@ NavigationPane {
                                             textStyle.fontWeight: ListItemData.unread > 0 ? FontWeight.Bold : FontWeight.W500
                                         }
                                         Label {
-                                            visible: ListItemData.subtitle != "" && _mm.showPreview
+                                            visible: ListItemData.subtitle != "" && channelItem.ListItem.view.showPreview
                                             text: ListItemData.subtitle
                                             textFormat: TextFormat.Plain
                                             textStyle.color: Color.create("#6b747d")
@@ -556,7 +558,13 @@ NavigationPane {
         }
     }
 
+    function applyPreview() {
+        channelList.showPreview = _mm.showPreview
+    }
+
     onCreationCompleted: {
+        applyPreview()
+        _mm.prefsChanged.connect(applyPreview)
         _mm.channelsLoaded.connect(takeChannels)
         _mm.avatarReady.connect(takeAvatar)
         _mm.loggedInChanged.connect(function() {
