@@ -131,9 +131,9 @@ Page {
                                     Label {
                                         text: ListItemData.message
                                         textFormat: TextFormat.Html
+                                        content.flags: TextContentFlag.EmoticonsOff
                                         multiline: true
                                         autoSize.maxLineCount: 3
-                                        textStyle.fontSize: FontSize.Small
                                     }
                                 }
                             }

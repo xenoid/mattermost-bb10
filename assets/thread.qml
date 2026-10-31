@@ -281,7 +281,6 @@ Page {
                                     content.flags: TextContentFlag.EmoticonsOff
                                     multiline: true
                                     horizontalAlignment: HorizontalAlignment.Fill
-                                    textStyle.fontSize: FontSize.Medium
                                 }
 
                                 Container {
