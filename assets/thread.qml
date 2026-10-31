@@ -291,7 +291,7 @@ Page {
                                     visible: ListItemData.message != ""
                                     text: ListItemData.message
                                     textFormat: TextFormat.Html
-                                    content.flags: TextContentFlag.ActiveTextOff | TextContentFlag.EmoticonsOff
+                                    content.flags: TextContentFlag.ActiveText | TextContentFlag.EmoticonsOff
                                     multiline: true
                                     horizontalAlignment: HorizontalAlignment.Fill
                                 }
