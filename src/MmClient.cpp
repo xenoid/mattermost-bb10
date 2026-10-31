@@ -1517,7 +1517,7 @@ void MmClient::markRead(const QString &channelId)
 
 // ---------------------------------------------------------------- Zeilen
 
-QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &all, bool inThread) const
+QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &all, bool inThread)
 {
     const QString uid = post.value("user_id").toString();
     const QString postId = post.value("id").toString();
@@ -1576,6 +1576,16 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     imageBox(imgW, imgH, showW, showH);
     imageBox(imgW2, imgH2, showW2, showH2);
 
+    QMap<QString, QString> emojiByName;
+    const QVariantList emojiMeta = post.value("metadata").toMap().value("emojis").toList();
+    for (int i = 0; i < emojiMeta.size(); ++i) {
+        const QVariantMap emoji = emojiMeta.at(i).toMap();
+        const QString ename = emoji.value("name").toString();
+        const QString eid = emoji.value("id").toString();
+        if (!ename.isEmpty() && !eid.isEmpty())
+            emojiByName.insert(ename, eid);
+    }
+
     QStringList reactBits;
     QStringList reactOwn;
     const QVariantList reactions = post.value("metadata").toMap().value("reactions").toList();
@@ -1592,13 +1602,39 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
         if (reaction.value("user_id").toString() == m_userId && !reactOwn.contains(name))
             reactOwn.append(name);
     }
-    for (int i = 0; i < reactNames.size() && reactBits.size() < 4; ++i) {
+    QString slotName[8];
+    QString slotGlyph[8];
+    QString slotCount[8];
+    QString slotOwn[8];
+    QString slotImg[8];
+    int shown = 0;
+    for (int i = 0; i < reactNames.size() && shown < 8; ++i) {
         const QString name = reactNames.at(i);
-        QString glyph = Emoji::glyph(name);
-        if (glyph.isEmpty())
-            glyph = ":" + name + ":";
-        reactBits.append(glyph + " " + QString::number(reactCount.value(name)));
+        const QString glyph = Emoji::glyph(name);
+        QString image;
+        if (glyph.isEmpty()) {
+            const QString eid = emojiByName.value(name);
+            if (!eid.isEmpty()) {
+                const QString path = ImageStore::dir() + "/e-" + eid + ".img";
+                if (QFileInfo(path).size() > 32)
+                    image = ImageStore::fileUrl(path);
+                else if (!m_emojiMiss.contains(name))
+                    queueEmoji(eid, name);
+            } else if (!m_emojiMiss.contains(name)) {
+                queueEmojiName(name);
+            }
+        }
+        slotName[shown] = name;
+        slotGlyph[shown] = glyph;
+        slotCount[shown] = QString::number(reactCount.value(name));
+        slotOwn[shown] = reactOwn.contains(name) ? QString("1") : QString();
+        slotImg[shown] = image;
+        const QString face = !image.isEmpty() ? image : (glyph.isEmpty() ? name : glyph);
+        reactBits.append(face + " " + slotCount[shown]);
+        ++shown;
     }
+    const QString reactMore = reactNames.size() > shown
+        ? QString("+%1").arg(reactNames.size() - shown) : QString();
 
     bool linkOnly = false;
     const QString link = firstUrl(message, &linkOnly);
@@ -1633,6 +1669,15 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["pending"] = QString();
     row["react"] = reactBits.join(QString("   "));
     row["reactOwn"] = reactOwn.join(",");
+    row["rmore"] = reactMore;
+    for (int s = 0; s < 8; ++s) {
+        const QString n = QString::number(s);
+        row["r" + n] = slotName[s];
+        row["rg" + n] = slotGlyph[s];
+        row["rn" + n] = slotCount[s];
+        row["ro" + n] = slotOwn[s];
+        row["ri" + n] = slotImg[s];
+    }
     row["imageId"] = imageId;
     row["imagePath"] = QString();
     row["imgW"] = showW;
@@ -1749,6 +1794,32 @@ void MmClient::queueAvatar(const QString &userId)
     queueJob(job, false);
 }
 
+void MmClient::queueEmoji(const QString &emojiId, const QString &name)
+{
+    if (emojiId.isEmpty() || name.isEmpty() || m_emojiMiss.contains(name))
+        return;
+    if (QFileInfo(ImageStore::dir() + "/e-" + emojiId + ".img").size() > 32)
+        return;
+    FileJob job;
+    job.kind = FileEmoji;
+    job.id = emojiId;
+    job.name = name;
+    job.attempt = 0;
+    queueJob(job, false);
+}
+
+void MmClient::queueEmojiName(const QString &name)
+{
+    if (name.isEmpty() || m_emojiMiss.contains(name))
+        return;
+    FileJob job;
+    job.kind = FileEmojiName;
+    job.id = name;
+    job.name = name;
+    job.attempt = 0;
+    queueJob(job, false);
+}
+
 void MmClient::pumpFiles()
 {
     while (m_filesBusy < 2 && !m_fileQueue.isEmpty())
@@ -1786,6 +1857,13 @@ void MmClient::startJob(const FileJob &job)
         timeout = 120000;
         break;
     }
+    case FileEmoji:
+        api = "/api/v4/emoji/" + job.id + "/image";
+        save = ImageStore::dir() + "/e-" + job.id + ".img";
+        break;
+    case FileEmojiName:
+        api = "/api/v4/emoji/name/" + QString::fromUtf8(QUrl::toPercentEncoding(job.id));
+        break;
     }
     ++m_filesBusy;
     QNetworkReply *reply = start(StepFile, api, QByteArray(), "GET", true, timeout);
@@ -1801,8 +1879,24 @@ void MmClient::finishFile(int kind, const QString &id, const QString &name, cons
                           int attempt, const QString &savePath, int http, const QByteArray &payload)
 {
     m_filesBusy = qMax(0, m_filesBusy - 1);
+    if (kind == FileEmojiName) {
+        if (http == 200) {
+            JsonDataAccess json;
+            const QVariant parsed = json.loadFromBuffer(payload);
+            const QString eid = parsed.toMap().value("id").toString();
+            if (!eid.isEmpty())
+                queueEmoji(eid, name);
+            else
+                m_emojiMiss.insert(name);
+        } else if (http == 404 || http == 400)
+            m_emojiMiss.insert(name);
+        pumpFiles();
+        if (http == 401)
+            logout();
+        return;
+    }
     bool ok = http == 200 && payload.size() > 32;
-    if (ok && (kind == FileAvatar || kind == FilePreview))
+    if (ok && (kind == FileAvatar || kind == FilePreview || kind == FileEmoji))
         ok = ImageStore::isImage(payload.left(12));
     if (ok && kind == FileFull)
         ok = !payload.startsWith("{") && !payload.startsWith("<");
@@ -1835,6 +1929,9 @@ void MmClient::finishFile(int kind, const QString &id, const QString &name, cons
                 setStatus("");
                 openFile(savePath, mime);
             }
+        } else if (kind == FileEmoji) {
+            storeEmoji(name, url);
+            emit emojiReady(name, url);
         }
     } else if (kind == FilePreview && attempt < 2 && http != 401) {
         FileJob retry;
@@ -1848,6 +1945,8 @@ void MmClient::finishFile(int kind, const QString &id, const QString &name, cons
     } else if (kind == FileAttach && id == m_pendingAttach) {
         m_pendingAttach.clear();
         setStatus(tr("Attachment could not be loaded"));
+    } else if (kind == FileEmoji && http != 401) {
+        m_emojiMiss.insert(name);
     }
     Q_UNUSED(name);
     pumpFiles();
@@ -1871,6 +1970,35 @@ void MmClient::storeAvatar(const QString &userId, const QString &url)
             m_searchRows[i] = row;
         }
     }
+}
+
+static void paintEmoji(QVariantList &rows, const QString &name, const QString &url)
+{
+    for (int i = 0; i < rows.size(); ++i) {
+        QVariantMap row = rows.at(i).toMap();
+        bool hit = false;
+        for (int s = 0; s < 8; ++s) {
+            const QString n = QString::number(s);
+            if (row.value("r" + n).toString() != name)
+                continue;
+            row["ri" + n] = url;
+            row["rg" + n] = QString();
+            hit = true;
+        }
+        if (!hit)
+            continue;
+        const QString react = row.value("react").toString();
+        if (!react.contains(url))
+            row["react"] = react + " " + url;
+        rows[i] = row;
+    }
+}
+
+void MmClient::storeEmoji(const QString &name, const QString &url)
+{
+    paintEmoji(m_postRows, name, url);
+    paintEmoji(m_replyRows, name, url);
+    paintEmoji(m_searchRows, name, url);
 }
 
 void MmClient::storePreview(const QString &fileId, const QString &url)
@@ -2604,6 +2732,15 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["pending"] = QString("1");
     row["react"] = QString();
     row["reactOwn"] = QString();
+    row["rmore"] = QString();
+    for (int s = 0; s < 8; ++s) {
+        const QString n = QString::number(s);
+        row["r" + n] = QString();
+        row["rg" + n] = QString();
+        row["rn" + n] = QString();
+        row["ro" + n] = QString();
+        row["ri" + n] = QString();
+    }
     row["imageId"] = QString();
     row["imagePath"] = QString();
     row["imgW"] = 360;

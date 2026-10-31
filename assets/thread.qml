@@ -113,6 +113,9 @@ Page {
             function askReact(postId) {
                 _mm.askReact(postId)
             }
+            function toggleReact(postId, name) {
+                _mm.toggleReaction(postId, name)
+            }
             function askReplies(rootId) {
                 _mm.askReplies(rootId)
             }
@@ -378,12 +381,364 @@ Page {
                                     textStyle.fontSize: FontSize.XSmall
                                     textStyle.fontWeight: FontWeight.Bold
                                 }
-                                Label {
-                                    visible: ListItemData.react != ""
-                                    text: ListItemData.react
-                                    textFormat: TextFormat.Plain
-                                    textStyle.color: Color.create(ListItemData.reactOwn != "" ? "#1c58d9" : "#5e6770")
-                                    textStyle.fontSize: FontSize.Small
+                                Container {
+                                    visible: ListItemData.r0 != ""
+                                    topMargin: 8
+                                    layout: GridLayout {
+                                        columnCount: 4
+                                    }
+                                    Container {
+                                        visible: ListItemData.r0 != ""
+                                        background: Color.create(ListItemData.ro0 == "1" ? "#e7eefc" : "#f3f5f7")
+                                        leftPadding: 10
+                                        rightPadding: 10
+                                        topPadding: 4
+                                        bottomPadding: 4
+                                        leftMargin: 4
+                                        topMargin: 4
+                                        touchPropagationMode: TouchPropagationMode.None
+                                        layout: StackLayout {
+                                            orientation: LayoutOrientation.LeftToRight
+                                        }
+                                        ImageView {
+                                            visible: ListItemData.ri0 != ""
+                                            imageSource: ListItemData.ri0
+                                            preferredWidth: 36
+                                            preferredHeight: 36
+                                            scalingMethod: ScalingMethod.AspectFit
+                                            verticalAlignment: VerticalAlignment.Center
+                                        }
+                                        Label {
+                                            visible: ListItemData.ri0 == ""
+                                            text: ListItemData.rg0 != "" ? ListItemData.rg0 : ListItemData.r0
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.Small
+                                            textStyle.color: Color.create(ListItemData.ro0 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        Label {
+                                            text: ListItemData.rn0
+                                            leftMargin: 6
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.XSmall
+                                            textStyle.color: Color.create(ListItemData.ro0 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        gestureHandlers: [
+                                            TapHandler {
+                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r0)
+                                            }
+                                        ]
+                                    }
+                                    Container {
+                                        visible: ListItemData.r1 != ""
+                                        background: Color.create(ListItemData.ro1 == "1" ? "#e7eefc" : "#f3f5f7")
+                                        leftPadding: 10
+                                        rightPadding: 10
+                                        topPadding: 4
+                                        bottomPadding: 4
+                                        leftMargin: 4
+                                        topMargin: 4
+                                        touchPropagationMode: TouchPropagationMode.None
+                                        layout: StackLayout {
+                                            orientation: LayoutOrientation.LeftToRight
+                                        }
+                                        ImageView {
+                                            visible: ListItemData.ri1 != ""
+                                            imageSource: ListItemData.ri1
+                                            preferredWidth: 36
+                                            preferredHeight: 36
+                                            scalingMethod: ScalingMethod.AspectFit
+                                            verticalAlignment: VerticalAlignment.Center
+                                        }
+                                        Label {
+                                            visible: ListItemData.ri1 == ""
+                                            text: ListItemData.rg1 != "" ? ListItemData.rg1 : ListItemData.r1
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.Small
+                                            textStyle.color: Color.create(ListItemData.ro1 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        Label {
+                                            text: ListItemData.rn1
+                                            leftMargin: 6
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.XSmall
+                                            textStyle.color: Color.create(ListItemData.ro1 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        gestureHandlers: [
+                                            TapHandler {
+                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r1)
+                                            }
+                                        ]
+                                    }
+                                    Container {
+                                        visible: ListItemData.r2 != ""
+                                        background: Color.create(ListItemData.ro2 == "1" ? "#e7eefc" : "#f3f5f7")
+                                        leftPadding: 10
+                                        rightPadding: 10
+                                        topPadding: 4
+                                        bottomPadding: 4
+                                        leftMargin: 4
+                                        topMargin: 4
+                                        touchPropagationMode: TouchPropagationMode.None
+                                        layout: StackLayout {
+                                            orientation: LayoutOrientation.LeftToRight
+                                        }
+                                        ImageView {
+                                            visible: ListItemData.ri2 != ""
+                                            imageSource: ListItemData.ri2
+                                            preferredWidth: 36
+                                            preferredHeight: 36
+                                            scalingMethod: ScalingMethod.AspectFit
+                                            verticalAlignment: VerticalAlignment.Center
+                                        }
+                                        Label {
+                                            visible: ListItemData.ri2 == ""
+                                            text: ListItemData.rg2 != "" ? ListItemData.rg2 : ListItemData.r2
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.Small
+                                            textStyle.color: Color.create(ListItemData.ro2 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        Label {
+                                            text: ListItemData.rn2
+                                            leftMargin: 6
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.XSmall
+                                            textStyle.color: Color.create(ListItemData.ro2 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        gestureHandlers: [
+                                            TapHandler {
+                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r2)
+                                            }
+                                        ]
+                                    }
+                                    Container {
+                                        visible: ListItemData.r3 != ""
+                                        background: Color.create(ListItemData.ro3 == "1" ? "#e7eefc" : "#f3f5f7")
+                                        leftPadding: 10
+                                        rightPadding: 10
+                                        topPadding: 4
+                                        bottomPadding: 4
+                                        leftMargin: 4
+                                        topMargin: 4
+                                        touchPropagationMode: TouchPropagationMode.None
+                                        layout: StackLayout {
+                                            orientation: LayoutOrientation.LeftToRight
+                                        }
+                                        ImageView {
+                                            visible: ListItemData.ri3 != ""
+                                            imageSource: ListItemData.ri3
+                                            preferredWidth: 36
+                                            preferredHeight: 36
+                                            scalingMethod: ScalingMethod.AspectFit
+                                            verticalAlignment: VerticalAlignment.Center
+                                        }
+                                        Label {
+                                            visible: ListItemData.ri3 == ""
+                                            text: ListItemData.rg3 != "" ? ListItemData.rg3 : ListItemData.r3
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.Small
+                                            textStyle.color: Color.create(ListItemData.ro3 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        Label {
+                                            text: ListItemData.rn3
+                                            leftMargin: 6
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.XSmall
+                                            textStyle.color: Color.create(ListItemData.ro3 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        gestureHandlers: [
+                                            TapHandler {
+                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r3)
+                                            }
+                                        ]
+                                    }
+                                    Container {
+                                        visible: ListItemData.r4 != ""
+                                        background: Color.create(ListItemData.ro4 == "1" ? "#e7eefc" : "#f3f5f7")
+                                        leftPadding: 10
+                                        rightPadding: 10
+                                        topPadding: 4
+                                        bottomPadding: 4
+                                        leftMargin: 4
+                                        topMargin: 4
+                                        touchPropagationMode: TouchPropagationMode.None
+                                        layout: StackLayout {
+                                            orientation: LayoutOrientation.LeftToRight
+                                        }
+                                        ImageView {
+                                            visible: ListItemData.ri4 != ""
+                                            imageSource: ListItemData.ri4
+                                            preferredWidth: 36
+                                            preferredHeight: 36
+                                            scalingMethod: ScalingMethod.AspectFit
+                                            verticalAlignment: VerticalAlignment.Center
+                                        }
+                                        Label {
+                                            visible: ListItemData.ri4 == ""
+                                            text: ListItemData.rg4 != "" ? ListItemData.rg4 : ListItemData.r4
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.Small
+                                            textStyle.color: Color.create(ListItemData.ro4 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        Label {
+                                            text: ListItemData.rn4
+                                            leftMargin: 6
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.XSmall
+                                            textStyle.color: Color.create(ListItemData.ro4 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        gestureHandlers: [
+                                            TapHandler {
+                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r4)
+                                            }
+                                        ]
+                                    }
+                                    Container {
+                                        visible: ListItemData.r5 != ""
+                                        background: Color.create(ListItemData.ro5 == "1" ? "#e7eefc" : "#f3f5f7")
+                                        leftPadding: 10
+                                        rightPadding: 10
+                                        topPadding: 4
+                                        bottomPadding: 4
+                                        leftMargin: 4
+                                        topMargin: 4
+                                        touchPropagationMode: TouchPropagationMode.None
+                                        layout: StackLayout {
+                                            orientation: LayoutOrientation.LeftToRight
+                                        }
+                                        ImageView {
+                                            visible: ListItemData.ri5 != ""
+                                            imageSource: ListItemData.ri5
+                                            preferredWidth: 36
+                                            preferredHeight: 36
+                                            scalingMethod: ScalingMethod.AspectFit
+                                            verticalAlignment: VerticalAlignment.Center
+                                        }
+                                        Label {
+                                            visible: ListItemData.ri5 == ""
+                                            text: ListItemData.rg5 != "" ? ListItemData.rg5 : ListItemData.r5
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.Small
+                                            textStyle.color: Color.create(ListItemData.ro5 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        Label {
+                                            text: ListItemData.rn5
+                                            leftMargin: 6
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.XSmall
+                                            textStyle.color: Color.create(ListItemData.ro5 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        gestureHandlers: [
+                                            TapHandler {
+                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r5)
+                                            }
+                                        ]
+                                    }
+                                    Container {
+                                        visible: ListItemData.r6 != ""
+                                        background: Color.create(ListItemData.ro6 == "1" ? "#e7eefc" : "#f3f5f7")
+                                        leftPadding: 10
+                                        rightPadding: 10
+                                        topPadding: 4
+                                        bottomPadding: 4
+                                        leftMargin: 4
+                                        topMargin: 4
+                                        touchPropagationMode: TouchPropagationMode.None
+                                        layout: StackLayout {
+                                            orientation: LayoutOrientation.LeftToRight
+                                        }
+                                        ImageView {
+                                            visible: ListItemData.ri6 != ""
+                                            imageSource: ListItemData.ri6
+                                            preferredWidth: 36
+                                            preferredHeight: 36
+                                            scalingMethod: ScalingMethod.AspectFit
+                                            verticalAlignment: VerticalAlignment.Center
+                                        }
+                                        Label {
+                                            visible: ListItemData.ri6 == ""
+                                            text: ListItemData.rg6 != "" ? ListItemData.rg6 : ListItemData.r6
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.Small
+                                            textStyle.color: Color.create(ListItemData.ro6 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        Label {
+                                            text: ListItemData.rn6
+                                            leftMargin: 6
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.XSmall
+                                            textStyle.color: Color.create(ListItemData.ro6 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        gestureHandlers: [
+                                            TapHandler {
+                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r6)
+                                            }
+                                        ]
+                                    }
+                                    Container {
+                                        visible: ListItemData.r7 != ""
+                                        background: Color.create(ListItemData.ro7 == "1" ? "#e7eefc" : "#f3f5f7")
+                                        leftPadding: 10
+                                        rightPadding: 10
+                                        topPadding: 4
+                                        bottomPadding: 4
+                                        leftMargin: 4
+                                        topMargin: 4
+                                        touchPropagationMode: TouchPropagationMode.None
+                                        layout: StackLayout {
+                                            orientation: LayoutOrientation.LeftToRight
+                                        }
+                                        ImageView {
+                                            visible: ListItemData.ri7 != ""
+                                            imageSource: ListItemData.ri7
+                                            preferredWidth: 36
+                                            preferredHeight: 36
+                                            scalingMethod: ScalingMethod.AspectFit
+                                            verticalAlignment: VerticalAlignment.Center
+                                        }
+                                        Label {
+                                            visible: ListItemData.ri7 == ""
+                                            text: ListItemData.rg7 != "" ? ListItemData.rg7 : ListItemData.r7
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.Small
+                                            textStyle.color: Color.create(ListItemData.ro7 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        Label {
+                                            text: ListItemData.rn7
+                                            leftMargin: 6
+                                            textFormat: TextFormat.Plain
+                                            verticalAlignment: VerticalAlignment.Center
+                                            textStyle.fontSize: FontSize.XSmall
+                                            textStyle.color: Color.create(ListItemData.ro7 == "1" ? "#1c58d9" : "#5e6770")
+                                        }
+                                        gestureHandlers: [
+                                            TapHandler {
+                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r7)
+                                            }
+                                        ]
+                                    }
+                                    Label {
+                                        visible: ListItemData.rmore != ""
+                                        text: ListItemData.rmore
+                                        textFormat: TextFormat.Plain
+                                        verticalAlignment: VerticalAlignment.Center
+                                        textStyle.color: Color.create("#5e6770")
+                                        textStyle.fontSize: FontSize.XSmall
+                                    }
                                 }
                                 Container {
                                     visible: ListItemData.imageId2 != ""
@@ -910,6 +1265,26 @@ Page {
         }
     }
 
+    function takeEmoji(name, path) {
+        for (var i = 0; i < postModel.size(); ++i) {
+            var row = postModel.data([i])
+            if (!row)
+                continue
+            var changed = false
+            for (var s = 0; s < 8; ++s) {
+                var key = "r" + s
+                var img = "ri" + s
+                if (row[key] == name && row[img] != path) {
+                    row[img] = path
+                    row["rg" + s] = ""
+                    changed = true
+                }
+            }
+            if (changed)
+                postModel.replace(i, row)
+        }
+    }
+
     function takeAvatar(userId, path) {
         for (var i = 0; i < postModel.size(); ++i) {
             var row = postModel.data([i])
@@ -926,6 +1301,7 @@ Page {
         _mm.focusNudge.disconnect(onFocusNudge)
         _mm.repliesLoaded.disconnect(takeReplies)
         _mm.imageReady.disconnect(takeImage)
+        _mm.emojiReady.disconnect(takeEmoji)
         _mm.avatarReady.disconnect(takeAvatar)
         _mm.sendFailed.disconnect(restoreText)
     }
@@ -935,6 +1311,7 @@ Page {
         _mm.focusNudge.connect(onFocusNudge)
         _mm.repliesLoaded.connect(takeReplies)
         _mm.imageReady.connect(takeImage)
+        _mm.emojiReady.connect(takeEmoji)
         _mm.avatarReady.connect(takeAvatar)
         _mm.sendFailed.connect(restoreText)
     }

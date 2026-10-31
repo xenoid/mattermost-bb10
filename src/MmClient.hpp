@@ -128,6 +128,7 @@ signals:
     void chooseTeam();
     void historyChanged();
     void imageReady(const QString &fileId, const QString &path);
+    void emojiReady(const QString &name, const QString &path);
     void avatarReady(const QString &userId, const QString &path);
     void showImage(const QString &path);
     void sendFailed(const QString &text);
@@ -171,7 +172,9 @@ private:
         FilePreview = 0,   // Vorschaubild in der Nachricht
         FileFull,          // Original für die Bildansicht
         FileAvatar,        // Profilbild
-        FileAttach         // sonstiger Anhang
+        FileAttach,        // sonstiger Anhang
+        FileEmoji,         // Bild eines Server-Emoji
+        FileEmojiName      // Name → Id, danach das Bild
     };
 
     struct FileJob {
@@ -247,7 +250,7 @@ private:
     // Zeilen für die Oberfläche
     QVariantList buildConversation(const QVariantList &order, const QVariantMap &posts,
                                    bool inThread, QStringList &userIds);
-    QVariantMap makePostRow(const QVariantMap &post, const QVariantMap &all, bool inThread = false) const;
+    QVariantMap makePostRow(const QVariantMap &post, const QVariantMap &all, bool inThread = false);
     void decorate(QVariantMap &row) const;
     QString personLabel(const QVariantMap &user) const;
     QString nameOf(const QString &userId) const;
@@ -255,6 +258,8 @@ private:
     // Dateien
     void queuePreview(const QString &fileId);
     void queueAvatar(const QString &userId);
+    void queueEmoji(const QString &emojiId, const QString &name);
+    void queueEmojiName(const QString &name);
     void queueJob(const FileJob &job, bool front);
     void pumpFiles();
     void startJob(const FileJob &job);
@@ -262,6 +267,7 @@ private:
                     int attempt, const QString &savePath, int http, const QByteArray &payload);
     void storeAvatar(const QString &userId, const QString &url);
     void storePreview(const QString &fileId, const QString &url);
+    void storeEmoji(const QString &name, const QString &url);
     void openFile(const QString &path, const QString &mime);
 
     // Hilfen
@@ -349,6 +355,7 @@ private:
     LocalStore m_store;
     QList<FileJob> m_fileQueue;
     QSet<QString> m_avatarTried;
+    QSet<QString> m_emojiMiss;
     QHash<QString, UserInfo> m_users;
 };
 
