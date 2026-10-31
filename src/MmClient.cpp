@@ -1183,16 +1183,21 @@ void MmClient::loadPosts(bool silent)
 {
     if (!m_loggedIn || m_channelId.isEmpty() || m_headless)
         return;
+    // Eine laufende Liste darf die Fundstelle nicht auf die neueste Seite umbiegen.
+    if (!m_focusPost.isEmpty()) {
+        if (m_postsBusy) {
+            m_postsAgain = true;
+            return;
+        }
+        const QString focus = m_focusPost;
+        m_focusPost.clear();
+        loadAround(focus);
+        return;
+    }
     if (silent && m_hasNewer)
         return;
     if (m_postsBusy) {
         m_postsAgain = true;
-        return;
-    }
-    if (!m_focusPost.isEmpty() && !silent) {
-        const QString focus = m_focusPost;
-        m_focusPost.clear();
-        loadAround(focus);
         return;
     }
     m_postsBusy = true;
@@ -2274,9 +2279,17 @@ void MmClient::onFinished(QNetworkReply *reply)
 
     if (step == StepPosts) {
         if (chan != m_channelId) {
+            const bool jump = !m_focusPost.isEmpty();
+            if (jump)
+                m_postsAgain = true;
             postsIdle();
-            if (!m_channelId.isEmpty())
+            if (!jump && !m_channelId.isEmpty())
                 loadPosts(false);
+            return;
+        }
+        if (!m_focusPost.isEmpty()) {
+            m_postsAgain = true;
+            postsIdle();
             return;
         }
         const QVariantMap root = parsed.toMap();
