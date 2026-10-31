@@ -306,6 +306,7 @@ private:
     int m_listTick;
     int m_filesBusy;
     int m_aroundLeft;
+    bool m_anchored;
 
     bool m_headless;
     bool m_hasOlder;

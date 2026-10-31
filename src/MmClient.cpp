@@ -193,6 +193,7 @@ MmClient::MmClient(QObject *parent)
       m_listTick(0),
       m_filesBusy(0),
       m_aroundLeft(0),
+      m_anchored(false),
       m_headless(false),
       m_hasOlder(false),
       m_hasNewer(false),
@@ -455,6 +456,7 @@ void MmClient::resetSession()
     m_hasOlder = false;
     m_hasNewer = false;
     m_aroundLeft = 0;
+    m_anchored = false;
     bb::platform::Notification::deleteAllFromInbox();
     m_store.clear();
 }
@@ -1206,7 +1208,14 @@ void MmClient::loadPosts(bool silent)
         loadAround(focus);
         return;
     }
-    if (silent && m_hasNewer)
+    // Die Umgebung bleibt, bis der Kanal neu geladen wird. Eine stille
+    // Abfrage darf sie nicht durch die neueste Seite ersetzen.
+    if (m_aroundLeft > 0) {
+        if (!silent)
+            m_postsAgain = true;
+        return;
+    }
+    if (silent && (m_anchored || m_hasNewer))
         return;
     if (m_postsBusy) {
         m_postsAgain = true;
@@ -1214,6 +1223,7 @@ void MmClient::loadPosts(bool silent)
     }
     m_postsBusy = true;
     if (!silent) {
+        m_anchored = false;
         m_rawOrder.clear();
         m_rawPosts.clear();
         setHistory(false, false);
@@ -1264,6 +1274,7 @@ void MmClient::loadAround(const QString &postId)
     if (postId.isEmpty() || m_channelId.isEmpty())
         return;
     m_postsBusy = true;
+    m_anchored = true;
     m_aroundLeft = 3;
     m_aroundSelf = postId;
     m_aroundChan = m_channelId;
@@ -1407,6 +1418,7 @@ void MmClient::finishAround()
 {
     m_aroundLeft = 0;
     if (m_aroundChan != m_channelId) {
+        m_anchored = false;
         m_aroundPosts.clear();
         postsIdle();
         return;
@@ -1423,6 +1435,7 @@ void MmClient::finishAround()
     m_idsAfter.clear();
     m_idsBefore.clear();
     if (order.isEmpty()) {
+        m_anchored = false;
         m_aroundPosts.clear();
         postsIdle();
         setStatus(tr("Message not loaded"));
@@ -2113,6 +2126,10 @@ void MmClient::onFinished(QNetworkReply *reply)
         return;
     }
     if (http >= 400 || (http == 0 && netCode != 0)) {
+        const bool heldPage = step == StepPosts
+            && (m_aroundLeft > 0 || (m_anchored && page != "older" && page != "newer"));
+        if (heldPage)
+            return;
         failed(step, silent, http, netCode);
         return;
     }
@@ -2127,6 +2144,9 @@ void MmClient::onFinished(QNetworkReply *reply)
                     finishAround();
                 return;
             }
+            if (step == StepPosts
+                    && (m_aroundLeft > 0 || (m_anchored && page != "older" && page != "newer")))
+                return;
             if (step == StepUpload || step == StepSend)
                 outgoingDone(localId, false, false, msg);
             else
@@ -2290,7 +2310,13 @@ void MmClient::onFinished(QNetworkReply *reply)
     }
 
     if (step == StepPosts) {
+        const bool hold = m_aroundLeft > 0
+            || (m_anchored && page != "older" && page != "newer");
+        if (hold)
+            return;
         if (chan != m_channelId) {
+            if (m_anchored)
+                return;
             const bool jump = !m_focusPost.isEmpty();
             if (jump)
                 m_postsAgain = true;
@@ -2845,6 +2871,7 @@ void MmClient::outgoingDone(const QString &localId, bool ok, bool network, const
         m_inflight.clear();
     if (ok) {
         m_store.remove(localId);
+        m_anchored = false;
         if (!m_channelId.isEmpty())
             loadPosts(true);
         if (!m_threadRoot.isEmpty())
