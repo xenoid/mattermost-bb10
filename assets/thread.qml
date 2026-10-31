@@ -195,6 +195,7 @@ Page {
                             rightPadding: 16
                             topPadding: ListItemData.grouped ? 2 : 16
                             bottomPadding: 4
+                            background: ListItemData.mark == "1" ? Color.create("#e7eefc") : Color.create("#ffffff")
                             layout: StackLayout {
                                 orientation: LayoutOrientation.LeftToRight
                             }
