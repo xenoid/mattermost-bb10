@@ -90,27 +90,28 @@ QString inlineFormat(const QString &input)
         ++guard;
     }
 
-    // Die schließende Klammer des Links ist die bei Tiefe 0, nicht die letzte der Zeile.
+    // Die Beschriftung ist die nächste Klammer vor ](. Fehlversuche zählen nicht,
+    // sonst fällt ein späterer Link weg.
     int linkAt = 0;
     guard = 0;
-    while (linkAt < text.size() && guard < 20) {
-        const int lb = text.indexOf(QLatin1Char('['), linkAt);
-        if (lb < 0)
+    while (linkAt < text.size() && guard < 40) {
+        const int close = text.indexOf(QLatin1String("]("), linkAt);
+        if (close < 0)
             break;
-        const int rb = text.indexOf(QLatin1Char(']'), lb + 1);
-        if (rb < 0)
-            break;
-        if (rb == lb + 1 || rb + 1 >= text.size() || text.at(rb + 1) != QLatin1Char('(')) {
-            linkAt = lb + 1;
-            ++guard;
+        if (close < 1) {
+            linkAt = close + 2;
             continue;
         }
-        const int urlAt = rb + 2;
+        const int lb = text.lastIndexOf(QLatin1Char('['), close - 1);
+        if (lb < linkAt || lb + 1 >= close) {
+            linkAt = close + 2;
+            continue;
+        }
+        const int urlAt = close + 2;
         const QString rest = text.mid(urlAt);
         if (!rest.startsWith(QLatin1String("https://"))
                 && !rest.startsWith(QLatin1String("http://"))) {
-            linkAt = lb + 1;
-            ++guard;
+            linkAt = close + 2;
             continue;
         }
         int depth = 0;
@@ -129,11 +130,10 @@ QString inlineFormat(const QString &input)
             }
         }
         if (end < 0) {
-            linkAt = lb + 1;
-            ++guard;
+            linkAt = close + 2;
             continue;
         }
-        const QString label = text.mid(lb + 1, rb - lb - 1);
+        const QString label = text.mid(lb + 1, close - lb - 1);
         const QString href = safeHref(trimHref(text.mid(urlAt, end - urlAt)));
         QString replacement = label;
         if (!href.isEmpty())
@@ -146,20 +146,18 @@ QString inlineFormat(const QString &input)
     QRegExp raw("(https?://[^\\s<]+)");
     guard = 0;
     from = 0;
-    while (from < text.size() && text.indexOf(raw, from) >= 0 && guard < 20) {
+    while (from < text.size() && text.indexOf(raw, from) >= 0 && guard < 40) {
         const int at = raw.pos(0);
         const int endAnchor = text.lastIndexOf("</a>", at);
         const int startAnchor = text.lastIndexOf("<a ", at);
         if (startAnchor >= 0 && (endAnchor < 0 || startAnchor > endAnchor)) {
             from = at + raw.matchedLength();
-            ++guard;
             continue;
         }
         const QString body = trimHref(raw.cap(1));
         const QString href = safeHref(body);
         if (href.isEmpty()) {
             from = at + raw.matchedLength();
-            ++guard;
             continue;
         }
         const QString replacement = QString("<a href=\"%1\">%2</a>").arg(href, body);
