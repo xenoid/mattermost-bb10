@@ -760,6 +760,7 @@ void MmClient::openChannel(const QString &id, const QString &name)
     m_rawOrder.clear();
     m_rawPosts.clear();
     m_aroundLeft = 0;
+    m_aroundSelf.clear();
     setHistory(false, false);
     ensureStore();
     m_postRows = m_store.posts(id);
@@ -786,6 +787,8 @@ void MmClient::closeChannel()
     m_channelId.clear();
     m_channelName.clear();
     m_postRows.clear();
+    m_aroundSelf.clear();
+    m_focusPost.clear();
     emit channelChanged();
     loadChannels(true);
 }
@@ -1539,6 +1542,7 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
 
     QVariantMap row;
     row["id"] = post.value("id").toString();
+    row["mark"] = (!m_aroundSelf.isEmpty() && postId == m_aroundSelf) ? QString("1") : QString();
     row["type"] = QString("post");
     row["userId"] = uid;
     row["mine"] = !m_userId.isEmpty() && uid == m_userId;
