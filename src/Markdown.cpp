@@ -134,5 +134,5 @@ QString Markdown::html(const QString &plain)
         }
         out.append(inlineFormat(line));
     }
-    return out.join("<br/>");
+    return QString("<html>%1</html>").arg(out.join("<br/>"));
 }
