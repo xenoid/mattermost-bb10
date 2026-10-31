@@ -62,7 +62,7 @@ This list is the Mattermost Android client, scored by what this program already 
 | 🔴 | More than one account |
 | 🔴 | Dark theme |
 
-Markdown is drawn with the small HTML subset Cascades accepts: `b`, `i`, `a`, `font color`, `br`. A `font face` makes Cascades drop the whole label, so code is a color, not a monospace face.
+Markdown uses the tags the Cascades text reader matches: `b`, `strong`, `i`, `em`, `u`, `a`, `br`. It has no `span` and no `font`. Code is underlined. A quote is italic.
 
 ## Install in 2026
 

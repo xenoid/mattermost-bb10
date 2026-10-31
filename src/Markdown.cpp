@@ -92,8 +92,9 @@ QString inlineFormat(const QString &input)
     }
 
     for (int i = 0; i < codes.size(); ++i) {
+        // Der Leser kennt span nicht. Unterstrichen setzt er.
         text.replace(QString("\x01%1\x01").arg(i),
-                     QString("<span style='font-family:\"courier new\"'>%1</span>").arg(codes.at(i)));
+                     QString("<u>%1</u>").arg(codes.at(i)));
     }
     return text;
 }
@@ -121,15 +122,14 @@ QString Markdown::html(const QString &plain)
             continue;
         }
         if (code) {
-            out.append(QString("<span style='font-family:\"courier new\"'>%1</span>").arg(line));
+            out.append(QString("<u>%1</u>").arg(line));
             continue;
         }
         if (line.startsWith("&gt;")) {
             QString body = line.mid(4);
             if (body.startsWith(" "))
                 body = body.mid(1);
-            out.append(QString("<span style='background-color:rgb(214,220,226)'><i>%1</i></span>")
-                       .arg(inlineFormat(body)));
+            out.append(QString("<i>%1</i>").arg(inlineFormat(body)));
             continue;
         }
         out.append(inlineFormat(line));
