@@ -93,13 +93,16 @@ NavigationPane {
 
     function showTeams() {
         var rows = _mm.teamChoices()
-        teamDialog.clearList()
-        var ids = []
         var n = (rows && rows.length) ? rows.length : 0
+        var ids = []
+        var names = []
         for (var i = 0; i < n; ++i) {
-            teamDialog.appendItem(rows[i].name)
-            ids.push(rows[i].id)
+            ids.push(String(rows[i].id))
+            names.push(String(rows[i].name))
         }
+        teamDialog.clearList()
+        for (var j = 0; j < names.length; ++j)
+            teamDialog.appendItem(names[j])
         teamIds = ids
         if (n > 0)
             teamDialog.show()

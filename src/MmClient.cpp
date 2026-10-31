@@ -2769,8 +2769,9 @@ void MmClient::startUpload(const OutItem &item)
     channelPart.setBody(item.channelId.toUtf8());
     multi->append(channelPart);
     QHttpPart filePart;
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-                       QVariant("form-data; name=\"files\"; filename=\"" + name + "\""));
+    const QByteArray disposition = QByteArray("form-data; name=\"files\"; filename=\"")
+        + name.toUtf8() + "\"";
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant(disposition));
     filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant(mime));
     filePart.setBodyDevice(file);
     file->setParent(multi);
