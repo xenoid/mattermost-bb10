@@ -14,6 +14,7 @@ Page {
     property string heldName: ""
     property bool heldImage: false
     property string focusPost: ""
+    property string markedPost: ""
     property int focusTries: 0
     property bool focusHold: false
 
@@ -194,6 +195,14 @@ Page {
                             bottomPadding: 4
                             layout: StackLayout {
                                 orientation: LayoutOrientation.LeftToRight
+                            }
+
+                            Container {
+                                visible: ListItemData.mark == "1"
+                                preferredWidth: ListItemData.mark == "1" ? 6 : 0
+                                background: Color.create("#1c58d9")
+                                verticalAlignment: VerticalAlignment.Fill
+                                rightMargin: ListItemData.mark == "1" ? 10 : 0
                             }
 
                             // Profilbild links, bei Folgenachrichten derselben Person leer
@@ -760,7 +769,20 @@ Page {
         applyRows(rows)
     }
 
+    function withMark(rows) {
+        if (markedPost == "")
+            return rows
+        for (var k = 0; k < rows.length; ++k) {
+            if (rows[k] && rows[k].id == markedPost)
+                rows[k].mark = "1"
+        }
+        return rows
+    }
+
     function applyRows(rows) {
+        if (focusPost != "")
+            markedPost = focusPost
+        rows = withMark(rows)
         var size = postModel.size()
         if (focusPost != "") {
             focusHold = true
