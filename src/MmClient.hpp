@@ -2,6 +2,7 @@
 #define MMCLIENT_HPP
 
 #include "LocalStore.hpp"
+#include "MmSocket.hpp"
 
 #include <QDate>
 #include <QDateTime>
@@ -117,6 +118,8 @@ public:
     Q_INVOKABLE QVariantList emojiCatalog(const QString &query) const;
     Q_INVOKABLE void loadCustomEmoji();
     Q_INVOKABLE QVariantList slashMatches(const QString &text);
+    Q_INVOKABLE void noteTyping(const QString &parentId);
+    Q_INVOKABLE QString typingLine(const QString &parentId) const;
     Q_INVOKABLE void refresh();
     Q_INVOKABLE void search(const QString &terms);
     Q_INVOKABLE void openFromSearch(const QString &id, const QString &name, const QString &postId);
@@ -150,6 +153,7 @@ signals:
     void emojiReady(const QString &name, const QString &path);
     void customEmojiChanged();
     void commandsChanged();
+    void typingChanged();
     void avatarReady(const QString &userId, const QString &path);
     void showImage(const QString &path);
     void sendFailed(const QString &text);
@@ -165,6 +169,11 @@ private slots:
     void flushInbox();
     void bootHeadless();
     void emitFocusNudge();
+    void ensureLive();
+    void onLiveReady();
+    void onLiveFailed();
+    void onRemoteTyping(const QString &channelId, const QString &userId, const QString &parentId);
+    void sweepTyping();
 
 private:
     enum Step {
@@ -419,6 +428,18 @@ private:
     QString m_commandsTeam;
     int m_previewLeft;
     QHash<QString, UserInfo> m_users;
+
+    struct Typer {
+        qint64 until;
+        QString channel;
+        QString parent;
+    };
+    MmSocket m_live;
+    QTimer m_liveTimer;
+    QTimer m_typeSweep;
+    QHash<QString, Typer> m_typers;
+    QSet<QString> m_typeAsked;
+    qint64 m_typedAt;
 };
 
 #endif

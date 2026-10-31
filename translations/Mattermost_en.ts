@@ -24,6 +24,14 @@
         <translation>Certificate not trusted</translation>
     </message>
     <message>
+        <source>%1 is typing</source>
+        <translation>%1 is typing</translation>
+    </message>
+    <message>
+        <source>%1 are typing</source>
+        <translation>%1 are typing</translation>
+    </message>
+    <message>
         <location filename="../src/MmClient.cpp" line="87" />
         <source>No connection</source>
         <translation>No connection</translation>

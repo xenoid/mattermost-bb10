@@ -212,7 +212,9 @@ MmClient::MmClient(QObject *parent)
       m_emojiListedAt(0),
       m_commandsBusy(false),
       m_commandsAt(0),
-      m_previewLeft(0)
+      m_previewLeft(0),
+      m_live(this),
+      m_typedAt(0)
 {
     loadTrust();
     ImageStore::sweepLegacy();
@@ -226,6 +228,15 @@ MmClient::MmClient(QObject *parent)
     connect(m_invoke, SIGNAL(invoked(const bb::system::InvokeRequest&)),
             this, SLOT(onInvoked(const bb::system::InvokeRequest&)));
     connect(&m_net, SIGNAL(finished(QNetworkReply*)), this, SLOT(onFinished(QNetworkReply*)));
+    connect(&m_live, SIGNAL(ready()), this, SLOT(onLiveReady()));
+    connect(&m_live, SIGNAL(failed()), this, SLOT(onLiveFailed()));
+    connect(&m_live, SIGNAL(typing(QString,QString,QString)),
+            this, SLOT(onRemoteTyping(QString,QString,QString)));
+    m_liveTimer.setSingleShot(true);
+    m_liveTimer.setInterval(8000);
+    connect(&m_liveTimer, SIGNAL(timeout()), this, SLOT(ensureLive()));
+    m_typeSweep.setInterval(1000);
+    connect(&m_typeSweep, SIGNAL(timeout()), this, SLOT(sweepTyping()));
     m_timer.setInterval(kPollMs);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTick()));
     if (g_deferHeavy)
@@ -245,6 +256,7 @@ MmClient::MmClient(QObject *parent)
     m_debugLog = settings.value("debugLog", false).toBool();
     if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
         setLoggedIn(true);
+        ensureLive();
         loadMe();
     }
 }
@@ -534,6 +546,12 @@ void MmClient::resetSession()
     m_commandsBusy = false;
     m_commandsAt = 0;
     m_commandsTeam.clear();
+    m_live.close();
+    m_liveTimer.stop();
+    m_typeSweep.stop();
+    m_typers.clear();
+    m_typeAsked.clear();
+    m_typedAt = 0;
     m_lastPostId.clear();
     m_postsSig.clear();
     m_threadRoot.clear();
@@ -903,6 +921,8 @@ void MmClient::openChannel(const QString &id, const QString &name)
 {
     m_channelId = id;
     m_channelName = name;
+    m_typedAt = 0;
+    emit typingChanged();
     m_lastPostId.clear();
     m_postsSig.clear();
     m_rawOrder.clear();
@@ -1031,6 +1051,102 @@ void MmClient::takeEmojiPage(const QVariantList &list)
     m_emojiListedAt = QDateTime::currentMSecsSinceEpoch();
     emit customEmojiChanged();
     pumpFiles();
+}
+
+void MmClient::ensureLive()
+{
+    if (m_headless || !m_loggedIn || m_token.isEmpty() || m_serverUrl.isEmpty())
+        return;
+    m_live.open(m_serverUrl, m_token);
+}
+
+void MmClient::onLiveReady()
+{
+    m_liveTimer.stop();
+}
+
+void MmClient::onLiveFailed()
+{
+    if (m_headless || !m_loggedIn)
+        return;
+    if (!m_liveTimer.isActive())
+        m_liveTimer.start();
+}
+
+void MmClient::noteTyping(const QString &parentId)
+{
+    if (m_headless || !m_loggedIn || m_channelId.isEmpty())
+        return;
+    ensureLive();
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (m_typedAt > 0 && now - m_typedAt < 2000)
+        return;
+    m_typedAt = now;
+    m_live.sendTyping(m_channelId, parentId);
+}
+
+QString MmClient::typingLine(const QString &parentId) const
+{
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    QStringList names;
+    QHash<QString, Typer>::const_iterator it = m_typers.constBegin();
+    for (; it != m_typers.constEnd(); ++it) {
+        if (it.value().until <= now)
+            continue;
+        if (it.value().channel != m_channelId)
+            continue;
+        if (it.value().parent != parentId)
+            continue;
+        names.append(nameOf(it.key()));
+        if (names.size() >= 3)
+            break;
+    }
+    if (names.isEmpty())
+        return QString();
+    if (names.size() == 1)
+        return tr("%1 is typing").arg(names.at(0));
+    return tr("%1 are typing").arg(names.join(QLatin1String(", ")));
+}
+
+void MmClient::onRemoteTyping(const QString &channelId, const QString &userId, const QString &parentId)
+{
+    if (userId.isEmpty() || userId == m_userId || channelId.isEmpty())
+        return;
+    if (channelId != m_channelId)
+        return;
+    Typer row;
+    row.until = QDateTime::currentMSecsSinceEpoch() + 5000;
+    row.channel = channelId;
+    row.parent = parentId;
+    m_typers.insert(userId, row);
+    if (!m_typeSweep.isActive())
+        m_typeSweep.start();
+    if (!m_users.contains(userId) && !m_typeAsked.contains(userId)) {
+        m_typeAsked.insert(userId);
+        QStringList ids;
+        ids.append(userId);
+        loadUsers(ids, StepUsers);
+    }
+    emit typingChanged();
+}
+
+void MmClient::sweepTyping()
+{
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    bool changed = false;
+    QHash<QString, Typer>::iterator it = m_typers.begin();
+    while (it != m_typers.end()) {
+        if (it.value().until <= now) {
+            it = m_typers.erase(it);
+            changed = true;
+        } else {
+            ++it;
+        }
+    }
+    if (m_typers.isEmpty())
+        m_typeSweep.stop();
+    if (changed)
+        emit typingChanged();
 }
 
 void MmClient::loadCommands()
@@ -1821,6 +1937,8 @@ void MmClient::learnUsers(const QVariantList &users)
         if (m_store.isOpen())
             m_store.saveUser(id, info.label, info.username);
     }
+    if (!m_typers.isEmpty())
+        emit typingChanged();
 }
 
 void MmClient::markRead(const QString &channelId)
@@ -2714,6 +2832,7 @@ void MmClient::onFinished(QNetworkReply *reply)
         settings.setValue("userId", m_userId);
         setLoggedIn(true);
         emit sessionChanged();
+        ensureLive();
         queueAvatar(m_userId);
         pumpFiles();
         loadFlagged();

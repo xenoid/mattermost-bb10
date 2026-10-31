@@ -9,6 +9,7 @@ Page {
     objectName: "thread"
     property string editId: ""
     property string deleteId: ""
+    property string typingLine: ""
     attachedObjects: [
         SystemPrompt {
             id: editPrompt
@@ -993,6 +994,20 @@ Page {
             }
         }
 
+        // ------------------------------------------------ Schreibanzeige
+        Label {
+            id: typingLabel
+            visible: typingLine != ""
+            text: typingLine
+            leftMargin: 16
+            rightMargin: 16
+            topMargin: 4
+            bottomMargin: 4
+            textFormat: TextFormat.Plain
+            textStyle.color: Color.create("#6b747d")
+            textStyle.fontSize: FontSize.XSmall
+        }
+
         // ------------------------------------------------ Eingabe
         Container {
             background: Color.White
@@ -1083,7 +1098,11 @@ Page {
                         spaceQuota: 1
                     }
                     input.onSubmitted: send()
-                    onTextChanging: refreshSlash(text)
+                    onTextChanging: {
+                        refreshSlash(text)
+                        if (text != "")
+                            _mm.noteTyping(rootId)
+                    }
                     onFocusedChanged: {
                         if (focused)
                             emojiPanel.visible = false
@@ -1193,6 +1212,10 @@ Page {
 
     function onCommands() {
         refreshSlash(composer.text)
+    }
+
+    function refreshTyping() {
+        typingLine = _mm.typingLine(rootId)
     }
 
     function refreshSlash(text) {
@@ -1497,6 +1520,7 @@ Page {
         _mm.emojiReady.disconnect(takeEmoji)
         _mm.customEmojiChanged.disconnect(onCustomEmoji)
         _mm.commandsChanged.disconnect(onCommands)
+        _mm.typingChanged.disconnect(refreshTyping)
         _mm.avatarReady.disconnect(takeAvatar)
         _mm.sendFailed.disconnect(restoreText)
     }
@@ -1511,6 +1535,8 @@ Page {
         _mm.emojiReady.connect(takeEmoji)
         _mm.customEmojiChanged.connect(onCustomEmoji)
         _mm.commandsChanged.connect(onCommands)
+        refreshTyping()
+        _mm.typingChanged.connect(refreshTyping)
         _mm.avatarReady.connect(takeAvatar)
         _mm.sendFailed.connect(restoreText)
     }
