@@ -740,8 +740,10 @@ Page {
     function jumpToFocus() {
         if (focusPost == "" || focusHold)
             return
-        if (postLayout.layoutFrame.height <= 0)
+        if (postLayout.layoutFrame.height <= 0) {
+            _mm.nudgeFocus()
             return
+        }
         var index = focusIndex()
         // Solange die Liste leer ist, ist die Fundstelle noch unterwegs.
         // Der Zähler darf sie nicht vorher verwerfen.
