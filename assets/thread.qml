@@ -164,6 +164,7 @@ Page {
                 ListItemComponent {
                     type: "post"
                     CustomListItem {
+                        id: postItem
                         dividerVisible: false
                         contextActions: [
                             ActionSet {
@@ -171,37 +172,37 @@ Page {
                                 ActionItem {
                                     title: qsTr("Reply")
                                     enabled: ListItemData.inThread != "1" && ListItemData.pending != "1"
-                                    onTriggered: ListItem.view.askReplies(ListItemData.threadRoot)
+                                    onTriggered: postItem.ListItem.view.askReplies(ListItemData.threadRoot)
                                 }
                                 ActionItem {
                                     title: qsTr("React")
                                     enabled: ListItemData.pending != "1"
-                                    onTriggered: ListItem.view.askReact(ListItemData.id)
+                                    onTriggered: postItem.ListItem.view.askReact(ListItemData.id)
                                 }
                                 ActionItem {
                                     title: qsTr("Open image")
                                     enabled: ListItemData.imageId != "" && ListItemData.imageId != "local"
-                                    onTriggered: ListItem.view.openImage(ListItemData.imageId)
+                                    onTriggered: postItem.ListItem.view.openImage(ListItemData.imageId)
                                 }
                                 ActionItem {
                                     title: qsTr("Image 2")
                                     enabled: ListItemData.imageId2 != ""
-                                    onTriggered: ListItem.view.openImage(ListItemData.imageId2)
+                                    onTriggered: postItem.ListItem.view.openImage(ListItemData.imageId2)
                                 }
                                 ActionItem {
                                     title: qsTr("Open attachment")
                                     enabled: ListItemData.attachId != "" && ListItemData.attachId != "local"
-                                    onTriggered: ListItem.view.openAttachment(ListItemData.attachId, ListItemData.attachName, ListItemData.attachMime)
+                                    onTriggered: postItem.ListItem.view.openAttachment(ListItemData.attachId, ListItemData.attachName, ListItemData.attachMime)
                                 }
                                 ActionItem {
                                     title: qsTr("Attachment 2")
                                     enabled: ListItemData.attachId2 != ""
-                                    onTriggered: ListItem.view.openAttachment(ListItemData.attachId2, ListItemData.attachName2, ListItemData.attachMime2)
+                                    onTriggered: postItem.ListItem.view.openAttachment(ListItemData.attachId2, ListItemData.attachName2, ListItemData.attachMime2)
                                 }
                                 ActionItem {
                                     title: qsTr("Open link")
                                     enabled: ListItemData.link != ""
-                                    onTriggered: ListItem.view.openLink(ListItemData.link)
+                                    onTriggered: postItem.ListItem.view.openLink(ListItemData.link)
                                 }
                             }
                         ]
