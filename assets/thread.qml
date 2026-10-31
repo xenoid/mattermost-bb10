@@ -15,6 +15,7 @@ Page {
     property bool heldImage: false
     property string focusPost: ""
     property int focusTries: 0
+    property bool focusHold: false
 
     onRootIdChanged: objectName = rootId == "" ? "thread" : "replies"
 
@@ -720,10 +721,10 @@ Page {
         return -1
     }
 
-    // Erst loslassen, wenn die Fundstelle oben in der Liste steht.
-    // Ein früher Treffer im Modell reicht nicht: das Layout kommt danach.
+    // Während reload() feuert das Layout für jede Zeile. Das darf den
+    // Sprung nicht verbrauchen, bevor die Liste steht.
     function jumpToFocus() {
-        if (focusPost == "")
+        if (focusPost == "" || focusHold)
             return
         if (postLayout.layoutFrame.height <= 0)
             return
@@ -731,18 +732,18 @@ Page {
         if (index < 0)
             return
         var visible = scrollState.firstVisibleItem
-        if (visible && visible.length > 0 && visible[0] == index) {
-            focusPost = ""
-            focusTries = 0
-            return
-        }
-        focusTries = focusTries + 1
-        if (focusTries > 12) {
+        var at = (visible && visible.length > 0) ? Number(visible[0]) : -1
+        if (at == index || (scrollState.atEnd && at >= 0 && index >= at)) {
             focusPost = ""
             focusTries = 0
             return
         }
         postList.scrollToItem([index], ScrollAnimation.None)
+        focusTries = focusTries + 1
+        if (focusTries > 8) {
+            focusPost = ""
+            focusTries = 0
+        }
     }
 
     // Neue Zeilen anhängen, geänderte ersetzen. Nur ans Ende springen,
@@ -762,8 +763,10 @@ Page {
     function applyRows(rows) {
         var size = postModel.size()
         if (focusPost != "") {
+            focusHold = true
             focusTries = 0
             reload(rows, false)
+            focusHold = false
             jumpToFocus()
             return
         }
