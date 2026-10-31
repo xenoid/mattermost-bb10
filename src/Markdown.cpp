@@ -90,7 +90,8 @@ QString inlineFormat(const QString &input)
         ++guard;
     }
 
-    QRegExp mdlink("\\[([^\\]]+)\\]\\((https?://[^\\s\\)]+)\\)");
+    // Die Klammer der Adresse darf nicht die Klammer des Links sein.
+    QRegExp mdlink("\\[([^\\]]+)\\]\\((https?://[^\\s]+)\\)");
     guard = 0;
     while (text.indexOf(mdlink) >= 0 && guard < 20) {
         const QString href = safeHref(trimHref(mdlink.cap(2)));

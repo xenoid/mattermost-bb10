@@ -714,7 +714,7 @@ Page {
         return a.type == b.type && a.rev == b.rev && a.imagePath == b.imagePath
             && a.imagePath2 == b.imagePath2 && a.react == b.react && a.pending == b.pending
             && a.avatar == b.avatar && a.title == b.title && a.grouped == b.grouped
-            && a.quote == b.quote && a.mark == b.mark
+            && a.quote == b.quote && a.mark == b.mark && a.message == b.message
     }
 
     function reload(rows, stickEnd) {
