@@ -311,7 +311,19 @@ QString MmClient::firstUrl(const QString &message, bool *linkOnly) const
     QString url = rx.cap(0);
     while (!url.isEmpty()) {
         const QChar tail = url.at(url.size() - 1);
-        if (tail != '.' && tail != ',' && tail != ')' && tail != ']' && tail != ';' && tail != ':')
+        if (tail == ')') {
+            if (url.count(QLatin1Char('(')) >= url.count(QLatin1Char(')')))
+                break;
+            url.chop(1);
+            continue;
+        }
+        if (tail == ']') {
+            if (url.count(QLatin1Char('[')) >= url.count(QLatin1Char(']')))
+                break;
+            url.chop(1);
+            continue;
+        }
+        if (tail != '.' && tail != ',' && tail != ';' && tail != ':')
             break;
         url.chop(1);
     }

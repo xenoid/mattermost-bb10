@@ -31,7 +31,19 @@ QString trimHref(QString href)
         if (href.isEmpty())
             break;
         const QChar tail = href.at(href.size() - 1);
-        if (tail != '.' && tail != ',' && tail != ')' && tail != ']' && tail != ';' && tail != ':')
+        if (tail == ')') {
+            if (href.count(QLatin1Char('(')) >= href.count(QLatin1Char(')')))
+                break;
+            href.chop(1);
+            continue;
+        }
+        if (tail == ']') {
+            if (href.count(QLatin1Char('[')) >= href.count(QLatin1Char(']')))
+                break;
+            href.chop(1);
+            continue;
+        }
+        if (tail != '.' && tail != ',' && tail != ';' && tail != ':')
             break;
         href.chop(1);
     }
