@@ -1453,6 +1453,16 @@ void MmClient::setChannelText(const QString &channelId, const QString &field, co
     start(StepChannelText, "/api/v4/channels/" + channelId + "/patch", bytes, "PUT");
 }
 
+void MmClient::leaveTeam()
+{
+    // Nach dem Verlassen wählt die Team-Auswahl ein verbleibendes Team, oder die App meldet keins.
+    if (!m_loggedIn || m_userId.isEmpty() || m_teamId.isEmpty())
+        return;
+    QNetworkReply *reply = start(StepTeamLeave, "/api/v4/teams/" + m_teamId + "/members/" + m_userId,
+                                 QByteArray(), "DELETE");
+    reply->setProperty("teamId", m_teamId);
+}
+
 void MmClient::archiveChannel(const QString &channelId)
 {
     // DELETE auf einen Kanal archiviert ihn. Er verschwindet aus der Liste.
@@ -2980,6 +2990,27 @@ void MmClient::onFinished(QNetworkReply *reply)
             }
         }
         setStatus(tr("No user with that name"));
+        return;
+    }
+    if (step == StepTeamLeave) {
+        const QString id = reply->property("teamId").toString();
+        if (http >= 200 && http < 300 && netCode == 0) {
+            if (m_teamId == id) {
+                m_teamId.clear();
+                m_teamName.clear();
+                m_channelId.clear();
+                m_channelName.clear();
+                m_channelRows.clear();
+                m_postRows.clear();
+                emit channelChanged();
+                emit channelsLoaded(QVariantList());
+                emit postsLoaded(QVariantList());
+            }
+            setStatus(tr("Left the team"));
+            loadTeams();
+        } else {
+            setStatus(tr("Could not leave the team"));
+        }
         return;
     }
     if (step == StepArchive) {

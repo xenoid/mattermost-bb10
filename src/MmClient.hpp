@@ -146,6 +146,7 @@ public:
     Q_INVOKABLE void openSaved();
     Q_INVOKABLE void leaveChannel(const QString &channelId);
     Q_INVOKABLE void archiveChannel(const QString &channelId);
+    Q_INVOKABLE void leaveTeam();
     Q_INVOKABLE void saveProfile(const QString &firstName, const QString &lastName,
                                  const QString &nickname, const QString &position);
     Q_INVOKABLE void setChannelText(const QString &channelId, const QString &field, const QString &text);
@@ -237,7 +238,8 @@ private:
         StepLeave,
         StepArchive,
         StepProfileSet,
-        StepChannelText
+        StepChannelText,
+        StepTeamLeave
     };
 
     enum FileKind {

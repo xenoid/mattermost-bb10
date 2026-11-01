@@ -129,6 +129,17 @@ Page {
                 }
                 _mm.saveProfile(first, last, nick, position)
             }
+        },
+        SystemDialog {
+            id: leaveTeamDialog
+            title: qsTr("Leave team")
+            body: qsTr("You will no longer see its channels here.")
+            confirmButton.label: qsTr("Leave")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.leaveTeam()
+            }
         }
     ]
 
@@ -583,6 +594,26 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: _mm.logout()
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Leave team")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#d6322e")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: leaveTeamDialog.show()
                     }
                 ]
             }
