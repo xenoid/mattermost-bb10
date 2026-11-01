@@ -147,6 +147,7 @@ public:
     Q_INVOKABLE void leaveChannel(const QString &channelId);
     Q_INVOKABLE void archiveChannel(const QString &channelId);
     Q_INVOKABLE void leaveTeam();
+    Q_INVOKABLE void loadMembers(const QString &channelId);
     Q_INVOKABLE void saveProfile(const QString &firstName, const QString &lastName,
                                  const QString &nickname, const QString &position);
     Q_INVOKABLE void setChannelText(const QString &channelId, const QString &field, const QString &text);
@@ -185,6 +186,7 @@ signals:
     void prefsChanged();
     void presenceChanged();
     void profileChanged();
+    void membersLoaded(const QVariantList &rows);
 
 private slots:
     void onFinished(QNetworkReply *reply);
@@ -239,7 +241,9 @@ private:
         StepArchive,
         StepProfileSet,
         StepChannelText,
-        StepTeamLeave
+        StepTeamLeave,
+        StepMemberList,
+        StepMemberListUsers
     };
 
     enum FileKind {
@@ -288,6 +292,7 @@ private:
     void loadMe();
     void loadFlagged();
     void loadPresence();
+    void finishMembers();
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);
@@ -435,6 +440,7 @@ private:
     QString m_lastName;
     QString m_nickname;
     QString m_position;
+    QStringList m_memberIds;
     QString m_focusPost;
     QString m_aroundSelf;
     QString m_aroundChan;

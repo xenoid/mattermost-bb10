@@ -25,6 +25,10 @@ NavigationPane {
             id: notifyDef
             source: "asset:///channelnotify.qml"
         },
+        ComponentDefinition {
+            id: membersDef
+            source: "asset:///members.qml"
+        },
         SystemToast {
             id: toast
         },
@@ -356,6 +360,15 @@ NavigationPane {
                         page.load()
                         nav.push(page)
                     }
+                    function openMembers(channelId, title) {
+                        var page = nav.make(membersDef)
+                        if (!page)
+                            return
+                        page.channelId = channelId
+                        page.channelTitle = title
+                        page.load()
+                        nav.push(page)
+                    }
                     listItemComponents: [
                         ListItemComponent {
                             type: "header"
@@ -391,6 +404,10 @@ NavigationPane {
                                         ActionItem {
                                             title: qsTr("Notifications")
                                             onTriggered: channelItem.ListItem.view.openNotify(ListItemData.channelId, ListItemData.title)
+                                        }
+                                        ActionItem {
+                                            title: qsTr("Members")
+                                            onTriggered: channelItem.ListItem.view.openMembers(ListItemData.channelId, ListItemData.title)
                                         }
                                         ActionItem {
                                             title: qsTr("Leave channel")

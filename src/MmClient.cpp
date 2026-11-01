@@ -1453,6 +1453,32 @@ void MmClient::setChannelText(const QString &channelId, const QString &field, co
     start(StepChannelText, "/api/v4/channels/" + channelId + "/patch", bytes, "PUT");
 }
 
+void MmClient::loadMembers(const QString &channelId)
+{
+    if (!m_loggedIn || channelId.isEmpty()) {
+        emit membersLoaded(QVariantList());
+        return;
+    }
+    m_memberIds.clear();
+    QNetworkReply *reply = start(StepMemberList, "/api/v4/channels/" + channelId + "/members?per_page=200");
+    reply->setProperty("channelId", channelId);
+}
+
+void MmClient::finishMembers()
+{
+    QVariantList rows;
+    for (int i = 0; i < m_memberIds.size(); ++i) {
+        const QString id = m_memberIds.at(i);
+        QVariantMap row;
+        row["userId"] = id;
+        row["title"] = nameOf(id);
+        const bool named = m_users.contains(id) && !m_users.value(id).username.isEmpty();
+        row["subtitle"] = named ? "@" + m_users.value(id).username : QString();
+        rows.append(row);
+    }
+    emit membersLoaded(rows);
+}
+
 void MmClient::leaveTeam()
 {
     // Nach dem Verlassen wählt die Team-Auswahl ein verbleibendes Team, oder die App meldet keins.
@@ -1782,6 +1808,11 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         return;
     case StepSearchUsers:
         finishSearch();
+        return;
+    case StepMemberList:
+    case StepMemberListUsers:
+        setStatus(tr("Could not load the members"));
+        emit membersLoaded(QVariantList());
         return;
     case StepSend:
     case StepUpload:
@@ -3207,6 +3238,30 @@ void MmClient::onFinished(QNetworkReply *reply)
         } else {
             setStatus(tr("Could not save the profile"));
         }
+        return;
+    }
+    if (step == StepMemberList) {
+        if (http == 200 && netCode == 0) {
+            const QVariantList members = parsed.toList();
+            for (int i = 0; i < members.size(); ++i) {
+                const QString uid = members.at(i).toMap().value("user_id").toString();
+                if (!uid.isEmpty() && !m_memberIds.contains(uid))
+                    m_memberIds.append(uid);
+            }
+            const QStringList missing = unknownUsers(m_memberIds);
+            if (missing.isEmpty())
+                finishMembers();
+            else
+                loadUsers(missing, StepMemberListUsers);
+        } else {
+            setStatus(tr("Could not load the members"));
+            emit membersLoaded(QVariantList());
+        }
+        return;
+    }
+    if (step == StepMemberListUsers) {
+        learnUsers(parsed.toList());
+        finishMembers();
         return;
     }
     if (step == StepMe) {
