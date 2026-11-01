@@ -3,9 +3,10 @@ import bb.cascades 1.3
 Page {
     objectName: "search"
     property bool empty: false
+    property string heading: qsTr("Search")
 
     titleBar: TitleBar {
-        title: qsTr("Search")
+        title: heading
     }
 
     actionBarVisibility: ChromeVisibility.Compact

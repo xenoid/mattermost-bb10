@@ -47,6 +47,10 @@ class MmClient : public QObject
     Q_PROPERTY(bool notifyHub READ notifyHub WRITE setNotifyHub NOTIFY prefsChanged)
     Q_PROPERTY(bool notifyMentions READ notifyMentions WRITE setNotifyMentions NOTIFY prefsChanged)
     Q_PROPERTY(bool debugLog READ debugLog WRITE setDebugLog NOTIFY prefsChanged)
+    Q_PROPERTY(QString presence READ presence NOTIFY presenceChanged)
+    Q_PROPERTY(QString customText READ customText NOTIFY presenceChanged)
+    Q_PROPERTY(QString customEmoji READ customEmoji NOTIFY presenceChanged)
+    Q_PROPERTY(QVariantMap profile READ profile NOTIFY profileChanged)
     Q_PROPERTY(bool trustReady READ trustReady CONSTANT)
     Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
 
@@ -76,6 +80,9 @@ public:
     bool notifyMentions() const { return m_notifyMentions; }
     bool debugLog() const { return m_debugLog; }
     bool trustReady() const { return m_trustReady; }
+    QString customText() const { return m_statusText; }
+    QString customEmoji() const { return m_statusEmoji; }
+    QVariantMap profile() const;
     QString appVersion() const;
     void setShowPreview(bool on);
     void setShowImages(bool on);
@@ -126,6 +133,21 @@ public:
     Q_INVOKABLE void openImage(const QString &fileId);
     Q_INVOKABLE void openAttachment(const QString &fileId, const QString &name, const QString &mime);
     Q_INVOKABLE void openLink(const QString &url);
+    Q_INVOKABLE QVariantMap channelNotify(const QString &channelId) const;
+    Q_INVOKABLE void setChannelNotify(const QString &channelId, const QString &key, const QString &value);
+    Q_INVOKABLE QString presence() const;
+    Q_INVOKABLE QVariantMap customStatus() const;
+    Q_INVOKABLE void setPresence(const QString &value);
+    Q_INVOKABLE void setCustomStatus(const QString &emoji, const QString &text);
+    Q_INVOKABLE void clearCustomStatus();
+    Q_INVOKABLE void startDirect(const QString &username);
+    Q_INVOKABLE void createChannel(const QString &displayName);
+    Q_INVOKABLE void searchMentions();
+    Q_INVOKABLE void openSaved();
+    Q_INVOKABLE void leaveChannel(const QString &channelId);
+    Q_INVOKABLE void saveProfile(const QString &firstName, const QString &lastName,
+                                 const QString &nickname, const QString &position);
+    Q_INVOKABLE void setChannelText(const QString &channelId, const QString &field, const QString &text);
     void enterHeadless();
     static void deferUntilLoop();
 
@@ -159,6 +181,8 @@ signals:
     void sendFailed(const QString &text);
     void inboxRequested(const QString &id, const QString &name);
     void prefsChanged();
+    void presenceChanged();
+    void profileChanged();
 
 private slots:
     void onFinished(QNetworkReply *reply);
@@ -200,7 +224,18 @@ private:
         StepPreview,
         StepMutate,
         StepFlagged,
-        StepCommands
+        StepCommands,
+        StepNotify,
+        StepPresence,
+        StepPresenceSet,
+        StepCustomSet,
+        StepDirectUser,
+        StepDirectOpen,
+        StepChannelCreate,
+        StepSaved,
+        StepLeave,
+        StepProfileSet,
+        StepChannelText
     };
 
     enum FileKind {
@@ -248,6 +283,7 @@ private:
     // Sitzung und Listen
     void loadMe();
     void loadFlagged();
+    void loadPresence();
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);
@@ -342,6 +378,7 @@ private:
 
     QString m_serverUrl;
     QString m_username;
+    QString m_handle;
     QString m_userId;
     QString m_token;
     QString m_teamId;
@@ -387,6 +424,13 @@ private:
     bool m_mfaSent;
 
     QString m_mfaPassword;
+    QString m_presence;
+    QString m_statusEmoji;
+    QString m_statusText;
+    QString m_firstName;
+    QString m_lastName;
+    QString m_nickname;
+    QString m_position;
     QString m_focusPost;
     QString m_aroundSelf;
     QString m_aroundChan;

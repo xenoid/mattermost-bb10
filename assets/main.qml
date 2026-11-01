@@ -21,8 +21,37 @@ NavigationPane {
             id: settingsDef
             source: "asset:///settings.qml"
         },
+        ComponentDefinition {
+            id: notifyDef
+            source: "asset:///channelnotify.qml"
+        },
         SystemToast {
             id: toast
+        },
+        SystemDialog {
+            id: leaveDialog
+            property string leaveId: ""
+            title: qsTr("Leave channel")
+            body: qsTr("You can join again later.")
+            confirmButton.label: qsTr("Leave")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.leaveChannel(leaveId)
+            }
+        },
+        SystemPrompt {
+            id: channelTextPrompt
+            property string channelTextId: ""
+            property string channelTextField: ""
+            inputField.inputMode: SystemUiInputMode.Default
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Save")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.setChannelText(channelTextId, channelTextField, inputFieldTextEntry())
+            }
         },
         SystemListDialog {
             id: reactDialog
@@ -213,6 +242,24 @@ NavigationPane {
                     topMargin: 20
                     onClicked: _mm.login(serverField.text, userField.text, passField.text)
                 }
+                Label {
+                    text: qsTr("Forgot password?")
+                    horizontalAlignment: HorizontalAlignment.Center
+                    topMargin: 16
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Small
+                    gestureHandlers: [
+                        TapHandler {
+                            onTapped: {
+                                // Der Link öffnet die Zurücksetzen-Seite des eingetragenen Servers im Browser.
+                                var server = serverField.text.trim().replace(/\/+$/, "")
+                                if (server.indexOf("http") == 0)
+                                    _mm.openLink(server + "/reset_password")
+                            }
+                        }
+                    ]
+                }
             }
 
             // ------------------------------------------------ Kanalliste
@@ -288,6 +335,15 @@ NavigationPane {
                             return data.type
                         return "channel"
                     }
+                    function openNotify(channelId, title) {
+                        var page = nav.make(notifyDef)
+                        if (!page)
+                            return
+                        page.channelId = channelId
+                        page.channelTitle = title
+                        page.load()
+                        nav.push(page)
+                    }
                     listItemComponents: [
                         ListItemComponent {
                             type: "header"
@@ -317,6 +373,45 @@ NavigationPane {
                             CustomListItem {
                                 id: channelItem
                                 dividerVisible: true
+                                contextActions: [
+                                    ActionSet {
+                                        title: ListItemData.title
+                                        ActionItem {
+                                            title: qsTr("Notifications")
+                                            onTriggered: channelItem.ListItem.view.openNotify(ListItemData.channelId, ListItemData.title)
+                                        }
+                                        ActionItem {
+                                            title: qsTr("Leave channel")
+                                            enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
+                                            onTriggered: {
+                                                leaveDialog.leaveId = ListItemData.channelId
+                                                leaveDialog.show()
+                                            }
+                                        }
+                                        ActionItem {
+                                            title: qsTr("Edit header")
+                                            enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
+                                            onTriggered: {
+                                                channelTextPrompt.title = qsTr("Channel header")
+                                                channelTextPrompt.channelTextId = ListItemData.channelId
+                                                channelTextPrompt.channelTextField = "header"
+                                                channelTextPrompt.inputField.defaultText = ListItemData.header
+                                                channelTextPrompt.show()
+                                            }
+                                        }
+                                        ActionItem {
+                                            title: qsTr("Edit purpose")
+                                            enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
+                                            onTriggered: {
+                                                channelTextPrompt.title = qsTr("Channel purpose")
+                                                channelTextPrompt.channelTextId = ListItemData.channelId
+                                                channelTextPrompt.channelTextField = "purpose"
+                                                channelTextPrompt.inputField.defaultText = ListItemData.purpose
+                                                channelTextPrompt.show()
+                                            }
+                                        }
+                                    }
+                                ]
                                 Container {
                                     preferredHeight: 112
                                     horizontalAlignment: HorizontalAlignment.Fill

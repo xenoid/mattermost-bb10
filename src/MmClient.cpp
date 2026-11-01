@@ -522,6 +522,14 @@ void MmClient::setLoggedIn(bool on)
 
 void MmClient::resetSession()
 {
+    m_handle.clear();
+    m_presence.clear();
+    m_statusEmoji.clear();
+    m_statusText.clear();
+    m_firstName.clear();
+    m_lastName.clear();
+    m_nickname.clear();
+    m_position.clear();
     m_mfaPassword.clear();
     m_mfaSent = false;
     m_token.clear();
@@ -1271,6 +1279,196 @@ void MmClient::openLink(const QString &url)
         reply->setParent(this);
 }
 
+QVariantMap MmClient::channelNotify(const QString &channelId) const
+{
+    QVariantMap prefs;
+    for (int i = 0; i < m_channelRows.size(); ++i) {
+        const QVariantMap row = m_channelRows.at(i).toMap();
+        if (row.value("channelId").toString() != channelId)
+            continue;
+        prefs["push"] = row.value("push").toString();
+        prefs["desktop"] = row.value("desktop").toString();
+        prefs["markUnread"] = row.value("markUnread").toString();
+        break;
+    }
+    return prefs;
+}
+
+void MmClient::setChannelNotify(const QString &channelId, const QString &key, const QString &value)
+{
+    // Nur die drei Schlüssel der Oberfläche, Werte nur Kleinbuchstaben.
+    const bool knownKey = key == "push" || key == "desktop" || key == "mark_unread";
+    const bool plainValue = QRegExp("^[a-z]+$").exactMatch(value);
+    if (!m_loggedIn || m_userId.isEmpty() || channelId.isEmpty() || !knownKey || !plainValue)
+        return;
+    const QByteArray body = "{\"" + key.toLatin1() + "\":\"" + value.toLatin1() + "\"}";
+    start(StepNotify, "/api/v4/channels/" + channelId + "/members/" + m_userId + "/notify_props",
+          body, "PUT");
+}
+
+QString MmClient::presence() const
+{
+    return m_presence;
+}
+
+QVariantMap MmClient::customStatus() const
+{
+    QVariantMap custom;
+    custom["emoji"] = m_statusEmoji;
+    custom["text"] = m_statusText;
+    return custom;
+}
+
+QVariantMap MmClient::profile() const
+{
+    QVariantMap map;
+    map["first"] = m_firstName;
+    map["last"] = m_lastName;
+    map["nickname"] = m_nickname;
+    map["position"] = m_position;
+    return map;
+}
+
+void MmClient::saveProfile(const QString &firstName, const QString &lastName,
+                           const QString &nickname, const QString &position)
+{
+    if (!m_loggedIn || m_userId.isEmpty())
+        return;
+    QVariantMap body;
+    body["first_name"] = firstName.trimmed();
+    body["last_name"] = lastName.trimmed();
+    body["nickname"] = nickname.trimmed();
+    body["position"] = position.trimmed();
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    start(StepProfileSet, "/api/v4/users/" + m_userId + "/patch", bytes, "PUT");
+}
+
+void MmClient::setPresence(const QString &value)
+{
+    const bool known = value == "online" || value == "away" || value == "dnd" || value == "offline";
+    if (!m_loggedIn || m_userId.isEmpty() || !known)
+        return;
+    QVariantMap body;
+    body["user_id"] = m_userId;
+    body["status"] = value;
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    QNetworkReply *reply = start(StepPresenceSet, "/api/v4/users/" + m_userId + "/status",
+                                 bytes, "PUT");
+    reply->setProperty("value", value);
+}
+
+void MmClient::setCustomStatus(const QString &emoji, const QString &text)
+{
+    const QString plain = text.trimmed();
+    if (!m_loggedIn || m_userId.isEmpty() || plain.isEmpty())
+        return;
+    QVariantMap body;
+    body["emoji"] = emoji;
+    body["text"] = plain;
+    body["duration"] = QString("dont_clear");
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    QNetworkReply *reply = start(StepCustomSet, "/api/v4/users/" + m_userId + "/status/custom",
+                                 bytes, "PUT");
+    reply->setProperty("emoji", emoji);
+    reply->setProperty("text", plain);
+}
+
+void MmClient::clearCustomStatus()
+{
+    if (!m_loggedIn || m_userId.isEmpty())
+        return;
+    QNetworkReply *reply = start(StepCustomSet, "/api/v4/users/" + m_userId + "/status/custom",
+                                 QByteArray(), "DELETE");
+    reply->setProperty("emoji", QString());
+    reply->setProperty("text", QString());
+}
+
+void MmClient::startDirect(const QString &username)
+{
+    QString name = username.trimmed();
+    if (name.startsWith("@"))
+        name = name.mid(1);
+    if (!m_loggedIn || m_userId.isEmpty() || !QRegExp("^[A-Za-z0-9._-]+$").exactMatch(name)) {
+        setStatus(tr("No user with that name"));
+        return;
+    }
+    start(StepDirectUser, "/api/v4/users/username/" + name);
+}
+
+void MmClient::openSaved()
+{
+    if (!m_loggedIn || m_userId.isEmpty())
+        return;
+    setStatus(tr("Searching…"));
+    start(StepSaved, "/api/v4/users/" + m_userId + "/posts/flagged?page=0&per_page=200");
+}
+
+void MmClient::searchMentions()
+{
+    // Erwähnungen findet die Suche über den Benutzernamen mit @ davor.
+    if (m_handle.isEmpty())
+        return;
+    search("@" + m_handle);
+}
+
+void MmClient::createChannel(const QString &displayName)
+{
+    // Mattermost verlangt einen kurzen Namen aus Kleinbuchstaben, Ziffern und Bindestrichen.
+    const QString title = displayName.trimmed().left(64);
+    QString slug = title.toLower();
+    slug.replace(QRegExp("[^a-z0-9]+"), "-");
+    slug.replace(QRegExp("^-+|-+$"), "");
+    if (!m_loggedIn || m_teamId.isEmpty() || slug.length() < 2) {
+        setStatus(tr("Could not create the channel"));
+        return;
+    }
+    QVariantMap body;
+    body["team_id"] = m_teamId;
+    body["name"] = slug;
+    body["display_name"] = title;
+    body["type"] = QString("O");
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    start(StepChannelCreate, "/api/v4/channels", bytes, "POST");
+}
+
+void MmClient::setChannelText(const QString &channelId, const QString &field, const QString &text)
+{
+    // Nur Kopfzeile und Zweck. Der Server ändert nur das Feld, das im Body steht.
+    const bool known = field == "header" || field == "purpose";
+    if (!m_loggedIn || channelId.isEmpty() || !known)
+        return;
+    QVariantMap body;
+    body[field] = text.trimmed();
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    start(StepChannelText, "/api/v4/channels/" + channelId + "/patch", bytes, "PUT");
+}
+
+void MmClient::leaveChannel(const QString &channelId)
+{
+    if (!m_loggedIn || m_userId.isEmpty() || channelId.isEmpty())
+        return;
+    QNetworkReply *reply = start(StepLeave, "/api/v4/channels/" + channelId + "/members/" + m_userId,
+                                 QByteArray(), "DELETE");
+    reply->setProperty("channelId", channelId);
+}
+
+void MmClient::loadPresence()
+{
+    if (!m_loggedIn || m_userId.isEmpty())
+        return;
+    start(StepPresence, "/api/v4/users/" + m_userId + "/status");
+}
+
 void MmClient::openFile(const QString &path, const QString &mime)
 {
     if (!m_invoke)
@@ -1422,6 +1620,14 @@ void MmClient::syncInbox()
         int attention = unread > mentions ? unread : mentions;
         if (m_notifyMentions)
             attention = mentions;
+        // Der Kanal überschreibt die globale Einstellung, „default“ lässt sie gelten.
+        const QString desktop = row.value("desktop").toString();
+        if (desktop == "none")
+            attention = 0;
+        else if (desktop == "mention")
+            attention = mentions;
+        else if (desktop == "all")
+            attention = unread > mentions ? unread : mentions;
         const int seen = m_noteUnread.value(id, 0);
         if (attention <= 0)
             clearInbox(id);
@@ -2741,6 +2947,102 @@ void MmClient::onFinished(QNetworkReply *reply)
         }
         return;
     }
+    if (step == StepNotify) {
+        if (http == 200 && netCode == 0)
+            loadChannels(true);
+        else
+            setStatus(tr("Could not change notifications"));
+        return;
+    }
+    if (step == StepDirectUser) {
+        if (http == 200 && netCode == 0) {
+            JsonDataAccess directJson;
+            const QVariant directParsed = directJson.loadFromBuffer(payload);
+            const QString otherId = directParsed.toMap().value("id").toString();
+            if (!directJson.hasError() && !otherId.isEmpty()) {
+                QVariantList pair;
+                pair.append(m_userId);
+                pair.append(otherId);
+                JsonDataAccess pairJson;
+                QByteArray bytes;
+                pairJson.saveToBuffer(pair, &bytes);
+                start(StepDirectOpen, "/api/v4/channels/direct", bytes, "POST");
+                return;
+            }
+        }
+        setStatus(tr("No user with that name"));
+        return;
+    }
+    if (step == StepLeave) {
+        const QString id = reply->property("channelId").toString();
+        if (http >= 200 && http < 300 && netCode == 0) {
+            setStatus(tr("Left the channel"));
+            if (m_channelId == id)
+                closeChannel();
+            else
+                loadChannels(true);
+        } else {
+            setStatus(tr("Could not leave the channel"));
+        }
+        return;
+    }
+    if (step == StepChannelText) {
+        if (http == 200 && netCode == 0) {
+            setStatus(tr("Channel updated"));
+            loadChannels(true);
+        } else {
+            setStatus(tr("Could not change the channel"));
+        }
+        return;
+    }
+    if (step == StepChannelCreate) {
+        if (http >= 200 && http < 300 && netCode == 0) {
+            setStatus(tr("Channel created"));
+            loadChannels(true);
+        } else {
+            setStatus(tr("Could not create the channel"));
+        }
+        return;
+    }
+    if (step == StepDirectOpen) {
+        if (http >= 200 && http < 300 && netCode == 0) {
+            setStatus(tr("Direct message ready"));
+            loadChannels(true);
+        } else {
+            setStatus(tr("Could not start the direct message"));
+        }
+        return;
+    }
+    if (step == StepPresence) {
+        if (http == 200 && netCode == 0) {
+            JsonDataAccess presenceJson;
+            const QVariant presenceParsed = presenceJson.loadFromBuffer(payload);
+            if (!presenceJson.hasError()) {
+                m_presence = presenceParsed.toMap().value("status").toString();
+                emit presenceChanged();
+            }
+        }
+        return;
+    }
+    if (step == StepPresenceSet) {
+        if (http == 200 && netCode == 0) {
+            m_presence = reply->property("value").toString();
+            emit presenceChanged();
+        } else {
+            setStatus(tr("Could not change status"));
+        }
+        return;
+    }
+    if (step == StepCustomSet) {
+        if (http == 200 && netCode == 0) {
+            m_statusEmoji = reply->property("emoji").toString();
+            m_statusText = reply->property("text").toString();
+            emit presenceChanged();
+        } else {
+            setStatus(tr("Could not change status"));
+        }
+        return;
+    }
     if (step == StepCommands) {
         const QString team = reply->property("team").toString();
         if (http >= 400 || http == 0 || netCode != 0) {
@@ -2840,9 +3142,29 @@ void MmClient::onFinished(QNetworkReply *reply)
         return;
     }
 
+    if (step == StepProfileSet) {
+        if (http == 200 && netCode == 0) {
+            const QVariantMap user = parsed.toMap();
+            m_firstName = user.value("first_name").toString();
+            m_lastName = user.value("last_name").toString();
+            m_nickname = user.value("nickname").toString();
+            m_position = user.value("position").toString();
+            emit profileChanged();
+            setStatus(tr("Profile saved"));
+        } else {
+            setStatus(tr("Could not save the profile"));
+        }
+        return;
+    }
     if (step == StepMe) {
         const QVariantMap user = parsed.toMap();
         m_userId = user.value("id").toString();
+        m_handle = user.value("username").toString();
+        m_firstName = user.value("first_name").toString();
+        m_lastName = user.value("last_name").toString();
+        m_nickname = user.value("nickname").toString();
+        m_position = user.value("position").toString();
+        emit profileChanged();
         QVariantList me;
         me.append(user);
         learnUsers(me);
@@ -2854,6 +3176,19 @@ void MmClient::onFinished(QNetworkReply *reply)
         pumpFiles();
         loadFlagged();
         loadTeams();
+        // Der eigene Custom Status steht als JSON-Text in den Eigenschaften.
+        m_statusEmoji.clear();
+        m_statusText.clear();
+        const QString custom = user.value("props").toMap().value("customStatus").toString();
+        if (!custom.isEmpty()) {
+            JsonDataAccess customJson;
+            const QVariantMap parsedCustom = customJson.loadFromBuffer(custom.toUtf8()).toMap();
+            if (!customJson.hasError()) {
+                m_statusEmoji = parsedCustom.value("emoji").toString();
+                m_statusText = parsedCustom.value("text").toString();
+            }
+        }
+        loadPresence();
         return;
     }
 
@@ -2904,6 +3239,8 @@ void MmClient::onFinished(QNetworkReply *reply)
             row["title"] = repairText(title);
             row["subtitle"] = (type == "O" || type == "P") ? repairText(subtitle) : QString();
             row["peerId"] = peer;
+            row["header"] = channel.value("header").toString();
+            row["purpose"] = channel.value("purpose").toString();
             row["last"] = channel.value("last_post_at").toLongLong();
             row["total"] = channel.value("total_msg_count").toLongLong();
             const qint64 last = channel.value("last_post_at").toLongLong();
@@ -2938,7 +3275,11 @@ void MmClient::onFinished(QNetworkReply *reply)
                 qint64 unread = row.value("total").toLongLong() - member.value("msg_count").toLongLong();
                 if (unread < 0)
                     unread = 0;
-                const QString mark = member.value("notify_props").toMap().value("mark_unread").toString();
+                const QVariantMap props = member.value("notify_props").toMap();
+                const QString mark = props.value("mark_unread").toString();
+                row["push"] = props.value("push").toString();
+                row["desktop"] = props.value("desktop").toString();
+                row["markUnread"] = mark;
                 if (mark == "mention")
                     unread = 0;
                 int mentions = member.value("mention_count").toInt();
@@ -3094,7 +3435,7 @@ void MmClient::onFinished(QNetworkReply *reply)
         return;
     }
 
-    if (step == StepSearch) {
+    if (step == StepSearch || step == StepSaved) {
         const QVariantMap root = parsed.toMap();
         const QVariantList order = root.value("order").toList();
         const QVariantMap posts = root.value("posts").toMap();

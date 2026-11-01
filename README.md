@@ -1,89 +1,57 @@
-# mattermost-bb10
-
-A Mattermost client for BlackBerry 10. It is built for the Classic, the square 720 screen, and a world in which BlackBerry no longer signs applications.
-
-On the phone the app is named **Mattermost**. The package id is `com.hollweck.mattermost`. This repository is the source: [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10). Version in the tree: **1.0.0**, build **131**.
+# Mattermost for BlackBerry 10
 
 <p>
 <img src="icon.png" width="96" alt="App icon">
 </p>
 
-The client talks to any Mattermost server you can reach over HTTPS, with the API v4. Posts, names, and emoji are UTF-8, in whatever language the team writes. The buttons and dialogs follow the phone language: German and English ship with the app.
+An unofficial [Mattermost](https://mattermost.com) client for the BlackBerry Classic (BlackBerry 10). It is written in C++ with Qt 4.8 and Cascades, and it talks to any Mattermost server over HTTPS with API v4.
 
-## Languages
+Not affiliated with Mattermost, Inc. or BlackBerry.
 
-Server text is shown as stored. A German team, an English team, and a mixed team all come through the same client. Dates and file sizes use the phone locale. Emoji are drawn from the color font on the device, without flags, skin tones, or ZWJ sequences.
+- **Package:** `com.hollweck.mattermost`, shown on the phone as **Mattermost**
+- **Version:** 1.0.0, build 132
+- **Source:** [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10)
 
-The interface source strings are English (`qsTr` and `tr`). At startup the app loads `app/native/qm/Mattermost_<language>.qm`. A phone set to German (`de`, `de_DE`, `de_AT`, …) gets `Mattermost_de`. Every other language gets `Mattermost_en` until a catalog for that language exists. Both catalogs are in this tree, finished, and packed into the BAR.
+## Status
 
-## Toward the Android app
+The app is usable for daily work: sign in, read, send, reply in threads, search, attach files, and get hub alerts. It works offline for sending, which queues messages until the phone is back online.
 
-This list is the Mattermost Android client, scored by what this program already does. 23 rows are done, 2 are only part way, 8 are still missing.
+The goal is the feature set of the official Android app, minus voice and video calls. [PARITY.md](PARITY.md) lists every feature and its state. At the time of writing, 28 of 93 tracked features are done, 16 are partly done, and 49 are open.
 
-| | |
-| --- | --- |
-| 🟢 | Done. Same job as on Android. |
-| 🟡 | Started. Android does more, or this part does not finish. |
-| 🔴 | Not built. |
+## Features
 
-| | |
-| --- | --- |
-| 🟢 | Sign in with server, name, and password |
-| 🟢 | Keep the session |
-| 🟢 | Ask for an MFA code |
-| 🟢 | Pick a team |
-| 🟢 | Channel list: public, private, direct, unread, mentions |
-| 🟢 | Hide the channel subtitle |
-| 🟢 | Read posts, including older and newer pages |
-| 🟢 | Send a message |
-| 🟢 | Send later when the phone is offline |
-| 🟢 | Search and open the hit |
-| 🟢 | Threads and replies |
-| 🟡 | Reactions: swipe opens twelve names, up to eight chips, a tap toggles that one, a server emoji is its image |
-| 🟢 | Open images and other files |
-| 🟢 | Upload a file under its original name |
-| 🟢 | Check the server certificate against a current CA bundle |
-| 🟢 | Markdown: bold, italic, code, quote, link. A heading is bold. A list, a table, and a strike are readable text |
-| 🟢 | Emoji panel, including the server's own emoji. Flags and skin tones are not in the phone font |
-| 🟢 | A Hub row per channel. The body is the latest message when that post has text |
-| 🟢 | Background refresh every six minutes |
-| 🟢 | Settings: refresh, team, log out, preview, 24-hour clock, images, hub alerts, mentions only, protocol log |
-| 🟡 | English and German. Further languages are a catalog |
-| 🟢 | Edit and delete your own message from the swipe |
-| 🟢 | Pin and save a post from the swipe |
-| 🟢 | Slash commands: a suggestion list while typing / |
-| 🟢 | Typing indicator over a websocket |
-| 🔴 | SSO |
-| 🔴 | Notification settings per channel |
-| 🔴 | Create a channel, show its members |
-| 🔴 | Custom status |
-| 🔴 | Calls and screen share |
-| 🔴 | Boards and playbooks |
-| 🔴 | More than one account |
-| 🔴 | Dark theme |
+- Sign in with server URL, username or email, and password, including MFA codes
+- Keep the session; log out from Settings
+- Team picker and channel list with public, private, direct, unread, and mention filters
+- Read posts with paging in both directions, and open a permalink or search hit
+- Send, reply in threads, edit and delete your own posts, pin and save posts
+- Slash command suggestions while typing `/`
+- Typing indicator over a websocket
+- Emoji panel with the server's custom emoji
+- Upload files under their original names; open images and other files
+- Offline outbox that sends queued posts when the connection returns
+- Hub: a background process that refreshes every six minutes and raises alerts
+- Settings: refresh, team, preview, 24-hour clock, images, hub alerts, mentions only, protocol log
+- English and German interface
 
-Markdown uses the tags the Cascades text reader matches: `b`, `strong`, `i`, `em`, `u`, `a`, `br`. It has no `span` and no `font`. Code is underlined. A quote is an italic line with a bar. A heading is bold. A bullet or a number stays a line of text. A table is cells separated by a dot. A strike loses the tildes and keeps the words.
+## Requirements
 
-A reaction is a swipe, then one of twelve names. Choosing the same name again removes it. The row shows up to eight chips. Tapping a chip toggles that emoji. A server emoji is downloaded and shown as a picture. The phone font has no flags, skin tones, or the red heart, so `heart` is the sparkling one. Build 123 called the swipe through the post row. Whether that list opens has not been seen on a finger since then.
+- BlackBerry Classic (720 × 720) on BlackBerry 10 OS 10.3
+- A Mattermost server with API v4, reachable over HTTPS
+- To install an unsigned package, a rooted device (see [Install](#install))
+- To build from source, the BlackBerry NDK 10.3.1
 
-The emoji panel lists the phone font and, after the panel opens, the server's own emoji. A font glyph is inserted as the character. A server emoji is inserted as `:name:` and shown as its picture once that picture has arrived.
+## Install
 
-A Hub entry uses the channel name as the title. The body is the latest post, shortened, for up to eight channels that have something unread. A post with no text keeps the count.
+BlackBerry no longer signs third-party applications, so the package is unsigned.
 
-Edit opens the message in a prompt and sends the new text. Delete asks first, then removes the message. Pin and save toggle. A saved post is one you flagged. The server still decides whether you are allowed to edit, delete, or pin.
+- **Rooted device:** install the BAR with `sud_install_package_2`.
+- **Developer access:** `tools/bb.sh install <file.bar>` pushes the package over SSH and installs it as root. Set the host and key paths at the top of the script, and export the device password as `BB10_PW`. Do not write the password into the script.
+- **Unrooted device without developer mode:** the installer stops with error 881. This project does not offer a way around that.
 
-Typing `/` asks the team for its commands and shows up to eight matches above the field. A tap fills the name and a space. A space hides the list. Sending is still an ordinary post. The server runs the command.
+## Build from source
 
-While a message is being typed, the client keeps a websocket to `/api/v4/websocket` and tells the server. A line above the field names who is typing in this channel. The line goes away after a few seconds. The hub still only polls.
-
-## Install in 2026
-
-The BlackBerry Signing Authority is gone. There is no store certificate to attach.
-
-- A **rooted** Classic can install the unsigned BAR with `sud_install_package_2`.
-- A Classic that is not rooted, and not in developer mode, stops at error **881**. Developer mode is not a substitute this project claims to ship.
-
-This tree builds the unsigned device package:
+Build with the NDK 10.3.1 environment. The compiler is the one in that NDK: C++03, Qt 4.8, Cascades. Do not use `auto`, lambdas, or `QJsonDocument`.
 
 ```sh
 source /path/to/bbndk/bbndk-env_10_3_1_995.sh
@@ -92,17 +60,68 @@ make
 blackberry-nativepackager -package -configuration Device-Release Mattermost-release.bar bar-descriptor.xml
 ```
 
-The NDK is 10.3.1. The compiler is the one in that NDK: C++03, Qt 4.8, Cascades. No `auto`, no lambdas, no `QJsonDocument`. `QNX_TARGET` has to be set before `make`, because the headless binary is linked against it.
+`QNX_TARGET` must be set before `make`, because the hub binary links against it. The environment script sets it.
 
-The BAR, the `o.le-v7/` build tree, and the generated Makefile stay out of git. So do passwords, tokens, and the phone's session file.
+### TLS shim
+
+Qt 4.8 asks for `SSLv23_client_method`, and the servers this client targets require TLS 1.2. The tree ships a shim: `lib/libssl.so.2` forwards to `lib/libsslmm.so` and changes only that one call. To rebuild it from the device's own `libssl.so.2`, run:
+
+```sh
+tools/ssl-shim.sh /path/to/device/libssl.so.2
+```
+
+The script needs `qcc` from the NDK on the path.
+
+## Project layout
+
+| Path | Role |
+| --- | --- |
+| `src/MmClient.*` | REST client and app state. Its 40 `Q_INVOKABLE` methods are the API the QML pages call. |
+| `src/MmSocket.*` | Websocket for the typing indicator |
+| `src/LocalStore.*` | Local cache and the offline outbox |
+| `src/ImageStore.*` | Image and file cache. It also paints a few icons. |
+| `src/Markdown.*` | Converts Markdown to the tags the Cascades text reader understands |
+| `src/Emoji.*` | Emoji catalog for the panel |
+| `src/main.cpp` | Entry point for the app |
+| `assets/*.qml` | Pages: main (channels), thread, search, settings, attachments, image viewer |
+| `translations/` | `Mattermost_en.ts` and `Mattermost_de.ts`, compiled to `.qm` and packed into the BAR |
+| `o.le-v7/`, `*.bar`, `Makefile` | Build output and generated files. Not in git. |
+
+The hub, `MattermostHub`, is a second executable built from the same objects. The system starts it on a timer.
 
 ## Design
 
-The Classic is 720 by 720 at 294 dpi. The accent is `#1c58d9`, pressed `#1544a8`, secondary text `#6b747d`, private channels `#b9822a`, mentions `#d6322e`. The chat page hides the action bar. Back is a swipe from the left edge. Settings are the last row of the channel list.
+The Classic screen is 720 by 720 at 294 dpi. Colours:
+
+| Use | Colour |
+| --- | --- |
+| Accent | `#1c58d9` (pressed `#1544a8`) |
+| Secondary text | `#6b747d` |
+| Private channels | `#b9822a` |
+| Mentions | `#d6322e` |
+
+The chat page hides the action bar. Back is a swipe from the left edge. Settings are the last row of the channel list.
+
+## Known limitations
+
+- **Markdown** shows bold, italic, code, quotes, and links. Lists, tables, and headings are plain text. Strikethrough keeps the words and drops the tildes.
+- **Emoji** come from the phone font, which has no flags, skin tones, or ZWJ sequences. Server emoji are shown as pictures.
+- **Reactions** work through a swipe, but the swipe has not been confirmed on the device since build 123.
+- **Notifications** come from a poll every six minutes, not from push. BlackBerry 10 has no push service for this app.
+- **Accounts:** one account and one server at a time.
+- **Calls** are not built and are not planned.
+- **Tests:** there are no automated tests yet. Changes are checked on a device.
 
 ## Contributing
 
-Another interface language is a catalog. Copy the English file, translate it, and send it:
+1. Pick an open item in [PARITY.md](PARITY.md), or open an issue first for anything larger.
+2. Keep the diff small, and follow the C++03 and Qt 4.8 limits above.
+3. Test on a device, and say in the pull request what you tested.
+4. Keep secrets out of commits. The `.gitignore` covers `*.conf`, `id_rsa*`, and `*.age`, but check `git status` before you commit. Do not paste tokens or session files into issues.
+
+### Adding a language
+
+Copy the English catalog, translate it, and compile it:
 
 ```sh
 lupdate -codecfortr UTF-8 src/*.cpp src/*.hpp assets/*.qml -ts translations/Mattermost_fr.ts
@@ -110,16 +129,20 @@ lupdate -codecfortr UTF-8 src/*.cpp src/*.hpp assets/*.qml -ts translations/Matt
 lrelease translations/Mattermost_fr.ts
 ```
 
-Add `<asset path="translations">qm</asset>` already covers every `Mattermost_*.qm` in that folder. The loader uses the language code in the phone locale (`fr` from `fr_FR`). English stays the fallback.
+The `translations` asset in `bar-descriptor.xml` already packs every `Mattermost_*.qm`. The app picks the catalog from the phone locale, so `fr_FR` loads `Mattermost_fr`. English is the fallback.
 
-Keep the diff small, and keep secrets out of commits. A token from a test server does not belong in an issue.
+## Security
+
+- The server certificate is checked against the Mozilla CA bundle in `assets/cacert.pem`. Client certificates are not supported.
+- The session token is stored in `QSettings` inside the app's sandbox.
+- Report a security problem privately to the maintainer, not in a public issue.
 
 ## License
 
-No license file yet. Until there is one, the usual open-source grants are not in force. Building it for your own Classic is what this tree is for.
+No license file yet. Until one is added, the usual open-source permissions do not apply. Building the app for your own Classic is what this tree is for.
 
 ## Support
 
 The app is free. If it keeps a Classic in use, a tip helps:
 
-[PayPal — paypal.me/lhollweck](https://www.paypal.com/paypalme/lhollweck)
+[PayPal: paypal.me/lhollweck](https://www.paypal.com/paypalme/lhollweck)

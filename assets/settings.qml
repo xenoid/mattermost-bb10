@@ -1,4 +1,5 @@
 import bb.cascades 1.3
+import bb.system 1.2
 
 // Konto, Anzeige und Diagnose. Die Aktionsleiste trägt nur den System-Chevron.
 Page {
@@ -12,6 +13,125 @@ Page {
 
     actionBarVisibility: ChromeVisibility.Default
 
+    property variant presenceValues: ["online", "away", "dnd", "offline"]
+
+    function presenceLabel(value) {
+        if (value == "online")
+            return qsTr("Online")
+        if (value == "away")
+            return qsTr("Away")
+        if (value == "dnd")
+            return qsTr("Do not disturb")
+        if (value == "offline")
+            return qsTr("Offline")
+        return ""
+    }
+
+    function showPresence() {
+        presenceDialog.clearList()
+        for (var i = 0; i < presenceValues.length; ++i)
+            presenceDialog.appendItem(presenceLabel(presenceValues[i]))
+        presenceDialog.show()
+    }
+
+    function profileName() {
+        var name = (_mm.profile.first + " " + _mm.profile.last).trim()
+        return name != "" ? name : qsTr("Not set")
+    }
+
+    function editProfile(field, title, current) {
+        profilePrompt.profileField = field
+        profilePrompt.title = title
+        profilePrompt.body = field == "name" ? qsTr("First name, then last name") : ""
+        profilePrompt.inputField.defaultText = current
+        profilePrompt.show()
+    }
+
+    attachedObjects: [
+        SystemListDialog {
+            id: presenceDialog
+            title: qsTr("Status")
+            dismissOnSelection: true
+            onFinished: {
+                if (value == SystemUiResult.ItemSelection && selectedIndices.length > 0)
+                    _mm.setPresence(presenceValues[selectedIndices[0]])
+            }
+        },
+        ComponentDefinition {
+            id: mentionsDef
+            source: "asset:///search.qml"
+        },
+        SystemPrompt {
+            id: channelPrompt
+            title: qsTr("New channel")
+            body: qsTr("Channel name")
+            inputField.inputMode: SystemUiInputMode.Default
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Create")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.createChannel(inputFieldTextEntry())
+            }
+        },
+        SystemPrompt {
+            id: dmPrompt
+            title: qsTr("Direct message")
+            body: qsTr("Username of the person")
+            inputField.inputMode: SystemUiInputMode.Default
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Start")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.startDirect(inputFieldTextEntry())
+            }
+        },
+        SystemPrompt {
+            id: customPrompt
+            title: qsTr("Custom status")
+            body: qsTr("What is your status?")
+            inputField.inputMode: SystemUiInputMode.Default
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Save")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection) {
+                    var typed = inputFieldTextEntry()
+                    if (typed.trim() != "")
+                        _mm.setCustomStatus(_mm.customEmoji != "" ? _mm.customEmoji : "speech_balloon", typed)
+                }
+            }
+        },
+        SystemPrompt {
+            id: profilePrompt
+            property string profileField: ""
+            inputField.inputMode: SystemUiInputMode.Default
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Save")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value != SystemUiResult.ConfirmButtonSelection)
+                    return
+                var typed = inputFieldTextEntry().trim()
+                var first = _mm.profile.first
+                var last = _mm.profile.last
+                var nick = _mm.profile.nickname
+                var position = _mm.profile.position
+                if (profileField == "name") {
+                    var cut = typed.indexOf(" ")
+                    first = cut < 0 ? typed : typed.substring(0, cut)
+                    last = cut < 0 ? "" : typed.substring(cut + 1).trim()
+                } else if (profileField == "nickname") {
+                    nick = typed
+                } else {
+                    position = typed
+                }
+                _mm.saveProfile(first, last, nick, position)
+            }
+        }
+    ]
+
     ScrollView {
         scrollRole: ScrollRole.Main
         horizontalAlignment: HorizontalAlignment.Fill
@@ -20,6 +140,359 @@ Page {
         Container {
             background: Color.White
             horizontalAlignment: HorizontalAlignment.Fill
+
+            Container {
+                background: Color.create("#f3f5f7")
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 56
+                leftPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("STATUS")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.XSmall
+                    textStyle.fontWeight: FontWeight.Bold
+                }
+            }
+
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Label {
+                    text: qsTr("Status")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1b1f23")
+                    textStyle.fontSize: FontSize.Medium
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                Label {
+                    text: presenceLabel(_mm.presence)
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.Small
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: showPresence()
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Label {
+                    text: qsTr("Custom status")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1b1f23")
+                    textStyle.fontSize: FontSize.Medium
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                Label {
+                    text: _mm.customText != "" ? _mm.customText : qsTr("Not set")
+                    verticalAlignment: VerticalAlignment.Center
+                    horizontalAlignment: HorizontalAlignment.Right
+                    multiline: false
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.Small
+                    textStyle.textAlign: TextAlign.Right
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: {
+                            customPrompt.inputField.defaultText = _mm.customText
+                            customPrompt.show()
+                        }
+                    }
+                ]
+            }
+            Container {
+                visible: _mm.customText != ""
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Clear custom status")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#d6322e")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: _mm.clearCustomStatus()
+                    }
+                ]
+            }
+
+            Container {
+                background: Color.create("#f3f5f7")
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 56
+                leftPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("PROFILE")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.XSmall
+                    textStyle.fontWeight: FontWeight.Bold
+                }
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Label {
+                    text: qsTr("Name")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1b1f23")
+                    textStyle.fontSize: FontSize.Medium
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                Label {
+                    text: profileName()
+                    verticalAlignment: VerticalAlignment.Center
+                    horizontalAlignment: HorizontalAlignment.Right
+                    multiline: false
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.Small
+                    textStyle.textAlign: TextAlign.Right
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: editProfile("name", qsTr("Name"), (_mm.profile.first + " " + _mm.profile.last).trim())
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Label {
+                    text: qsTr("Nickname")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1b1f23")
+                    textStyle.fontSize: FontSize.Medium
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                Label {
+                    text: _mm.profile.nickname != "" ? _mm.profile.nickname : qsTr("Not set")
+                    verticalAlignment: VerticalAlignment.Center
+                    horizontalAlignment: HorizontalAlignment.Right
+                    multiline: false
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.Small
+                    textStyle.textAlign: TextAlign.Right
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: editProfile("nickname", qsTr("Nickname"), _mm.profile.nickname)
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Label {
+                    text: qsTr("Position")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1b1f23")
+                    textStyle.fontSize: FontSize.Medium
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                Label {
+                    text: _mm.profile.position != "" ? _mm.profile.position : qsTr("Not set")
+                    verticalAlignment: VerticalAlignment.Center
+                    horizontalAlignment: HorizontalAlignment.Right
+                    multiline: false
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.Small
+                    textStyle.textAlign: TextAlign.Right
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: editProfile("position", qsTr("Position"), _mm.profile.position)
+                    }
+                ]
+            }
+
+            Container {
+                background: Color.create("#f3f5f7")
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 56
+                leftPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("MESSAGES")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.XSmall
+                    textStyle.fontWeight: FontWeight.Bold
+                }
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("New direct message")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: dmPrompt.show()
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Recent mentions")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: {
+                            if (!navPane)
+                                return
+                            var page = navPane.make(mentionsDef)
+                            if (!page)
+                                return
+                            page.heading = qsTr("Recent mentions")
+                            navPane.push(page)
+                            _mm.searchMentions()
+                        }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Saved messages")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: {
+                            if (!navPane)
+                                return
+                            var page = navPane.make(mentionsDef)
+                            if (!page)
+                                return
+                            page.heading = qsTr("Saved messages")
+                            navPane.push(page)
+                            _mm.openSaved()
+                        }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("New channel")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: channelPrompt.show()
+                    }
+                ]
+            }
 
             Container {
                 background: Color.create("#f3f5f7")
