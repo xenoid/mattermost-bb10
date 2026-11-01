@@ -1453,6 +1453,15 @@ void MmClient::setChannelText(const QString &channelId, const QString &field, co
     start(StepChannelText, "/api/v4/channels/" + channelId + "/patch", bytes, "PUT");
 }
 
+void MmClient::archiveChannel(const QString &channelId)
+{
+    // DELETE auf einen Kanal archiviert ihn. Er verschwindet aus der Liste.
+    if (!m_loggedIn || channelId.isEmpty())
+        return;
+    QNetworkReply *reply = start(StepArchive, "/api/v4/channels/" + channelId, QByteArray(), "DELETE");
+    reply->setProperty("channelId", channelId);
+}
+
 void MmClient::leaveChannel(const QString &channelId)
 {
     if (!m_loggedIn || m_userId.isEmpty() || channelId.isEmpty())
@@ -2971,6 +2980,19 @@ void MmClient::onFinished(QNetworkReply *reply)
             }
         }
         setStatus(tr("No user with that name"));
+        return;
+    }
+    if (step == StepArchive) {
+        const QString id = reply->property("channelId").toString();
+        if (http >= 200 && http < 300 && netCode == 0) {
+            setStatus(tr("Channel archived"));
+            if (m_channelId == id)
+                closeChannel();
+            else
+                loadChannels(true);
+        } else {
+            setStatus(tr("Could not archive the channel"));
+        }
         return;
     }
     if (step == StepLeave) {

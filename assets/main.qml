@@ -40,6 +40,18 @@ NavigationPane {
                     _mm.leaveChannel(leaveId)
             }
         },
+        SystemDialog {
+            id: archiveDialog
+            property string archiveId: ""
+            title: qsTr("Archive channel")
+            body: qsTr("Nobody can post in it afterwards.")
+            confirmButton.label: qsTr("Archive")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.archiveChannel(archiveId)
+            }
+        },
         SystemPrompt {
             id: channelTextPrompt
             property string channelTextId: ""
@@ -386,6 +398,14 @@ NavigationPane {
                                             onTriggered: {
                                                 leaveDialog.leaveId = ListItemData.channelId
                                                 leaveDialog.show()
+                                            }
+                                        }
+                                        ActionItem {
+                                            title: qsTr("Archive channel")
+                                            enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
+                                            onTriggered: {
+                                                archiveDialog.archiveId = ListItemData.channelId
+                                                archiveDialog.show()
                                             }
                                         }
                                         ActionItem {

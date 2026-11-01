@@ -9,7 +9,7 @@ An unofficial [Mattermost](https://mattermost.com) client for the BlackBerry Cla
 Not affiliated with Mattermost, Inc. or BlackBerry.
 
 - **Package:** `com.hollweck.mattermost`, shown on the phone as **Mattermost**
-- **Version:** 1.0.0, build 132
+- **Version:** 1.0.0, build 133
 - **Source:** [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10)
 
 ## Status

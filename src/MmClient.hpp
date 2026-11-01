@@ -145,6 +145,7 @@ public:
     Q_INVOKABLE void searchMentions();
     Q_INVOKABLE void openSaved();
     Q_INVOKABLE void leaveChannel(const QString &channelId);
+    Q_INVOKABLE void archiveChannel(const QString &channelId);
     Q_INVOKABLE void saveProfile(const QString &firstName, const QString &lastName,
                                  const QString &nickname, const QString &position);
     Q_INVOKABLE void setChannelText(const QString &channelId, const QString &field, const QString &text);
@@ -234,6 +235,7 @@ private:
         StepChannelCreate,
         StepSaved,
         StepLeave,
+        StepArchive,
         StepProfileSet,
         StepChannelText
     };
