@@ -46,7 +46,7 @@ The goal is the feature set of the official Android app, minus voice and video c
 BlackBerry no longer signs third-party applications, so the package is unsigned.
 
 - **Rooted device:** install the BAR with `sud_install_package_2`.
-- **Developer access:** `tools/bb.sh install <file.bar>` pushes the package over SSH and installs it as root. Set the host and key paths at the top of the script, and export the device password as `BB10_PW`. Do not write the password into the script.
+- **Developer access:** the package can also be pushed over SSH and installed as root. The helper script for this is not part of the repository. The device password, if your setup needs one, belongs in an environment variable and never in a script.
 - **Unrooted device without developer mode:** the installer stops with error 881. This project does not offer a way around that.
 
 ## Build from source
