@@ -630,6 +630,7 @@ void MmClient::resetSession()
     m_rawPosts.clear();
     m_teamChoices.clear();
     m_openTeams.clear();
+    m_categories.clear();
     m_hasOlder = false;
     m_hasNewer = false;
     m_aroundLeft = 0;
@@ -799,6 +800,7 @@ void MmClient::applyTeam(const QString &id, const QString &name)
         return;
     m_teamId = id;
     m_teamName = name;
+    m_categories.clear();
     if (m_commandsTeam != id) {
         m_commands.clear();
         m_commandsAt = 0;
@@ -2251,6 +2253,8 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         setStatus(tr("Could not load the bookmarks"));
         emit bookmarksLoaded(QVariantList());
         return;
+    case StepCategories:
+        return;
     case StepThreads:
         setStatus(tr("Could not load the threads"));
         m_searchRows.clear();
@@ -2331,6 +2335,10 @@ void MmClient::loadChannels(bool silent)
         setStatus(tr("Loading channels…"));
     start(StepChannels, "/api/v4/users/me/teams/" + m_teamId + "/channels",
           QByteArray(), "GET", silent);
+    // Kategorien der Seitenleiste: Favoriten, eigene und vom Admin verwaltete. Ohne Antwort bleibt die Liste wie bisher.
+    if (!m_headless)
+        start(StepCategories, "/api/v4/users/" + m_userId + "/teams/" + m_teamId + "/channels/categories",
+              QByteArray(), "GET", true);
 }
 
 void MmClient::loadPosts(bool silent)
@@ -3305,6 +3313,60 @@ void MmClient::finishChannels()
     qSort(directs.begin(), directs.end(), moreRecent);
 
     QVariantList view;
+    if (!m_categories.isEmpty()) {
+        // Reihenfolge und Zugehörigkeit kommen vom Server. Kanäle ohne Kategorie landen in den Abschnitten unten.
+        QHash<QString, QVariantMap> byId;
+        for (int i = 0; i < channels.size(); ++i)
+            byId.insert(channels.at(i).value("channelId").toString(), channels.at(i));
+        for (int i = 0; i < directs.size(); ++i)
+            byId.insert(directs.at(i).value("channelId").toString(), directs.at(i));
+        QSet<QString> placed;
+        for (int c = 0; c < m_categories.size(); ++c) {
+            const QVariantMap cat = m_categories.at(c).toMap();
+            const QString type = cat.value("type").toString();
+            const QVariantList ids = cat.value("ids").toList();
+            QList<QVariantMap> rows;
+            for (int k = 0; k < ids.size(); ++k) {
+                const QString id = ids.at(k).toString();
+                if (byId.contains(id) && !placed.contains(id)) {
+                    rows.append(byId.value(id));
+                    placed.insert(id);
+                }
+            }
+            if (rows.isEmpty())
+                continue;
+            const QString sorting = cat.value("sorting").toString();
+            if (type == "direct_messages" || sorting == "recent")
+                qSort(rows.begin(), rows.end(), moreRecent);
+            else if (sorting == "alpha")
+                qSort(rows.begin(), rows.end(), lessTitle);
+            QVariantMap header;
+            header["type"] = QString("header");
+            if (type == "favorites")
+                header["title"] = tr("FAVORITES");
+            else if (type == "channels")
+                header["title"] = tr("CHANNELS");
+            else if (type == "direct_messages")
+                header["title"] = tr("DIRECT");
+            else
+                header["title"] = cat.value("name").toString().toUpper();
+            view.append(header);
+            for (int k = 0; k < rows.size(); ++k)
+                view.append(rows.at(k));
+        }
+        QList<QVariantMap> restChannels;
+        QList<QVariantMap> restDirects;
+        for (int i = 0; i < channels.size(); ++i) {
+            if (!placed.contains(channels.at(i).value("channelId").toString()))
+                restChannels.append(channels.at(i));
+        }
+        for (int i = 0; i < directs.size(); ++i) {
+            if (!placed.contains(directs.at(i).value("channelId").toString()))
+                restDirects.append(directs.at(i));
+        }
+        channels = restChannels;
+        directs = restDirects;
+    }
     if (!channels.isEmpty()) {
         QVariantMap header;
         header["type"] = QString("header");
@@ -4209,6 +4271,27 @@ void MmClient::onFinished(QNetworkReply *reply)
     if (step == StepSearchUsers) {
         learnUsers(parsed.toList());
         finishSearch();
+        return;
+    }
+
+    if (step == StepCategories) {
+        const QVariantMap root = parsed.toMap();
+        const QVariantList list = root.value("categories").toList();
+        QVariantList categories;
+        for (int i = 0; i < list.size(); ++i) {
+            const QVariantMap cat = list.at(i).toMap();
+            QVariantMap entry;
+            entry["type"] = cat.value("type").toString();
+            entry["name"] = repairText(cat.value("display_name").toString());
+            entry["sorting"] = cat.value("sorting").toString();
+            entry["ids"] = cat.value("channel_ids").toList();
+            categories.append(entry);
+        }
+        const bool changed = categories != m_categories;
+        m_categories = categories;
+        traceWrite(QString("categories count=%1 changed=%2").arg(categories.size()).arg(changed ? 1 : 0));
+        if (changed && !m_chansBusy && !m_channelRows.isEmpty())
+            finishChannels();
         return;
     }
 

@@ -45,7 +45,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Show, add and remove members | Built: show members from the long-press menu, add by username, remove by tap and confirm. Only public and private channels. Device 2026-11-02: list opens after the fixes in 1.0.0.142 and 1.0.0.149; adding and removing not yet tested |
 | 🟡 | Leave, archive, edit header and purpose | Built: leave, archive, edit header and purpose from the long-press menu. Device 2026-11-02: the menu entries never fired, because list items cannot reach outer ids; fixed in 1.0.0.149, header and purpose pages now open. Saving, leave and archive not yet tested |
 | 🟡 | New direct message | Built: Settings, MESSAGES, enter a username. Group messages still missing. Not yet tested on the device |
-| 🔴 | Admin-managed sidebar categories | Android 2.41 |
+| 🟡 | Admin-managed sidebar categories | Built: the channel list follows the server's sidebar categories (favourites, custom and admin-managed ones) in their order. Collapsing and moving channels are missing. Not yet tested on the device |
 | 🟡 | Channel bookmarks | Built: read-only list from the channel long-press menu, a tap opens the link. Not yet tested on the device |
 | 🟡 | Channel banners | Built: the banner text shows at the top of the channel. The banner colour from the server is not used. Not tested: no channel with a banner on the test server |
 | 🔴 | Guest invitations | |

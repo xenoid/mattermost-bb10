@@ -303,7 +303,8 @@ private:
         StepAck,
         StepBookmarks,
         StepThreads,
-        StepSchedule
+        StepSchedule,
+        StepCategories
     };
 
     enum FileKind {
@@ -517,6 +518,7 @@ private:
     QString m_lastSent;
     QString m_nextPriority;
     qint64 m_nextScheduleAt;
+    QVariantList m_categories;
     bb::multimedia::AudioRecorder *m_recorder;
     QString m_recordPath;
     QString m_shareText;
