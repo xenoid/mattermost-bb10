@@ -42,8 +42,8 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Channel list: public, private, direct, unread, mentions | |
 | 🟢 | Hide the channel subtitle | |
 | 🟡 | Create a channel | Built: Settings, MESSAGES, New channel. Public channels only. Not yet tested on the device |
-| 🟡 | Show, add and remove members | Built: show members from the long-press menu, add by username, remove by tap and confirm. Only public and private channels. Not yet tested on the device |
-| 🟡 | Leave, archive, edit header and purpose | Built: leave, archive, edit header and purpose from the long-press menu. Not yet tested on the device |
+| 🟡 | Show, add and remove members | Built: show members from the long-press menu, add by username, remove by tap and confirm. Only public and private channels. Device test 2026-11-02: opening the member list shows an error. Being investigated |
+| 🟡 | Leave, archive, edit header and purpose | Built: leave, archive, edit header and purpose from the long-press menu. Device test 2026-11-02: edit header and purpose do nothing in the channel tried. The menu entries are greyed out for direct messages; not yet checked for a public or private channel |
 | 🟡 | New direct message | Built: Settings, MESSAGES, enter a username. Group messages still missing. Not yet tested on the device |
 | 🔴 | Admin-managed sidebar categories | Android 2.41 |
 | 🔴 | Channel bookmarks | Read-only display is enough at first |
@@ -70,10 +70,10 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Date and time formats | 24-hour setting exists. Full regional formats to verify |
 | 🔴 | Collapsed reply threads and global threads list | Thread page exists. List and follow logic missing. To verify |
 | 🔴 | Scheduled posts | Server API |
-| 🟡 | Drafts tab | Built: one draft per channel stays on the phone and comes back when the channel opens. The list of all drafts is missing. Not yet tested on the device |
+| 🟡 | Drafts tab | Built: one draft per channel stays on the phone and comes back when the channel opens. Device test 2026-11-02: works. The list of all drafts is missing |
 | 🔴 | Copy code block, copy email address | |
 | 🔴 | Edit or delete attachments on existing posts | Android 2.31 |
-| 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Image previews and permalink previews are missing. Not yet tested on the device |
+| 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Device test 2026-11-02: no preview shows for a Reddit link. Not yet checked whether the server sends previews. Image and permalink previews are missing |
 | 🔴 | Message attachments and interactive buttons | `mmaction://` links |
 | 🔴 | Interactive dialogs | Multiselect, dynamic search, several steps |
 | 🔴 | Mattermost Blocks | Android 2.43 |
@@ -123,7 +123,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | --- | --- | --- |
 | 🟡 | Set status: online, away, do not disturb, offline | Built: Settings, STATUS. Not yet tested on the device |
 | 🟡 | Custom status with emoji and expiry | Built: text and clear, with the default emoji. No emoji picker and no expiry yet. Not yet tested on the device |
-| 🟡 | View a user profile | Built: Settings, MESSAGES, Look up a user by name. Shows name, nickname, position and email. Opening it from a message or a member is missing. Not yet tested on the device |
+| 🟡 | View a user profile | Built: Settings, MESSAGES, Look up a user by name. Shows name, nickname, position and email. Device test 2026-11-02: works with the exact username. Opening it from a message or a member is missing |
 | 🟡 | Edit own profile | Built: Settings, PROFILE. Name, nickname, position. Email and avatar missing. Not yet tested on the device |
 | 🔴 | Custom profile attributes | Server feature flag |
 

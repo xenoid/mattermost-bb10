@@ -1278,13 +1278,14 @@ Page {
         composer.text = composer.text + glyph
     }
 
-    // Der Entwurf eines Kanals kommt zurück, sobald der Kanal offen ist. Nur einmal pro Seite,
-    // damit ein gerade gesendeter Text nicht wieder erscheint.
+    // Der Entwurf eines Kanals kommt zurück, und der Cursor steht im Eingabefeld, sobald der
+    // Kanal offen ist. Nur einmal pro Seite, damit ein gerade gesendeter Text nicht wieder erscheint.
     function restoreDraft() {
         if (rootId != "" || draftDone || _mm.channelId == "")
             return
         draftDone = true
         composer.text = _mm.draftFor(_mm.channelId)
+        composer.focused = true
     }
 
     function saveDraft() {
