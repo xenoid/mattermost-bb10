@@ -178,6 +178,8 @@ public:
     Q_INVOKABLE QVariantList accounts() const;
     Q_INVOKABLE void addAccount();
     Q_INVOKABLE void switchAccount(const QString &key);
+    Q_INVOKABLE void doPostAction(const QString &postId, const QString &actionId);
+    Q_INVOKABLE void loadAgents();
     Q_INVOKABLE void inviteGuest(const QString &channelId, const QString &email);
     Q_INVOKABLE bool setClientCertificate(const QString &certPath, const QString &keyPath, const QString &passphrase);
     Q_INVOKABLE void clearClientCertificate();
@@ -255,6 +257,7 @@ signals:
     void bookmarksLoaded(const QVariantList &rows);
     void runsLoaded(const QVariantList &rows);
     void playbooksLoaded(const QVariantList &rows);
+    void agentsLoaded(const QVariantList &rows);
     void notice(const QString &text);
     void recordingChanged();
     void shareChanged();
@@ -333,7 +336,9 @@ private:
         StepPlaybooks,
         StepNotice,
         StepProfileAttrs,
-        StepProfileFields
+        StepProfileFields,
+        StepAgents,
+        StepBots
     };
 
     enum FileKind {

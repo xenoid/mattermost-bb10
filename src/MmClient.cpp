@@ -2367,6 +2367,25 @@ void MmClient::emitLookup()
     emit userFound(user);
 }
 
+void MmClient::doPostAction(const QString &postId, const QString &actionId)
+{
+    // Knopf in einer Bot-Nachricht. Der Server ruft die Integration auf.
+    if (!m_loggedIn || postId.isEmpty() || actionId.isEmpty())
+        return;
+    noticeAction("/api/v4/posts/" + postId + "/actions/" + actionId, "POST", QByteArray("{}"),
+                 tr("Action sent"), tr("The action failed (HTTP %1)"));
+}
+
+void MmClient::loadAgents()
+{
+    // Erst die Agenten des KI-Plugins, sonst alle Bots, die der Server zeigt.
+    if (!m_loggedIn) {
+        emit agentsLoaded(QVariantList());
+        return;
+    }
+    start(StepAgents, "/plugins/mattermost-ai/ai_bots", QByteArray(), "GET", true);
+}
+
 void MmClient::startSso(const QString &serverUrl, const QString &service)
 {
     // Wie die Android-App: Anmeldung im Browser, der Server leitet mit dem Token auf mmauth:// zurück.
@@ -2719,6 +2738,13 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         emit bookmarksLoaded(QVariantList());
         return;
     case StepCategories:
+        return;
+    case StepAgents:
+        start(StepBots, "/api/v4/bots?per_page=200", QByteArray(), "GET", true);
+        return;
+    case StepBots:
+        emit notice(tr("No agents or bots visible for this account"));
+        emit agentsLoaded(QVariantList());
         return;
     case StepRuns:
         emit notice(http == 404 ? tr("Playbooks are not available on this server") : tr("Could not load the runs"));
@@ -3272,6 +3298,8 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
         priorityText = tr("Important");
     // Anhänge von Bots und Integrationen: Vortext, Titel, Text und Felder als einfacher Text.
     QStringList botLines;
+    QStringList actionIds;
+    QStringList actionNames;
     const QVariantList attachments = post.value("props").toMap().value("attachments").toList();
     for (int i = 0; i < attachments.size(); ++i) {
         const QVariantMap att = attachments.at(i).toMap();
@@ -3292,6 +3320,15 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
         }
         if (botLines.size() == before && !att.value("fallback").toString().isEmpty())
             botLines.append(repairText(att.value("fallback").toString()));
+        const QVariantList actions = att.value("actions").toList();
+        for (int a = 0; a < actions.size(); ++a) {
+            const QVariantMap action = actions.at(a).toMap();
+            const QString type = action.value("type").toString();
+            if (!type.isEmpty() && type != "button")
+                continue;
+            actionIds.append(action.value("id").toString());
+            actionNames.append(repairText(action.value("name").toString()));
+        }
     }
     QString previewText;
     const QVariantList embeds = meta.value("embeds").toList();
@@ -3367,6 +3404,8 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["priority"] = priorityText;
     row["preview"] = previewText;
     row["botText"] = botLines.join("\n");
+    row["actionIds"] = actionIds.join("|");
+    row["actionNames"] = actionNames.join("|");
     row["ackAsk"] = ackAsked ? QString("1") : QString();
     row["ackMine"] = ackMine ? QString("1") : QString();
     row["ackInfo"] = ackAsked ? tr("Acknowledged by %1").arg(acks.size()) : QString();
@@ -4803,6 +4842,32 @@ void MmClient::onFinished(QNetworkReply *reply)
         return;
     }
 
+    if (step == StepAgents || step == StepBots) {
+        QVariantList list = parsed.toList();
+        if (list.isEmpty())
+            list = parsed.toMap().value("bots").toList();
+        QVariantList rows;
+        for (int i = 0; i < list.size(); ++i) {
+            const QVariantMap bot = list.at(i).toMap();
+            const QString username = bot.value("username").toString();
+            if (username.isEmpty())
+                continue;
+            QString name = bot.value("displayName").toString();
+            if (name.isEmpty())
+                name = bot.value("display_name").toString();
+            QVariantMap row;
+            row["username"] = username;
+            row["title"] = repairText(name.isEmpty() ? username : name);
+            rows.append(row);
+        }
+        if (rows.isEmpty() && step == StepAgents) {
+            start(StepBots, "/api/v4/bots?per_page=200", QByteArray(), "GET", true);
+            return;
+        }
+        emit agentsLoaded(rows);
+        return;
+    }
+
     if (step == StepPlaybooks) {
         const QVariantList items = parsed.toMap().value("items").toList();
         QVariantList rows;
@@ -5016,6 +5081,8 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["priority"] = QString();
     row["preview"] = QString();
     row["botText"] = QString();
+    row["actionIds"] = QString();
+    row["actionNames"] = QString();
     row["ackAsk"] = QString();
     row["ackMine"] = QString();
     row["ackInfo"] = QString();

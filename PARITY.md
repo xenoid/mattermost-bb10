@@ -74,7 +74,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Copy code block, copy email address | Built: Copy text in the post long-press menu copies the whole message. Copying only a code block or an address is missing. Not yet tested on the device |
 | 🔴 | Edit or delete attachments on existing posts | Android 2.31 |
 | 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Device test 2026-11-02: no preview shows for a Reddit link. Not yet checked whether the server sends previews. Image and permalink previews are missing |
-| 🟡 | Message attachments and interactive buttons | Built: bot attachments (pretext, title, text, fields) show as text under the message. Buttons and menus are missing. Not yet tested on the device |
+| 🟡 | Message attachments and interactive buttons | Built: bot attachments (pretext, title, text, fields) show under the message; their buttons are in the long-press menu under Actions. Select menus are missing. Not yet tested on the device |
 | 🔴 | Interactive dialogs | Multiselect, dynamic search, several steps |
 | 🔴 | Mattermost Blocks | Android 2.43 |
 | 🟡 | Post priority | Built: shows the Urgent and Important labels; the + page sets Important or Urgent for the next channel message. Not for replies or files. Sending not yet tested on the device |
@@ -140,7 +140,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 
 | | Feature | Notes |
 | --- | --- | --- |
-| 🔴 | Agent chat with threads and bot selector | Android 2.40 |
+| 🟡 | Agent chat with threads and bot selector | Built: Settings, MESSAGES, Chat with an agent lists the AI plugin's agents (or the server's bots) and opens a direct message with the chosen one; threads work as in any chat. Not yet tested on the device |
 | 🔴 | Streaming, citations, stop and regenerate | Android 2.36 |
 | 🔴 | Tool-call approval | Android 2.36 and 2.44 |
 

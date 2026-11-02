@@ -21,6 +21,17 @@ Page {
                     _mm.editPost(editId, inputFieldTextEntry())
             }
         },
+        SystemListDialog {
+            id: actionDialog
+            property string postId: ""
+            property variant ids: []
+            title: qsTr("Actions")
+            dismissOnSelection: true
+            onFinished: {
+                if (value == SystemUiResult.ItemSelection && selectedIndices.length > 0)
+                    _mm.doPostAction(actionDialog.postId, actionDialog.ids[selectedIndices[0]])
+            }
+        },
         SystemDialog {
             id: deleteDialog
             title: qsTr("Delete message")
@@ -180,6 +191,15 @@ Page {
             function ackPost(postId) {
                 _mm.acknowledgePost(postId)
             }
+            function askActions(postId, ids, names) {
+                var nameList = names.split("|")
+                actionDialog.postId = postId
+                actionDialog.ids = ids.split("|")
+                actionDialog.clearList()
+                for (var i = 0; i < nameList.length; ++i)
+                    actionDialog.appendItem(nameList[i])
+                actionDialog.show()
+            }
             function askReplies(rootId) {
                 _mm.askReplies(rootId)
             }
@@ -265,6 +285,11 @@ Page {
                                     title: ListItemData.saved == "1" ? qsTr("Unsave") : qsTr("Save")
                                     enabled: ListItemData.pending != "1"
                                     onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml:243 onTriggered"); postItem.ListItem.view.savePost(ListItemData.id) }
+                                }
+                                ActionItem {
+                                    title: qsTr("Actions")
+                                    enabled: ListItemData.actionIds ? true : false
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml actions"); postItem.ListItem.view.askActions(ListItemData.id, ListItemData.actionIds, ListItemData.actionNames) }
                                 }
                                 ActionItem {
                                     title: qsTr("Acknowledge")

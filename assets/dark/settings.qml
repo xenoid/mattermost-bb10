@@ -57,10 +57,12 @@ Page {
 
     function dropSignals() {
         _mm.userFound.disconnect(showUser)
+        _mm.agentsLoaded.disconnect(showAgents)
     }
 
     onCreationCompleted: {
         _mm.userFound.connect(showUser)
+        _mm.agentsLoaded.connect(showAgents)
     }
 
     // Gespeicherte Konten und als letzter Eintrag "Konto hinzufügen".
@@ -75,6 +77,19 @@ Page {
         accountDialog.appendItem(qsTr("Add account"))
         accountDialog.keys = keys
         accountDialog.show()
+    }
+
+    // Agenten und Bots: die Auswahl startet eine Direktnachricht mit dem Bot.
+    function showAgents(rows) {
+        var names = []
+        agentDialog.clearList()
+        for (var i = 0; i < rows.length; ++i) {
+            names.push(String(rows[i].username))
+            agentDialog.appendItem(rows[i].title)
+        }
+        agentDialog.usernames = names
+        if (rows.length > 0)
+            agentDialog.show()
     }
 
     function profileName() {
@@ -242,6 +257,16 @@ Page {
             onFinished: {
                 if (value == SystemUiResult.ConfirmButtonSelection)
                     _mm.clearClientCertificate()
+            }
+        },
+        SystemListDialog {
+            id: agentDialog
+            property variant usernames: []
+            title: qsTr("Chat with an agent")
+            dismissOnSelection: true
+            onFinished: {
+                if (value == SystemUiResult.ItemSelection && selectedIndices.length > 0)
+                    _mm.startDirect(agentDialog.usernames[selectedIndices[0]])
             }
         },
         SystemListDialog {
@@ -579,6 +604,26 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:472 onTapped"); dmPrompt.show() }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Chat with an agent")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b9bf2")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings agents"); _mm.loadAgents() }
                     }
                 ]
             }
