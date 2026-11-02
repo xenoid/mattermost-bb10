@@ -48,6 +48,7 @@ Page {
     property int focusTries: 0
     property bool focusHold: false
     property bool focusSent: false
+    property bool draftDone: false
 
     onRootIdChanged: objectName = rootId == "" ? "thread" : "replies"
 
@@ -1277,6 +1278,20 @@ Page {
         composer.text = composer.text + glyph
     }
 
+    // Der Entwurf eines Kanals kommt zurück, sobald der Kanal offen ist. Nur einmal pro Seite,
+    // damit ein gerade gesendeter Text nicht wieder erscheint.
+    function restoreDraft() {
+        if (rootId != "" || draftDone || _mm.channelId == "")
+            return
+        draftDone = true
+        composer.text = _mm.draftFor(_mm.channelId)
+    }
+
+    function saveDraft() {
+        if (rootId == "")
+            _mm.saveDraft(_mm.channelId, composer.text)
+    }
+
     function send() {
         var text = composer.text.trim()
         if (text == "" && heldPath == "")
@@ -1542,6 +1557,7 @@ Page {
         _mm.typingChanged.disconnect(refreshTyping)
         _mm.avatarReady.disconnect(takeAvatar)
         _mm.sendFailed.disconnect(restoreText)
+        _mm.channelChanged.disconnect(restoreDraft)
     }
 
     onCreationCompleted: {
@@ -1558,5 +1574,6 @@ Page {
         _mm.typingChanged.connect(refreshTyping)
         _mm.avatarReady.connect(takeAvatar)
         _mm.sendFailed.connect(restoreText)
+        _mm.channelChanged.connect(restoreDraft)
     }
 }

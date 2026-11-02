@@ -70,7 +70,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Date and time formats | 24-hour setting exists. Full regional formats to verify |
 | 🔴 | Collapsed reply threads and global threads list | Thread page exists. List and follow logic missing. To verify |
 | 🔴 | Scheduled posts | Server API |
-| 🔴 | Drafts tab | Local drafts. `LocalStore` can hold them |
+| 🟡 | Drafts tab | Built: one draft per channel stays on the phone and comes back when the channel opens. The list of all drafts is missing. Not yet tested on the device |
 | 🔴 | Copy code block, copy email address | |
 | 🔴 | Edit or delete attachments on existing posts | Android 2.31 |
 | 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Image previews and permalink previews are missing. Not yet tested on the device |

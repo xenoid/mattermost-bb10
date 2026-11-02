@@ -154,6 +154,8 @@ NavigationPane {
     }
 
     onPopTransitionEnded: {
+        if (page && page.saveDraft)
+            page.saveDraft()
         if (page && page.dropSignals)
             page.dropSignals()
         nav.peekEnabled = true

@@ -1402,6 +1402,26 @@ void MmClient::startDirect(const QString &username)
     start(StepDirectUser, "/api/v4/users/username/" + name);
 }
 
+void MmClient::saveDraft(const QString &channelId, const QString &text)
+{
+    // Entwürfe liegen lokal in den Einstellungen, je Kanal. Ein leerer Text löscht den Entwurf.
+    if (channelId.isEmpty())
+        return;
+    QSettings settings("hollweck", "mattermost");
+    if (text.trimmed().isEmpty())
+        settings.remove("draft_" + channelId);
+    else
+        settings.setValue("draft_" + channelId, text);
+}
+
+QString MmClient::draftFor(const QString &channelId) const
+{
+    if (channelId.isEmpty())
+        return QString();
+    QSettings settings("hollweck", "mattermost");
+    return settings.value("draft_" + channelId).toString();
+}
+
 void MmClient::openSaved()
 {
     if (!m_loggedIn || m_userId.isEmpty())
