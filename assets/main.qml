@@ -118,9 +118,12 @@ NavigationPane {
 
     // Kopfzeile oder Zweck eines Kanals in einer eigenen Seite bearbeiten.
     function openChannelText(channelId, field, current) {
+        _mm.traceLog("channeltext open field=" + field + " channel=" + channelId + " current=" + current)
         var page = make(channelTextDef)
-        if (!page)
+        if (!page) {
+            _mm.traceLog("channeltext page could not be created")
             return
+        }
         page.channelId = channelId
         page.field = field
         page.current = current ? current : ""
@@ -132,6 +135,7 @@ NavigationPane {
     function make(def) {
         var page = def.createObject()
         if (!page) {
+            _mm.traceLog("QML error: " + def.errorMessage())
             console.log("QML: " + def.errorMessage())
             toast.body = def.errorMessage()
             toast.show()
@@ -434,12 +438,18 @@ NavigationPane {
                                         ActionItem {
                                             title: qsTr("Edit header")
                                             enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
-                                            onTriggered: nav.openChannelText(ListItemData.channelId, "header", ListItemData.header)
+                                            onTriggered: {
+                                                _mm.traceLog("menu: Edit header tapped")
+                                                nav.openChannelText(ListItemData.channelId, "header", ListItemData.header)
+                                            }
                                         }
                                         ActionItem {
                                             title: qsTr("Edit purpose")
                                             enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
-                                            onTriggered: nav.openChannelText(ListItemData.channelId, "purpose", ListItemData.purpose)
+                                            onTriggered: {
+                                                _mm.traceLog("menu: Edit purpose tapped")
+                                                nav.openChannelText(ListItemData.channelId, "purpose", ListItemData.purpose)
+                                            }
                                         }
                                     }
                                 ]

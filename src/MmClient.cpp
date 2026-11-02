@@ -1422,6 +1422,20 @@ QString MmClient::draftFor(const QString &channelId) const
     return settings.value("draft_" + channelId).toString();
 }
 
+void MmClient::traceLog(const QString &line)
+{
+    // Eine Zeile je Ereignis in debug.log im Datenordner der App. Bei über 256 KB wird die Datei neu begonnen.
+    const QString path = QDir::homePath() + "/debug.log";
+    QFile file(path);
+    const bool big = QFileInfo(path).size() > 262144;
+    const QIODevice::OpenMode mode = big ? (QIODevice::WriteOnly | QIODevice::Text)
+                                         : (QIODevice::Append | QIODevice::Text);
+    if (!file.open(mode))
+        return;
+    file.write((QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz") + " " + line + "\n").toUtf8());
+    file.close();
+}
+
 void MmClient::openSaved()
 {
     if (!m_loggedIn || m_userId.isEmpty())

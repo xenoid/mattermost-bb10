@@ -56,6 +56,7 @@ Page {
             gestureHandlers: [
                 TapHandler {
                     onTapped: {
+                        _mm.traceLog("channeltext save field=" + pageRoot.field + " channel=" + pageRoot.channelId + " text=" + editor.text)
                         _mm.setChannelText(pageRoot.channelId, pageRoot.field, editor.text)
                         if (pageRoot.navPane)
                             pageRoot.navPane.pop()

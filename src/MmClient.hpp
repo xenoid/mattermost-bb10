@@ -144,6 +144,7 @@ public:
     Q_INVOKABLE void createChannel(const QString &displayName);
     Q_INVOKABLE void searchMentions();
     Q_INVOKABLE void openSaved();
+    Q_INVOKABLE void traceLog(const QString &line);
     Q_INVOKABLE void saveDraft(const QString &channelId, const QString &text);
     Q_INVOKABLE QString draftFor(const QString &channelId) const;
     Q_INVOKABLE void leaveChannel(const QString &channelId);
