@@ -2413,6 +2413,26 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     const QString link = firstUrl(message, &linkOnly);
     const QDateTime when = QDateTime::fromMSecsSinceEpoch(created);
 
+    // Dringlichkeit und Vorschau einer Verlinkung. Der Server schickt beides nur, wenn es gilt.
+    const QVariantMap meta = post.value("metadata").toMap();
+    const QString priority = meta.value("priority").toMap().value("priority").toString();
+    QString priorityText;
+    if (priority == "urgent")
+        priorityText = tr("Urgent");
+    else if (priority == "important")
+        priorityText = tr("Important");
+    QString previewText;
+    const QVariantList embeds = meta.value("embeds").toList();
+    for (int i = 0; i < embeds.size(); ++i) {
+        const QVariantMap embed = embeds.at(i).toMap();
+        if (embed.value("type").toString() != "opengraph")
+            continue;
+        previewText = repairText(embed.value("data").toMap().value("title").toString());
+        if (previewText.isEmpty())
+            previewText = embed.value("url").toString();
+        break;
+    }
+
     QVariantMap row;
     row["id"] = post.value("id").toString();
     row["mark"] = (!m_aroundSelf.isEmpty() && postId == m_aroundSelf) ? QString("1") : QString();
@@ -2472,6 +2492,8 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["attachInfo2"] = attachInfo2;
     row["link"] = link;
     row["linkOnly"] = linkOnly;
+    row["priority"] = priorityText;
+    row["preview"] = previewText;
     row["rev"] = post.value("update_at").toString() + ":" + QString::number(replyCount) + ":" + row["react"].toString();
 
     if (!imageId.isEmpty()) {
@@ -3862,6 +3884,8 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["threadMark"] = QString();
     row["inThread"] = inThread ? QString("1") : QString();
     row["pending"] = QString("1");
+    row["priority"] = QString();
+    row["preview"] = QString();
     row["pinned"] = QString();
     row["saved"] = QString();
     row["react"] = QString();

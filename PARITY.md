@@ -73,11 +73,11 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🔴 | Drafts tab | Local drafts. `LocalStore` can hold them |
 | 🔴 | Copy code block, copy email address | |
 | 🔴 | Edit or delete attachments on existing posts | Android 2.31 |
-| 🔴 | Link and permalink previews | Read `post.metadata` |
+| 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Image previews and permalink previews are missing. Not yet tested on the device |
 | 🔴 | Message attachments and interactive buttons | `mmaction://` links |
 | 🔴 | Interactive dialogs | Multiselect, dynamic search, several steps |
 | 🔴 | Mattermost Blocks | Android 2.43 |
-| 🔴 | Post priority | To verify |
+| 🟡 | Post priority | Built: shows the Urgent and Important labels from the server. Sending a priority is missing. Not yet tested on the device |
 | 🔴 | Acknowledgements | To verify |
 | 🔴 | Burn on read | Enterprise Advanced. Display and send. To verify |
 | 🔴 | Auto-translation of messages | Enterprise Advanced beta |

@@ -367,12 +367,31 @@ Page {
                                 }
 
                                 Label {
+                                    visible: ListItemData.priority != ""
+                                    text: ListItemData.priority
+                                    textFormat: TextFormat.Plain
+                                    textStyle.color: Color.create("#d6322e")
+                                    textStyle.fontSize: FontSize.XSmall
+                                    textStyle.fontWeight: FontWeight.Bold
+                                }
+
+                                Label {
                                     visible: ListItemData.message != ""
                                     text: ListItemData.message
                                     textFormat: TextFormat.Html
                                     content.flags: TextContentFlag.ActiveText | TextContentFlag.EmoticonsOff
                                     multiline: true
                                     horizontalAlignment: HorizontalAlignment.Fill
+                                }
+
+                                Label {
+                                    visible: ListItemData.preview != ""
+                                    text: ListItemData.preview
+                                    textFormat: TextFormat.Plain
+                                    multiline: true
+                                    autoSize.maxLineCount: 2
+                                    textStyle.color: Color.create("#6b747d")
+                                    textStyle.fontSize: FontSize.XSmall
                                 }
 
                                 Container {
