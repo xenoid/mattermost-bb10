@@ -10,6 +10,8 @@
 #include <QSqlQuery>
 #include <QVariantMap>
 
+void traceWrite(const QString &line);
+
 namespace {
 
 const char *kConn = "mm";
@@ -48,6 +50,7 @@ QVariantList fromJson(const QString &text)
 
 bool LocalStore::open()
 {
+    traceWrite("db open");
     if (QSqlDatabase::contains(kConn) && db().isOpen())
         return true;
     if (QSqlDatabase::contains(kConn))
@@ -69,11 +72,13 @@ bool LocalStore::open()
 
 bool LocalStore::isOpen() const
 {
+    traceWrite("db isOpen");
     return QSqlDatabase::contains(kConn) && db().isOpen();
 }
 
 void LocalStore::clear()
 {
+    traceWrite("db clear");
     if (!isOpen()) {
         QFile::remove(dbPath());
         return;
@@ -86,6 +91,7 @@ void LocalStore::clear()
 
 void LocalStore::saveBlob(const QString &key, const QVariantList &rows)
 {
+    traceWrite("db saveBlob");
     if (!isOpen())
         return;
     QSqlQuery query(db());
@@ -97,6 +103,7 @@ void LocalStore::saveBlob(const QString &key, const QVariantList &rows)
 
 QVariantList LocalStore::loadBlob(const QString &key) const
 {
+    traceWrite("db loadBlob");
     if (!isOpen())
         return QVariantList();
     QSqlQuery query(db());
@@ -109,36 +116,43 @@ QVariantList LocalStore::loadBlob(const QString &key) const
 
 void LocalStore::saveChannels(const QVariantList &rows)
 {
+    traceWrite("db saveChannels");
     saveBlob("channels", rows);
 }
 
 QVariantList LocalStore::channels() const
 {
+    traceWrite("db channels");
     return loadBlob("channels");
 }
 
 void LocalStore::savePosts(const QString &channelId, const QVariantList &rows)
 {
+    traceWrite("db savePosts");
     saveBlob("posts:" + channelId, rows);
 }
 
 QVariantList LocalStore::posts(const QString &channelId) const
 {
+    traceWrite("db posts");
     return loadBlob("posts:" + channelId);
 }
 
 void LocalStore::saveThread(const QString &rootId, const QVariantList &rows)
 {
+    traceWrite("db saveThread");
     saveBlob("thread:" + rootId, rows);
 }
 
 QVariantList LocalStore::thread(const QString &rootId) const
 {
+    traceWrite("db thread");
     return loadBlob("thread:" + rootId);
 }
 
 void LocalStore::saveUser(const QString &id, const QString &label, const QString &username)
 {
+    traceWrite("db saveUser");
     if (!isOpen() || id.isEmpty())
         return;
     QSqlQuery query(db());
@@ -151,6 +165,7 @@ void LocalStore::saveUser(const QString &id, const QString &label, const QString
 
 QVariantList LocalStore::users() const
 {
+    traceWrite("db users");
     QVariantList list;
     if (!isOpen())
         return list;
@@ -169,6 +184,7 @@ QVariantList LocalStore::users() const
 
 void LocalStore::enqueue(const OutItem &item)
 {
+    traceWrite("db enqueue");
     if (!isOpen() || item.id.isEmpty())
         return;
     QSqlQuery query(db());
@@ -190,6 +206,7 @@ void LocalStore::enqueue(const OutItem &item)
 
 QList<OutItem> LocalStore::outbox() const
 {
+    traceWrite("db outbox");
     QList<OutItem> list;
     if (!isOpen())
         return list;
@@ -215,6 +232,7 @@ QList<OutItem> LocalStore::outbox() const
 
 void LocalStore::remove(const QString &id)
 {
+    traceWrite("db remove");
     if (!isOpen() || id.isEmpty())
         return;
     QSqlQuery query(db());

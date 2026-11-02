@@ -132,6 +132,7 @@ Page {
         ]
 
         onTriggered: {
+            _mm.traceLog("tap channelnotify.qml:134 onTriggered")
             var item = notifyModel.data(indexPath)
             if (item && item.type == "option")
                 pageRoot.choose(item.key, item.value)

@@ -90,7 +90,7 @@ Page {
             }
             gestureHandlers: [
                 TapHandler {
-                    onTapped: addPrompt.show()
+                    onTapped: { _mm.traceLog("tap members.qml:93 onTapped"); addPrompt.show() }
                 }
             ]
         }
@@ -156,6 +156,7 @@ Page {
                 ]
 
                 onTriggered: {
+                    _mm.traceLog("tap members.qml:158 onTriggered")
                     var item = resultModel.data(indexPath)
                     if (item && item.userId && pageRoot.canManage) {
                         removeDialog.removeId = item.userId

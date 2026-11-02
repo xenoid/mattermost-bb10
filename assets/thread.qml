@@ -63,7 +63,7 @@ Page {
     paneProperties: NavigationPaneProperties {
         backButton: ActionItem {
             title: qsTr("Back")
-            onTriggered: goBack()
+            onTriggered: { _mm.traceLog("tap thread.qml:66 onTriggered"); goBack() }
         }
     }
 
@@ -88,7 +88,7 @@ Page {
             textStyle.fontSize: FontSize.Small
             gestureHandlers: [
                 TapHandler {
-                    onTapped: _mm.loadOlder()
+                    onTapped: { _mm.traceLog("tap thread.qml:91 onTapped"); _mm.loadOlder() }
                 }
             ]
         }
@@ -102,7 +102,7 @@ Page {
             textStyle.fontSize: FontSize.Small
             gestureHandlers: [
                 TapHandler {
-                    onTapped: _mm.loadNewer()
+                    onTapped: { _mm.traceLog("tap thread.qml:105 onTapped"); _mm.loadNewer() }
                 }
             ]
         }
@@ -215,57 +215,57 @@ Page {
                                 ActionItem {
                                     title: qsTr("Reply")
                                     enabled: ListItemData.inThread != "1" && ListItemData.pending != "1"
-                                    onTriggered: postItem.ListItem.view.askReplies(ListItemData.threadRoot)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:218 onTriggered"); postItem.ListItem.view.askReplies(ListItemData.threadRoot) }
                                 }
                                 ActionItem {
                                     title: qsTr("React")
                                     enabled: ListItemData.pending != "1"
-                                    onTriggered: postItem.ListItem.view.askReact(ListItemData.id)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:223 onTriggered"); postItem.ListItem.view.askReact(ListItemData.id) }
                                 }
                                 ActionItem {
                                     title: qsTr("Edit")
                                     enabled: ListItemData.mine && ListItemData.pending != "1" && ListItemData.plain != ""
-                                    onTriggered: postItem.ListItem.view.beginEdit(ListItemData.id, ListItemData.plain)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:228 onTriggered"); postItem.ListItem.view.beginEdit(ListItemData.id, ListItemData.plain) }
                                 }
                                 ActionItem {
                                     title: qsTr("Delete")
                                     enabled: ListItemData.mine && ListItemData.pending != "1"
-                                    onTriggered: postItem.ListItem.view.beginDelete(ListItemData.id)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:233 onTriggered"); postItem.ListItem.view.beginDelete(ListItemData.id) }
                                 }
                                 ActionItem {
                                     title: ListItemData.pinned == "1" ? qsTr("Unpin") : qsTr("Pin")
                                     enabled: ListItemData.pending != "1"
-                                    onTriggered: postItem.ListItem.view.pinPost(ListItemData.id)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:238 onTriggered"); postItem.ListItem.view.pinPost(ListItemData.id) }
                                 }
                                 ActionItem {
                                     title: ListItemData.saved == "1" ? qsTr("Unsave") : qsTr("Save")
                                     enabled: ListItemData.pending != "1"
-                                    onTriggered: postItem.ListItem.view.savePost(ListItemData.id)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:243 onTriggered"); postItem.ListItem.view.savePost(ListItemData.id) }
                                 }
                                 ActionItem {
                                     title: qsTr("Open image")
                                     enabled: ListItemData.imageId != "" && ListItemData.imageId != "local"
-                                    onTriggered: postItem.ListItem.view.openImage(ListItemData.imageId)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:248 onTriggered"); postItem.ListItem.view.openImage(ListItemData.imageId) }
                                 }
                                 ActionItem {
                                     title: qsTr("Image 2")
                                     enabled: ListItemData.imageId2 != ""
-                                    onTriggered: postItem.ListItem.view.openImage(ListItemData.imageId2)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:253 onTriggered"); postItem.ListItem.view.openImage(ListItemData.imageId2) }
                                 }
                                 ActionItem {
                                     title: qsTr("Open attachment")
                                     enabled: ListItemData.attachId != "" && ListItemData.attachId != "local"
-                                    onTriggered: postItem.ListItem.view.openAttachment(ListItemData.attachId, ListItemData.attachName, ListItemData.attachMime)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:258 onTriggered"); postItem.ListItem.view.openAttachment(ListItemData.attachId, ListItemData.attachName, ListItemData.attachMime) }
                                 }
                                 ActionItem {
                                     title: qsTr("Attachment 2")
                                     enabled: ListItemData.attachId2 != ""
-                                    onTriggered: postItem.ListItem.view.openAttachment(ListItemData.attachId2, ListItemData.attachName2, ListItemData.attachMime2)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:263 onTriggered"); postItem.ListItem.view.openAttachment(ListItemData.attachId2, ListItemData.attachName2, ListItemData.attachMime2) }
                                 }
                                 ActionItem {
                                     title: qsTr("Open link")
                                     enabled: ListItemData.link != ""
-                                    onTriggered: postItem.ListItem.view.openLink(ListItemData.link)
+                                    onTriggered: { _mm.traceLog("tap thread.qml:268 onTriggered"); postItem.ListItem.view.openLink(ListItemData.link) }
                                 }
                             }
                         ]
@@ -505,7 +505,7 @@ Page {
                                         }
                                         gestureHandlers: [
                                             TapHandler {
-                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r0)
+                                                onTapped: { _mm.traceLog("tap thread.qml:508 onTapped"); postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r0) }
                                             }
                                         ]
                                     }
@@ -548,7 +548,7 @@ Page {
                                         }
                                         gestureHandlers: [
                                             TapHandler {
-                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r1)
+                                                onTapped: { _mm.traceLog("tap thread.qml:551 onTapped"); postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r1) }
                                             }
                                         ]
                                     }
@@ -591,7 +591,7 @@ Page {
                                         }
                                         gestureHandlers: [
                                             TapHandler {
-                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r2)
+                                                onTapped: { _mm.traceLog("tap thread.qml:594 onTapped"); postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r2) }
                                             }
                                         ]
                                     }
@@ -634,7 +634,7 @@ Page {
                                         }
                                         gestureHandlers: [
                                             TapHandler {
-                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r3)
+                                                onTapped: { _mm.traceLog("tap thread.qml:637 onTapped"); postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r3) }
                                             }
                                         ]
                                     }
@@ -677,7 +677,7 @@ Page {
                                         }
                                         gestureHandlers: [
                                             TapHandler {
-                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r4)
+                                                onTapped: { _mm.traceLog("tap thread.qml:680 onTapped"); postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r4) }
                                             }
                                         ]
                                     }
@@ -720,7 +720,7 @@ Page {
                                         }
                                         gestureHandlers: [
                                             TapHandler {
-                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r5)
+                                                onTapped: { _mm.traceLog("tap thread.qml:723 onTapped"); postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r5) }
                                             }
                                         ]
                                     }
@@ -763,7 +763,7 @@ Page {
                                         }
                                         gestureHandlers: [
                                             TapHandler {
-                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r6)
+                                                onTapped: { _mm.traceLog("tap thread.qml:766 onTapped"); postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r6) }
                                             }
                                         ]
                                     }
@@ -806,7 +806,7 @@ Page {
                                         }
                                         gestureHandlers: [
                                             TapHandler {
-                                                onTapped: postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r7)
+                                                onTapped: { _mm.traceLog("tap thread.qml:809 onTapped"); postItem.ListItem.view.toggleReact(ListItemData.id, ListItemData.r7) }
                                             }
                                         ]
                                     }
@@ -864,6 +864,7 @@ Page {
                 }
             ]
             onTriggered: {
+                _mm.traceLog("tap thread.qml:866 onTriggered")
                 openRow(postModel.data(indexPath))
             }
         }
@@ -939,6 +940,7 @@ Page {
                     }
                 ]
                 onTriggered: {
+                    _mm.traceLog("tap thread.qml:941 onTriggered")
                     var item = emojiModel.data(indexPath)
                     if (!item)
                         return
@@ -1007,6 +1009,7 @@ Page {
                     }
                 ]
                 onTriggered: {
+                    _mm.traceLog("tap thread.qml:1009 onTriggered")
                     var item = slashModel.data(indexPath)
                     if (item && item.trigger)
                         pickSlash(item.trigger)
@@ -1081,7 +1084,7 @@ Page {
                     textStyle.fontSize: FontSize.Small
                     gestureHandlers: [
                         TapHandler {
-                            onTapped: clearHeld()
+                            onTapped: { _mm.traceLog("tap thread.qml:1084 onTapped"); clearHeld() }
                         }
                     ]
                 }
@@ -1100,14 +1103,14 @@ Page {
                     preferredWidth: 72
                     preferredHeight: 72
                     verticalAlignment: VerticalAlignment.Center
-                    onClicked: openSend()
+                    onClicked: { _mm.traceLog("tap thread.qml:1103 onClicked"); openSend() }
                 }
                 ImageButton {
                     defaultImageSource: _mm.iconEmoji
                     preferredWidth: 72
                     preferredHeight: 72
                     verticalAlignment: VerticalAlignment.Center
-                    onClicked: toggleEmoji()
+                    onClicked: { _mm.traceLog("tap thread.qml:1110 onClicked"); toggleEmoji() }
                 }
                 TextField {
                     id: composer
@@ -1135,7 +1138,7 @@ Page {
                     preferredHeight: 84
                     verticalAlignment: VerticalAlignment.Center
                     leftMargin: 8
-                    onClicked: send()
+                    onClicked: { _mm.traceLog("tap thread.qml:1138 onClicked"); send() }
                 }
             }
         }

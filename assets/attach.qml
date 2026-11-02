@@ -47,7 +47,7 @@ Page {
             }
             gestureHandlers: [
                 TapHandler {
-                    onTapped: picturePicker.open()
+                    onTapped: { _mm.traceLog("tap attach.qml:50 onTapped"); picturePicker.open() }
                 }
             ]
             Container {
@@ -80,7 +80,7 @@ Page {
             }
             gestureHandlers: [
                 TapHandler {
-                    onTapped: docPicker.open()
+                    onTapped: { _mm.traceLog("tap attach.qml:83 onTapped"); docPicker.open() }
                 }
             ]
             Container {

@@ -142,6 +142,7 @@ Page {
                     }
                 ]
                 onTriggered: {
+                    _mm.traceLog("tap search.qml:144 onTriggered")
                     var item = resultModel.data(indexPath)
                     if (!item || !item.channelId)
                         return

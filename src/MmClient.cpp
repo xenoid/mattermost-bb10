@@ -162,6 +162,24 @@ QString copyIntoCache(const QString &path)
 
 }
 
+// Protokoll: jede Zeile landet in debug.log im Datenordner, aber nur wenn „Protokoll“ in den Einstellungen an ist.
+bool g_traceOn = false;
+
+void traceWrite(const QString &line)
+{
+    if (!g_traceOn)
+        return;
+    const QString path = QDir::homePath() + "/debug.log";
+    QFile file(path);
+    const bool big = QFileInfo(path).size() > 2097152;
+    const QIODevice::OpenMode mode = big ? (QIODevice::WriteOnly | QIODevice::Text)
+                                         : (QIODevice::Append | QIODevice::Text);
+    if (!file.open(mode))
+        return;
+    file.write((QDateTime::currentDateTime().toString("HH:mm:ss.zzz") + " " + line + "\n").toUtf8());
+    file.close();
+}
+
 namespace {
 bool g_deferHeavy = false;
 }
@@ -254,6 +272,7 @@ MmClient::MmClient(QObject *parent)
     m_notifyHub = settings.value("notifyHub", true).toBool();
     m_notifyMentions = settings.value("notifyMentions", false).toBool();
     m_debugLog = settings.value("debugLog", false).toBool();
+    g_traceOn = m_debugLog;
     if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
         setLoggedIn(true);
         ensureLive();
@@ -504,6 +523,8 @@ void MmClient::setDebugLog(bool on)
     if (m_debugLog == on)
         return;
     m_debugLog = on;
+    g_traceOn = on;
+    traceWrite(on ? "protocol on" : "protocol off");
     QSettings("hollweck", "mattermost").setValue("debugLog", on);
     emit prefsChanged();
 }
@@ -621,6 +642,7 @@ void MmClient::enterHeadless()
         m_notifyHub = settings.value("notifyHub", true).toBool();
         m_notifyMentions = settings.value("notifyMentions", false).toBool();
         m_debugLog = settings.value("debugLog", false).toBool();
+        g_traceOn = m_debugLog;
         m_net.setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
         if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
             setLoggedIn(true);
@@ -1424,16 +1446,8 @@ QString MmClient::draftFor(const QString &channelId) const
 
 void MmClient::traceLog(const QString &line)
 {
-    // Eine Zeile je Ereignis in debug.log im Datenordner der App. Bei über 256 KB wird die Datei neu begonnen.
-    const QString path = QDir::homePath() + "/debug.log";
-    QFile file(path);
-    const bool big = QFileInfo(path).size() > 262144;
-    const QIODevice::OpenMode mode = big ? (QIODevice::WriteOnly | QIODevice::Text)
-                                         : (QIODevice::Append | QIODevice::Text);
-    if (!file.open(mode))
-        return;
-    file.write((QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz") + " " + line + "\n").toUtf8());
-    file.close();
+    // Ereignisse aus der Oberfläche: Tipps und Seiten.
+    traceWrite("ui " + line);
 }
 
 void MmClient::openSaved()
@@ -1867,6 +1881,8 @@ QNetworkReply *MmClient::start(Step step, const QString &path, const QByteArray 
                                const QByteArray &verb, bool silent, int timeoutMs)
 {
     const QNetworkRequest request = makeRequest(path);
+    traceWrite(QString("net > step=%1 %2 %3 body=%4").arg(int(step)).arg(QString::fromLatin1(verb))
+               .arg(path).arg(QString::fromUtf8(body.left(300)).replace('\n', ' ')));
     QNetworkReply *reply = 0;
     if (verb == "POST")
         reply = m_net.post(request, body);
@@ -3035,6 +3051,9 @@ void MmClient::onFinished(QNetworkReply *reply)
     const QString localId = reply->property("localId").toString();
     const QString msg = reply->property("msg").toString();
     const QString root = reply->property("root").toString();
+    traceWrite(QString("net < step=%1 http=%2 net=%3 bytes=%4 body=%5").arg(int(step)).arg(http)
+               .arg(netCode).arg(payload.size())
+               .arg(QString::fromUtf8(payload.left(300)).replace('\n', ' ')));
     if (m_debugLog)
         qDebug("mm-net step %d http %d net %d", int(step), http, netCode);
     if (m_headless && netCode != 0) {
