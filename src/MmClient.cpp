@@ -920,6 +920,36 @@ void MmClient::login(const QString &serverUrl, const QString &user, const QStrin
     start(StepLogin, "/api/v4/users/login", bytes, "POST");
 }
 
+void MmClient::loginWithLink(const QString &serverUrl, const QString &link)
+{
+    // Magic Link für Gäste (Server 11.3+): <Server>/login/one_time_link?t=<Token> aus der E-Mail.
+    const QUrl url(link.trimmed());
+    const QString token = url.queryItemValue("t");
+    QString server = serverUrl.trimmed();
+    if (server.isEmpty() && url.isValid()) {
+        QString path = url.path();
+        const int cut = path.indexOf("/login/one_time_link");
+        if (cut >= 0)
+            path = path.left(cut);
+        server = url.scheme() + "://" + url.authority() + path;
+    }
+    if (token.isEmpty() || server.isEmpty()) {
+        setStatus(tr("This is not a sign-in link"));
+        return;
+    }
+    resetSession();
+    m_serverUrl = normalizeUrl(server);
+    emit sessionChanged();
+    QVariantMap body;
+    body["magic_link_token"] = token;
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    traceWrite("login magic link");
+    setStatus(tr("Signing in…"));
+    start(StepLogin, "/api/v4/users/login", bytes, "POST");
+}
+
 void MmClient::submitMfa(const QString &code)
 {
     const QString token = code.trimmed();

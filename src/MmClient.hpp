@@ -178,6 +178,7 @@ public:
     Q_INVOKABLE void loadRuns();
     Q_INVOKABLE void startSso(const QString &serverUrl, const QString &service);
     Q_INVOKABLE void setPreauthSecret(const QString &secret);
+    Q_INVOKABLE void loginWithLink(const QString &serverUrl, const QString &link);
     Q_INVOKABLE QVariantList accounts() const;
     Q_INVOKABLE void addAccount();
     Q_INVOKABLE void switchAccount(const QString &key);

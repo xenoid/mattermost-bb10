@@ -30,7 +30,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Authentication secret on server entry | Built: optional field on the login page; sent as X-Mattermost-Preauth-Secret on every request (server 10.12+ behind a proxy). A proxy rejection shows a message. The websocket does not send it yet. Not yet tested on the device |
 | 🟡 | Sign in with GitLab, Google or Entra ID (OAuth) | Built: the login page opens the server's mobile OAuth login (GitLab, Google, Office 365/Entra ID, OpenID) in the browser; the mmauth:// callback brings the token back into the app. The server must allow mmauth:// (default). Not yet tested on the device |
 | 🟡 | SAML (Okta, OneLogin, ADFS) | Built: same browser flow with the server's SAML mobile login. Not yet tested on the device |
-| 🔴 | Magic link for guests | Server v11.3 and later |
+| 🟡 | Magic link for guests | Built: the login page takes the link from the invitation email (…/login/one_time_link?t=…) and signs in with magic_link_token, as the Android app does. The link opens in the browser on BlackBerry 10, so it has to be pasted. Not yet tested on the device |
 | 🟡 | Forgot-password link | Built: opens `/reset_password` of the server in the browser. Not yet tested on the device |
 | 🟡 | AD/LDAP | The password login sends login_id, which the server also accepts for AD/LDAP accounts. Not tested: no LDAP server at hand |
 | ⚪ | Sign in with Microsoft under Intune | MDM, iOS only in the docs |

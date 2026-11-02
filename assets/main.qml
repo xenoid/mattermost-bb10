@@ -128,6 +128,21 @@ NavigationPane {
                     _mm.inviteGuest(guestPrompt.channelId, inputFieldTextEntry())
             }
         },
+        SystemPrompt {
+            id: linkPrompt
+            title: qsTr("Sign-in link")
+            body: qsTr("Paste the link from the invitation email.")
+            inputField.inputMode: SystemUiInputMode.Url
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Sign in")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection) {
+                    _mm.setPreauthSecret(secretField.text)
+                    _mm.loginWithLink(serverField.text, inputFieldTextEntry())
+                }
+            }
+        },
         SystemListDialog {
             id: ssoDialog
             title: qsTr("Single sign-on")
@@ -386,6 +401,22 @@ NavigationPane {
                                 var server = serverField.text.trim().replace(/\/+$/, "")
                                 if (server.indexOf("http") == 0)
                                     _mm.openLink(server + "/reset_password")
+                            }
+                        }
+                    ]
+                }
+                Label {
+                    text: qsTr("Sign in with a link from an email")
+                    horizontalAlignment: HorizontalAlignment.Center
+                    topMargin: 16
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Small
+                    gestureHandlers: [
+                        TapHandler {
+                            onTapped: {
+                                if (Qt.mm) Qt.mm.traceLog("tap main.qml magic link")
+                                linkPrompt.show()
                             }
                         }
                     ]
