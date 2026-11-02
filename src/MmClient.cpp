@@ -6,6 +6,7 @@
 #include <bb/data/JsonDataAccess>
 #include <bb/platform/Notification.hpp>
 #include <bb/system/ApplicationStartupMode.hpp>
+#include <bb/system/Clipboard>
 #include <bb/system/InvokeManager.hpp>
 #include <bb/system/InvokeRecurrenceRule.hpp>
 #include <bb/system/InvokeReply.hpp>
@@ -1442,6 +1443,33 @@ QString MmClient::draftFor(const QString &channelId) const
         return QString();
     QSettings settings("hollweck", "mattermost");
     return settings.value("draft_" + channelId).toString();
+}
+
+void MmClient::copyText(const QString &text)
+{
+    bb::system::Clipboard clipboard;
+    clipboard.clear();
+    const bool ok = !text.isEmpty() && clipboard.insert("text/plain", text.toUtf8());
+    traceWrite(QString("clipboard copy chars=%1 ok=%2").arg(text.size()).arg(ok ? 1 : 0));
+    setStatus(ok ? tr("Copied") : tr("Could not copy"));
+}
+
+void MmClient::copyProblemReport()
+{
+    // Version, Server und das Ende von debug.log. Den Text fügt der Nutzer selbst in eine Nachricht oder Mail ein.
+    QString report = QString("Mattermost BB10 %1\nServer: %2\nTeam: %3\nProtocol log: %4\n")
+                         .arg(appVersion(), m_serverUrl, m_teamName, m_debugLog ? "on" : "off");
+    QFile file(QDir::homePath() + "/debug.log");
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        const qint64 size = file.size();
+        if (size > 6000)
+            file.seek(size - 6000);
+        report += "\n" + QString::fromUtf8(file.readAll());
+        file.close();
+    } else {
+        report += "\n(no debug.log; turn on Protocol log first)\n";
+    }
+    copyText(report);
 }
 
 void MmClient::setNextPriority(const QString &value)

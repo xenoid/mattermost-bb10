@@ -969,7 +969,7 @@ Page {
                         textStyle.fontSize: FontSize.Medium
                     }
                     Label {
-                        text: qsTr("Step and HTTP status in the system log")
+                        text: qsTr("Every tap, request and database call in debug.log")
                         textFormat: TextFormat.Plain
                         textStyle.color: Color.create("#6b747d")
                         textStyle.fontSize: FontSize.XSmall
@@ -983,6 +983,27 @@ Page {
                             _mm.debugLog = checked
                     }
                 }
+            }
+
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Copy problem report")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings problem report"); _mm.copyProblemReport() }
+                    }
+                ]
             }
 
             Container {

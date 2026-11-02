@@ -71,7 +71,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🔴 | Collapsed reply threads and global threads list | Thread page exists. List and follow logic missing. To verify |
 | 🔴 | Scheduled posts | Server API |
 | 🟡 | Drafts tab | Built: one draft per channel stays on the phone and comes back when the channel opens. Device test 2026-11-02: works. The list of all drafts is missing |
-| 🔴 | Copy code block, copy email address | |
+| 🟡 | Copy code block, copy email address | Built: Copy text in the post long-press menu copies the whole message. Copying only a code block or an address is missing. Not yet tested on the device |
 | 🔴 | Edit or delete attachments on existing posts | Android 2.31 |
 | 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Device test 2026-11-02: no preview shows for a Reddit link. Not yet checked whether the server sends previews. Image and permalink previews are missing |
 | 🔴 | Message attachments and interactive buttons | `mmaction://` links |
@@ -115,7 +115,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Search, then open the hit | |
 | 🟡 | Recent mentions | Built: Settings, MESSAGES. Runs a search for @username. Not yet tested on the device |
 | 🟡 | Saved messages list | Built: Settings, MESSAGES. Shows the saved posts in the search page. Not yet tested on the device |
-| 🔴 | Search filters | To verify |
+| 🟡 | Search filters | Typed filters from:, in:, before:, after: and on: go to the server unchanged, and the search hint names them. No filter buttons. Not yet tested on the device |
 
 ## Profile and status
 
@@ -168,7 +168,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | | Feature | Notes |
 | --- | --- | --- |
 | 🟢 | Protocol log | Setting |
-| 🔴 | Problem report | Low priority |
+| 🟡 | Problem report | Built: Settings, DIAGNOSTICS, Copy problem report puts version, server and the end of debug.log on the clipboard. Not yet tested on the device |
 
 ## Out of scope
 

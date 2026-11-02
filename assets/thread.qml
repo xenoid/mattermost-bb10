@@ -156,6 +156,9 @@ Page {
             function savePost(postId) {
                 _mm.savePost(postId)
             }
+            function copyText(text) {
+                _mm.copyText(text)
+            }
             function askReplies(rootId) {
                 _mm.askReplies(rootId)
             }
@@ -241,6 +244,11 @@ Page {
                                     title: ListItemData.saved == "1" ? qsTr("Unsave") : qsTr("Save")
                                     enabled: ListItemData.pending != "1"
                                     onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml:243 onTriggered"); postItem.ListItem.view.savePost(ListItemData.id) }
+                                }
+                                ActionItem {
+                                    title: qsTr("Copy text")
+                                    enabled: ListItemData.plain != ""
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml copy text"); postItem.ListItem.view.copyText(ListItemData.plain) }
                                 }
                                 ActionItem {
                                     title: qsTr("Open image")

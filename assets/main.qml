@@ -323,7 +323,7 @@ NavigationPane {
                         }
                         TextField {
                             id: searchField
-                            hintText: qsTr("Search messages")
+                            hintText: qsTr("Search, also from: in: before: after:")
                             backgroundVisible: false
                             input.submitKey: SubmitKey.Search
                             verticalAlignment: VerticalAlignment.Center
