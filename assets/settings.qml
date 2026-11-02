@@ -61,6 +61,10 @@ Page {
             id: mentionsDef
             source: "asset:///search.qml"
         },
+        ComponentDefinition {
+            id: joinTeamDef
+            source: "asset:///jointeam.qml"
+        },
         SystemPrompt {
             id: channelPrompt
             title: qsTr("New channel")
@@ -573,6 +577,34 @@ Page {
                         onTapped: {
                             if (navPane)
                                 navPane.showTeams()
+                        }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Join a team")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: {
+                            if (!navPane)
+                                return
+                            var page = navPane.make(joinTeamDef)
+                            if (!page)
+                                return
+                            navPane.push(page)
+                            page.load()
                         }
                     }
                 ]

@@ -583,6 +583,7 @@ void MmClient::resetSession()
     m_rawOrder.clear();
     m_rawPosts.clear();
     m_teamChoices.clear();
+    m_openTeams.clear();
     m_hasOlder = false;
     m_hasNewer = false;
     m_aroundLeft = 0;
@@ -1489,6 +1490,31 @@ void MmClient::leaveTeam()
     reply->setProperty("teamId", m_teamId);
 }
 
+void MmClient::loadOpenTeams()
+{
+    // Normale Konten sehen nur offene Teams. Eigene Teams filtert die Antwort später heraus.
+    if (!m_loggedIn) {
+        emit openTeamsLoaded(QVariantList());
+        return;
+    }
+    start(StepOpenTeams, "/api/v4/teams?per_page=200");
+}
+
+void MmClient::joinTeam(const QString &teamId)
+{
+    // Der Beitritt zu einem offenen Team braucht nur die eigene Nutzer-ID.
+    if (!m_loggedIn || m_userId.isEmpty() || teamId.isEmpty())
+        return;
+    QVariantMap body;
+    body["team_id"] = teamId;
+    body["user_id"] = m_userId;
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    QNetworkReply *reply = start(StepTeamJoin, "/api/v4/teams/" + teamId + "/members", bytes, "POST");
+    reply->setProperty("teamId", teamId);
+}
+
 void MmClient::archiveChannel(const QString &channelId)
 {
     // DELETE auf einen Kanal archiviert ihn. Er verschwindet aus der Liste.
@@ -1813,6 +1839,13 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
     case StepMemberListUsers:
         setStatus(tr("Could not load the members"));
         emit membersLoaded(QVariantList());
+        return;
+    case StepOpenTeams:
+        setStatus(tr("Could not load the teams"));
+        emit openTeamsLoaded(QVariantList());
+        return;
+    case StepTeamJoin:
+        setStatus(tr("Could not join the team"));
         return;
     case StepSend:
     case StepUpload:
@@ -3308,6 +3341,58 @@ void MmClient::onFinished(QNetworkReply *reply)
             return;
         }
         offerTeams(teams);
+        return;
+    }
+
+    if (step == StepOpenTeams) {
+        // Offene Teams ohne die, in denen der Nutzer schon ist.
+        const QVariantList teams = parsed.toList();
+        m_openTeams.clear();
+        for (int i = 0; i < teams.size(); ++i) {
+            const QVariantMap team = teams.at(i).toMap();
+            const QString id = team.value("id").toString();
+            bool mine = false;
+            for (int j = 0; j < m_teamChoices.size(); ++j) {
+                if (m_teamChoices.at(j).toMap().value("id").toString() == id)
+                    mine = true;
+            }
+            if (id.isEmpty() || mine || !team.value("allow_open_invite").toBool())
+                continue;
+            const QString name = repairText(team.value("display_name").toString());
+            QVariantMap row;
+            row["id"] = id;
+            row["title"] = name.isEmpty() ? team.value("name").toString() : name;
+            row["subtitle"] = team.value("name").toString();
+            m_openTeams.append(row);
+        }
+        emit openTeamsLoaded(m_openTeams);
+        return;
+    }
+
+    if (step == StepTeamJoin) {
+        // Das neue Team gehört sofort zur Auswahl. loadTeams() würde den offenen Kanal zurücksetzen.
+        const QString id = reply->property("teamId").toString();
+        QVariantList rest;
+        QString name;
+        for (int i = 0; i < m_openTeams.size(); ++i) {
+            const QVariantMap open = m_openTeams.at(i).toMap();
+            if (open.value("id").toString() == id)
+                name = open.value("title").toString();
+            else
+                rest.append(open);
+        }
+        m_openTeams = rest;
+        if (name.isEmpty()) {
+            loadTeams();
+        } else {
+            QVariantMap choice;
+            choice["id"] = id;
+            choice["name"] = name;
+            m_teamChoices.append(choice);
+            emit sessionChanged();
+        }
+        emit openTeamsLoaded(m_openTeams);
+        setStatus(tr("Joined the team"));
         return;
     }
 

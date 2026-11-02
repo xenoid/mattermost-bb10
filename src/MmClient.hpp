@@ -148,6 +148,8 @@ public:
     Q_INVOKABLE void archiveChannel(const QString &channelId);
     Q_INVOKABLE void leaveTeam();
     Q_INVOKABLE void loadMembers(const QString &channelId);
+    Q_INVOKABLE void loadOpenTeams();
+    Q_INVOKABLE void joinTeam(const QString &teamId);
     Q_INVOKABLE void saveProfile(const QString &firstName, const QString &lastName,
                                  const QString &nickname, const QString &position);
     Q_INVOKABLE void setChannelText(const QString &channelId, const QString &field, const QString &text);
@@ -187,6 +189,7 @@ signals:
     void presenceChanged();
     void profileChanged();
     void membersLoaded(const QVariantList &rows);
+    void openTeamsLoaded(const QVariantList &rows);
 
 private slots:
     void onFinished(QNetworkReply *reply);
@@ -243,7 +246,9 @@ private:
         StepChannelText,
         StepTeamLeave,
         StepMemberList,
-        StepMemberListUsers
+        StepMemberListUsers,
+        StepOpenTeams,
+        StepTeamJoin
     };
 
     enum FileKind {
@@ -441,6 +446,7 @@ private:
     QString m_nickname;
     QString m_position;
     QStringList m_memberIds;
+    QVariantList m_openTeams;
     QString m_focusPost;
     QString m_aroundSelf;
     QString m_aroundChan;
