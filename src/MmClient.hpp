@@ -424,6 +424,7 @@ private:
     void rememberCurrent();
     void forgetCurrent();
     bool outboxBusy();
+    void appendBlocks(const QVariantList &blocks, QStringList &lines, QStringList &ids, QStringList &names);
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);
@@ -592,6 +593,7 @@ private:
     QVariantMap m_lookupUser;
     QVariantMap m_lookupAttrs;
     QHash<QString, QString> m_attrFields;
+    QHash<QString, QString> m_blockCookies;
     QString m_dialogUrl;
     QString m_dialogCallback;
     QString m_dialogState;

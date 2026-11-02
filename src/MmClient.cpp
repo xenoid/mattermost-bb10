@@ -2417,10 +2417,66 @@ void MmClient::emitLookup()
 void MmClient::doPostAction(const QString &postId, const QString &actionId)
 {
     // Knopf in einer Bot-Nachricht. Der Server ruft die Integration auf.
+    // Knöpfe aus Blocks tragen das Präfix "b:" und schicken Format und Cookie mit.
     if (!m_loggedIn || postId.isEmpty() || actionId.isEmpty())
         return;
-    noticeAction("/api/v4/posts/" + postId + "/actions/" + actionId, "POST", QByteArray("{}"),
+    QByteArray body("{}");
+    QString id = actionId;
+    if (id.startsWith("b:")) {
+        id = id.mid(2);
+        QVariantMap map;
+        map["integration_format"] = QString("mm_block");
+        const QString cookie = m_blockCookies.value(postId);
+        if (!cookie.isEmpty())
+            map["cookie"] = cookie;
+        JsonDataAccess json;
+        body.clear();
+        json.saveToBuffer(map, &body);
+    }
+    noticeAction("/api/v4/posts/" + postId + "/actions/" + id, "POST", body,
                  tr("Action sent"), tr("The action failed (HTTP %1)"));
+}
+
+void MmClient::appendBlocks(const QVariantList &blocks, QStringList &lines, QStringList &ids, QStringList &names)
+{
+    for (int i = 0; i < blocks.size(); ++i) {
+        const QVariantMap block = blocks.at(i).toMap();
+        const QString type = block.value("type").toString();
+        if (type == "text") {
+            const QString text = repairText(block.value("text").toString()).trimmed();
+            if (!text.isEmpty())
+                lines.append(text);
+        } else if (type == "image") {
+            QString label = block.value("title").toString();
+            if (label.isEmpty())
+                label = block.value("alt_text").toString();
+            lines.append(tr("[Image] %1").arg(label.isEmpty() ? block.value("url").toString() : repairText(label)));
+        } else if (type == "divider") {
+            lines.append(QString::fromUtf8("———"));
+        } else if (type == "button") {
+            if (!block.value("disabled").toBool() && !block.value("action_id").toString().isEmpty()) {
+                ids.append("b:" + block.value("action_id").toString());
+                names.append(repairText(block.value("text").toString()));
+            }
+        } else if (type == "static_select") {
+            QStringList options;
+            const QVariantList list = block.value("options").toList();
+            for (int k = 0; k < list.size(); ++k)
+                options.append(repairText(list.at(k).toMap().value("text").toString()));
+            lines.append(repairText(block.value("placeholder").toString()) + ": " + options.join(" / "));
+        } else if (type == "column_set") {
+            const QVariantList columns = block.value("columns").toList();
+            for (int k = 0; k < columns.size(); ++k)
+                appendBlocks(columns.at(k).toMap().value("items").toList(), lines, ids, names);
+        } else if (type == "column") {
+            appendBlocks(block.value("items").toList(), lines, ids, names);
+        } else if (type == "container") {
+            appendBlocks(block.value("content").toList(), lines, ids, names);
+        } else if (type == "collapsible") {
+            appendBlocks(block.value("header").toList(), lines, ids, names);
+            appendBlocks(block.value("content").toList(), lines, ids, names);
+        }
+    }
 }
 
 void MmClient::agentPost(const QString &postId, const QString &what)
@@ -3592,6 +3648,12 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
             actionIds.append(action.value("id").toString());
             actionNames.append(repairText(action.value("name").toString()));
         }
+    }
+    // Mattermost Blocks (props.mm_blocks) laufen über denselben Text und dieselben Aktionen.
+    const QVariantList blocks = postProps.value("mm_blocks").toList();
+    if (!blocks.isEmpty()) {
+        appendBlocks(blocks, botLines, actionIds, actionNames);
+        m_blockCookies.insert(postId, postProps.value("mm_blocks_actions").toString());
     }
     QString previewText;
     const QVariantList embeds = meta.value("embeds").toList();
