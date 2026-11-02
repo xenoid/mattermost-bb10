@@ -180,6 +180,8 @@ public:
     Q_INVOKABLE void switchAccount(const QString &key);
     Q_INVOKABLE void doPostAction(const QString &postId, const QString &actionId);
     Q_INVOKABLE void loadAgents();
+    Q_INVOKABLE void agentPost(const QString &postId, const QString &what);
+    Q_INVOKABLE void removeAttachments(const QString &postId);
     Q_INVOKABLE void submitDialog(const QVariantMap &values);
     Q_INVOKABLE void inviteGuest(const QString &channelId, const QString &email);
     Q_INVOKABLE bool setClientCertificate(const QString &certPath, const QString &keyPath, const QString &passphrase);

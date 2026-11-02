@@ -191,6 +191,12 @@ Page {
             function ackPost(postId) {
                 _mm.acknowledgePost(postId)
             }
+            function agentPost(postId, what) {
+                _mm.agentPost(postId, what)
+            }
+            function removeAttachments(postId) {
+                _mm.removeAttachments(postId)
+            }
             function askActions(postId, ids, names) {
                 var nameList = names.split("|")
                 actionDialog.postId = postId
@@ -285,6 +291,21 @@ Page {
                                     title: ListItemData.saved == "1" ? qsTr("Unsave") : qsTr("Save")
                                     enabled: ListItemData.pending != "1"
                                     onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml:243 onTriggered"); postItem.ListItem.view.savePost(ListItemData.id) }
+                                }
+                                ActionItem {
+                                    title: qsTr("Stop generating")
+                                    enabled: ListItemData.aiPost == "1"
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml ai stop"); postItem.ListItem.view.agentPost(ListItemData.id, "stop") }
+                                }
+                                ActionItem {
+                                    title: qsTr("Regenerate")
+                                    enabled: ListItemData.aiPost == "1"
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml ai regenerate"); postItem.ListItem.view.agentPost(ListItemData.id, "regenerate") }
+                                }
+                                ActionItem {
+                                    title: qsTr("Remove attachments")
+                                    enabled: ListItemData.mine && ListItemData.pending != "1" && (ListItemData.attachId != "" || ListItemData.imageId != "")
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml remove attachments"); postItem.ListItem.view.removeAttachments(ListItemData.id) }
                                 }
                                 ActionItem {
                                     title: qsTr("Actions")

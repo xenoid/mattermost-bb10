@@ -72,7 +72,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Scheduled posts | Built: + page, Send later sends the next channel message at a time (18:30) or after minutes (45). Needs server 10.3, possibly a licence. Listing and editing scheduled messages is missing. Not yet tested on the device |
 | 🟡 | Drafts tab | Built: one draft per channel stays on the phone and comes back when the channel opens. Device test 2026-11-02: works. The list of all drafts is missing |
 | 🟡 | Copy code block, copy email address | Built: Copy text in the post long-press menu copies the whole message. Copying only a code block or an address is missing. Not yet tested on the device |
-| 🔴 | Edit or delete attachments on existing posts | Android 2.31 |
+| 🟡 | Edit or delete attachments on existing posts | Built: Remove attachments in the menu of your own post (PUT patch with empty file_ids). Adding files to an existing post is missing. Not yet tested on the device |
 | 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Device test 2026-11-02: no preview shows for a Reddit link. Not yet checked whether the server sends previews. Image and permalink previews are missing |
 | 🟡 | Message attachments and interactive buttons | Built: bot attachments (pretext, title, text, fields) show under the message; their buttons are in the long-press menu under Actions. Select menus are missing. Not yet tested on the device |
 | 🟡 | Interactive dialogs | Built: an open_dialog event from the websocket opens a page with text, text area, select, radio and yes/no fields; Submit posts the values and shows field errors. Dynamic user and channel lists and multi-step dialogs are missing. Not yet tested on the device |
@@ -141,7 +141,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | | Feature | Notes |
 | --- | --- | --- |
 | 🟡 | Agent chat with threads and bot selector | Built: Settings, MESSAGES, Chat with an agent lists the AI plugin's agents (or the server's bots) and opens a direct message with the chosen one; threads work as in any chat. Not yet tested on the device |
-| 🔴 | Streaming, citations, stop and regenerate | Android 2.36 |
+| 🟡 | Streaming, citations, stop and regenerate | Built: agent replies fill in with the normal refresh; Stop generating and Regenerate are in the post menu (Agents plugin). Live streaming and citations are missing. Not yet tested on the device |
 | 🔴 | Tool-call approval | Android 2.36 and 2.44 |
 
 ## Settings and language

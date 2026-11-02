@@ -2377,6 +2377,25 @@ void MmClient::doPostAction(const QString &postId, const QString &actionId)
                  tr("Action sent"), tr("The action failed (HTTP %1)"));
 }
 
+void MmClient::agentPost(const QString &postId, const QString &what)
+{
+    // KI-Antwort stoppen oder neu erzeugen lassen (Agents-Plugin).
+    if (!m_loggedIn || postId.isEmpty() || (what != "stop" && what != "regenerate"))
+        return;
+    noticeAction("/plugins/mattermost-ai/post/" + postId + "/" + what, "POST", QByteArray(),
+                 what == "stop" ? tr("Generation stopped") : tr("New answer requested"),
+                 tr("The agent did not accept it (HTTP %1)"));
+}
+
+void MmClient::removeAttachments(const QString &postId)
+{
+    // Entfernt alle Anhänge des eigenen Beitrags. Der Text bleibt.
+    if (!m_loggedIn || postId.isEmpty())
+        return;
+    noticeAction("/api/v4/posts/" + postId + "/patch", "PUT", QByteArray("{\"file_ids\":[]}"),
+                 tr("Attachments removed"), tr("Could not remove the attachments (HTTP %1)"));
+}
+
 void MmClient::loadAgents()
 {
     // Erst die Agenten des KI-Plugins, sonst alle Bots, die der Server zeigt.
@@ -3464,6 +3483,7 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["priority"] = priorityText;
     row["preview"] = previewText;
     row["botText"] = botLines.join("\n");
+    row["aiPost"] = post.value("props").toMap().contains("llm_requester_user_id") ? QString("1") : QString();
     row["actionIds"] = actionIds.join("|");
     row["actionNames"] = actionNames.join("|");
     row["ackAsk"] = ackAsked ? QString("1") : QString();
@@ -5162,6 +5182,7 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["priority"] = QString();
     row["preview"] = QString();
     row["botText"] = QString();
+    row["aiPost"] = QString();
     row["actionIds"] = QString();
     row["actionNames"] = QString();
     row["ackAsk"] = QString();
