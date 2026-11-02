@@ -9,14 +9,14 @@ An unofficial [Mattermost](https://mattermost.com) client for the BlackBerry Cla
 Not affiliated with Mattermost, Inc. or BlackBerry.
 
 - **Package:** `com.hollweck.mattermost`, shown on the phone as **Mattermost**
-- **Version:** 1.0.0, build 168
+- **Version:** 1.0.0, build 169
 - **Source:** [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10)
 
 ## Status
 
 The app is usable for daily work: sign in, read, send, reply in threads, search, attach files, and get hub alerts. It works offline for sending, which queues messages until the phone is back online.
 
-The goal is the feature set of the official Android app, minus voice and video calls. [PARITY.md](PARITY.md) lists every feature and its state. At the time of writing, 32 of 89 tracked features are done, 49 are partly done, and 8 are open.
+The goal is the feature set of the official Android app, minus voice and video calls. [PARITY.md](PARITY.md) lists every feature and its state. At the time of writing, 32 of 89 tracked features are done, 50 are partly done, and 7 are open.
 
 ## Features
 
@@ -113,7 +113,7 @@ The chat page hides the action bar. Back is a swipe from the left edge. Settings
 - **Markdown** shows bold, italic, code, quotes, and links. Lists, tables, and headings are plain text. Strikethrough keeps the words and drops the tildes.
 - **Emoji** come from the phone font, which has no flags, skin tones, or ZWJ sequences. Server emoji are shown as pictures.
 - **Reactions** work through a swipe, but the swipe has not been confirmed on the device since build 123.
-- **Notifications** come from a poll every six minutes, not from push. BlackBerry 10 has no push service for this app.
+- **Notifications** come from a poll every six minutes, not from push, unless Realtime alerts keeps the Hub connected. BlackBerry 10 has no push service for this app.
 - **Accounts:** several accounts can be stored, but only the active one gets Hub alerts.
 - **Calls** are not built and are not planned.
 - **Tests:** there are no automated tests yet. Changes are checked on a device.

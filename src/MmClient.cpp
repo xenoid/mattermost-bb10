@@ -266,6 +266,11 @@ MmClient::MmClient(QObject *parent)
     connect(&m_live, SIGNAL(typing(QString,QString,QString)),
             this, SLOT(onRemoteTyping(QString,QString,QString)));
     connect(&m_live, SIGNAL(dialog(QString)), this, SLOT(onDialog(QString)));
+    m_realtimeHub = false;
+    connect(&m_live, SIGNAL(posted(QString)), this, SLOT(onRemotePosted(QString)));
+    m_postedTimer.setSingleShot(true);
+    m_postedTimer.setInterval(2000);
+    connect(&m_postedTimer, SIGNAL(timeout()), this, SLOT(refreshFromLive()));
     m_liveTimer.setSingleShot(true);
     m_liveTimer.setInterval(8000);
     connect(&m_liveTimer, SIGNAL(timeout()), this, SLOT(ensureLive()));
@@ -294,6 +299,7 @@ MmClient::MmClient(QObject *parent)
     m_preauth = settings.value("preauthSecret").toString();
     loadClientCertificate();
     m_nextScheduleAt = 0;
+    m_realtimeHub = settings.value("realtimeHub", false).toBool();
     if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
         setLoggedIn(true);
         ensureLive();
@@ -681,6 +687,10 @@ void MmClient::enterHeadless()
         m_notifyMentions = settings.value("notifyMentions", false).toBool();
         m_debugLog = settings.value("debugLog", false).toBool();
         g_traceOn = m_debugLog;
+        // Auch der Hub braucht Pre-Auth-Secret und Client-Zertifikat, sonst lehnt der Server ab.
+        m_preauth = settings.value("preauthSecret").toString();
+        loadClientCertificate();
+        m_realtimeHub = settings.value("realtimeHub", false).toBool();
         m_net.setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
         if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
             setLoggedIn(true);
@@ -772,6 +782,11 @@ void MmClient::quitIfHeadless()
 {
     if (!m_headless || !QCoreApplication::instance())
         return;
+    if (m_realtimeHub && m_loggedIn && !m_token.isEmpty()) {
+        // Echtzeit-Modus: der Hub bleibt wach und hört auf neue Beiträge.
+        ensureLive();
+        return;
+    }
     qDebug("mm-hub done");
     QTimer::singleShot(300, QCoreApplication::instance(), SLOT(quit()));
 }
@@ -1270,7 +1285,7 @@ void MmClient::takeEmojiPage(const QVariantList &list)
 
 void MmClient::ensureLive()
 {
-    if (m_headless || !m_loggedIn || m_token.isEmpty() || m_serverUrl.isEmpty())
+    if ((m_headless && !m_realtimeHub) || !m_loggedIn || m_token.isEmpty() || m_serverUrl.isEmpty())
         return;
     m_live.open(m_serverUrl, m_token);
 }
@@ -2404,6 +2419,39 @@ void MmClient::loadAgents()
         return;
     }
     start(StepAgents, "/plugins/mattermost-ai/ai_bots", QByteArray(), "GET", true);
+}
+
+void MmClient::onRemotePosted(const QString &channelId)
+{
+    // Neuer Beitrag laut Websocket. Im Hub kurz sammeln, dann Liste und Hub-Meldungen auffrischen.
+    traceWrite("live posted channel=" + channelId);
+    if (m_headless) {
+        m_postedTimer.start();
+        return;
+    }
+    if (!channelId.isEmpty() && channelId == m_channelId)
+        loadPosts(true);
+}
+
+void MmClient::refreshFromLive()
+{
+    if (m_loggedIn)
+        loadChannels(true);
+}
+
+bool MmClient::realtimeHub() const
+{
+    return QSettings("hollweck", "mattermost").value("realtimeHub", false).toBool();
+}
+
+void MmClient::setRealtimeHub(bool on)
+{
+    if (realtimeHub() == on)
+        return;
+    QSettings("hollweck", "mattermost").setValue("realtimeHub", on);
+    m_realtimeHub = on;
+    traceWrite(on ? "realtime hub on" : "realtime hub off");
+    emit prefsChanged();
 }
 
 void MmClient::onDialog(const QString &text)

@@ -51,6 +51,7 @@ class MmClient : public QObject
     Q_PROPERTY(bool debugLog READ debugLog WRITE setDebugLog NOTIFY prefsChanged)
     Q_PROPERTY(bool darkTheme READ darkTheme WRITE setDarkTheme NOTIFY prefsChanged)
     Q_PROPERTY(QString clientCertInfo READ clientCertInfo NOTIFY prefsChanged)
+    Q_PROPERTY(bool realtimeHub READ realtimeHub WRITE setRealtimeHub NOTIFY prefsChanged)
     Q_PROPERTY(QString presence READ presence NOTIFY presenceChanged)
     Q_PROPERTY(QString customText READ customText NOTIFY presenceChanged)
     Q_PROPERTY(QString customEmoji READ customEmoji NOTIFY presenceChanged)
@@ -97,6 +98,7 @@ public:
     bool debugLog() const { return m_debugLog; }
     bool darkTheme() const;
     QString clientCertInfo() const;
+    bool realtimeHub() const;
     bool trustReady() const { return m_trustReady; }
     QString customText() const { return m_statusText; }
     QString customEmoji() const { return m_statusEmoji; }
@@ -111,6 +113,7 @@ public:
     void setNotifyMentions(bool on);
     void setDebugLog(bool on);
     void setDarkTheme(bool on);
+    void setRealtimeHub(bool on);
     bool headlessLaunch() const;
 
     Q_INVOKABLE void login(const QString &serverUrl, const QString &user, const QString &password);
@@ -281,6 +284,8 @@ private slots:
     void onLiveReady();
     void onLiveFailed();
     void onDialog(const QString &text);
+    void onRemotePosted(const QString &channelId);
+    void refreshFromLive();
     void onRemoteTyping(const QString &channelId, const QString &userId, const QString &parentId);
     void sweepTyping();
 
@@ -622,6 +627,8 @@ private:
     };
     MmSocket m_live;
     QTimer m_liveTimer;
+    QTimer m_postedTimer;
+    bool m_realtimeHub;
     QTimer m_typeSweep;
     QHash<QString, Typer> m_typers;
     QSet<QString> m_typeAsked;

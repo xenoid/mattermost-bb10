@@ -269,6 +269,13 @@ void MmSocket::handleText(const QByteArray &payload)
         emit dialog(msg.value("data").toMap().value("dialog").toString());
         return;
     }
+    if (msg.value("event").toString() == QLatin1String("posted")) {
+        QString channel = msg.value("broadcast").toMap().value("channel_id").toString();
+        if (channel.isEmpty())
+            channel = msg.value("data").toMap().value("channel_id").toString();
+        emit posted(channel);
+        return;
+    }
     if (msg.value("event").toString() != QLatin1String("typing"))
         return;
     const QVariantMap data = msg.value("data").toMap();

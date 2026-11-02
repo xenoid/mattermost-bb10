@@ -1253,6 +1253,43 @@ Page {
                         spaceQuota: 1
                     }
                     Label {
+                        text: qsTr("Realtime alerts")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#1b1f23")
+                        textStyle.fontSize: FontSize.Medium
+                    }
+                    Label {
+                        text: qsTr("The Hub keeps a connection open. Uses more battery.")
+                        textFormat: TextFormat.Plain
+                        multiline: true
+                        textStyle.color: Color.create("#6b747d")
+                        textStyle.fontSize: FontSize.XSmall
+                    }
+                }
+                ToggleButton {
+                    verticalAlignment: VerticalAlignment.Center
+                    checked: _mm.realtimeHub
+                    onCheckedChanged: {
+                        if (_mm.realtimeHub != checked)
+                            _mm.realtimeHub = checked
+                    }
+                }
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                leftPadding: 20
+                rightPadding: 20
+                topPadding: 16
+                bottomPadding: 16
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Container {
+                    verticalAlignment: VerticalAlignment.Center
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                    Label {
                         text: qsTr("Mentions only")
                         textFormat: TextFormat.Plain
                         textStyle.color: Color.create("#1b1f23")

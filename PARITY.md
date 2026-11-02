@@ -103,7 +103,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Hub alert for new messages | Setting |
 | 🟢 | Mentions only | Setting |
 | 🟢 | Background refresh every six minutes | Hub process |
-| 🔴 | Realtime in background over websocket | Hub holds the socket. Costs battery. Needs a setting |
+| 🟡 | Realtime in background over websocket | Built: Settings, Realtime alerts (off by default). The Hub then stays running, keeps the websocket open and refreshes alerts two seconds after a new post. In the app, a new post in the open channel loads at once. Not yet tested on the device |
 | 🟡 | Notification settings per channel | Built: long-press a channel, then Notifications (push, desktop, mark as unread). Hub honours desktop setting. Not yet tested on the device |
 | 🟢 | Test notification tool | Settings, DIAGNOSTICS, Test notification puts a local alert in the Hub. Device 2026-11-02: works |
 | ⚪ | Push notifications | No FCM on BlackBerry 10 |
