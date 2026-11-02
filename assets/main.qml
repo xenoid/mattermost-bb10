@@ -37,6 +37,20 @@ NavigationPane {
             id: bookmarksDef
             source: "asset:///bookmarks.qml"
         },
+        SystemPrompt {
+            id: lockPrompt
+            title: qsTr("Mattermost is locked")
+            body: qsTr("Enter your PIN")
+            inputField.inputMode: SystemUiInputMode.Password
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Unlock")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                var ok = value == SystemUiResult.ConfirmButtonSelection && _mm.unlock(inputFieldTextEntry())
+                if (!ok)
+                    _mm.askUnlockLater()
+            }
+        },
         SystemToast {
             id: toast
         },
@@ -133,6 +147,12 @@ NavigationPane {
         page.current = current ? current : ""
         page.navPane = nav
         nav.push(page)
+    }
+
+    // App-Sperre: solange gesperrt, verlangt die App die PIN.
+    function askUnlock() {
+        if (_mm.locked)
+            lockPrompt.show()
     }
 
     // Kurze Meldung über jeder Seite, zum Beispiel nach dem Kopieren.
@@ -753,6 +773,8 @@ NavigationPane {
         _mm.prefsChanged.connect(applyPreview)
         _mm.channelsLoaded.connect(takeChannels)
         _mm.notice.connect(showNotice)
+        _mm.lockChanged.connect(askUnlock)
+        askUnlock()
         _mm.avatarReady.connect(takeAvatar)
         _mm.loggedInChanged.connect(function() {
             if (!_mm.loggedIn && nav.count() > 1)

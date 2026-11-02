@@ -159,7 +159,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | --- | --- | --- |
 | 🟢 | Server certificate checked against a current CA bundle | `assets/cacert.pem` |
 | 🔴 | Client certificates | `QSslConfiguration`, import screen needed |
-| 🔴 | App lock | No biometric API on BlackBerry 10. An app PIN would be the substitute |
+| 🟡 | App lock | Built: Settings, ACCOUNT, App lock with a PIN (stored as salted hash). Asked at start and after the app was in the background. No biometrics on BlackBerry 10. Not yet tested on the device |
 | ⚪ | Root and jailbreak blocking, screen-capture prevention | MDM |
 | ⚪ | Intune app protection, Zero Persistence Mode, Offline Persistence Timer, wipe notifications | MDM |
 

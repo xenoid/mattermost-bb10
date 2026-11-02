@@ -177,6 +177,30 @@ Page {
                 _mm.saveProfile(first, last, nick, position)
             }
         },
+        SystemPrompt {
+            id: pinPrompt
+            title: qsTr("Choose a PIN")
+            body: qsTr("At least 4 characters. Asked after the app was in the background.")
+            inputField.inputMode: SystemUiInputMode.Password
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Save")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.setAppLock(inputFieldTextEntry())
+            }
+        },
+        SystemDialog {
+            id: lockOffDialog
+            title: qsTr("App lock")
+            body: qsTr("Turn off the app lock?")
+            confirmButton.label: qsTr("Turn off")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.setAppLock("")
+            }
+        },
         SystemDialog {
             id: leaveTeamDialog
             title: qsTr("Leave team")
@@ -744,6 +768,43 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:711 onTapped"); leaveTeamDialog.show() }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Label {
+                    text: qsTr("App lock")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1b1f23")
+                    textStyle.fontSize: FontSize.Medium
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                Label {
+                    text: _mm.appLock ? qsTr("On") : qsTr("Off")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.Small
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: {
+                            if (Qt.mm) Qt.mm.traceLog("tap settings app lock")
+                            if (_mm.appLock)
+                                lockOffDialog.show()
+                            else
+                                pinPrompt.show()
+                        }
                     }
                 ]
             }

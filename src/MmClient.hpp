@@ -55,6 +55,8 @@ class MmClient : public QObject
     Q_PROPERTY(QString channelBanner READ channelBanner NOTIFY channelChanged)
     Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged)
     Q_PROPERTY(bool hasShare READ hasShare NOTIFY shareChanged)
+    Q_PROPERTY(bool appLock READ appLock NOTIFY prefsChanged)
+    Q_PROPERTY(bool locked READ locked NOTIFY lockChanged)
     Q_PROPERTY(QVariantMap profile READ profile NOTIFY profileChanged)
     Q_PROPERTY(bool trustReady READ trustReady CONSTANT)
     Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
@@ -71,6 +73,8 @@ public:
     QString channelBanner() const;
     bool recording() const { return !m_recordPath.isEmpty(); }
     bool hasShare() const { return !m_shareText.isEmpty() || !m_sharePath.isEmpty(); }
+    bool appLock() const;
+    bool locked() const { return m_locked; }
     QString teamName() const { return m_teamName; }
     QString iconSend() const { return m_iconSend; }
     QString iconSearch() const { return m_iconSearch; }
@@ -164,6 +168,9 @@ public:
     Q_INVOKABLE QString stopRecording();
     Q_INVOKABLE QString takeShareText();
     Q_INVOKABLE QString takeSharePath();
+    Q_INVOKABLE bool setAppLock(const QString &pin);
+    Q_INVOKABLE bool unlock(const QString &pin);
+    Q_INVOKABLE void askUnlockLater();
     Q_INVOKABLE void copyProblemReport();
     Q_INVOKABLE void saveDraft(const QString &channelId, const QString &text);
     Q_INVOKABLE QString draftFor(const QString &channelId) const;
@@ -222,6 +229,7 @@ signals:
     void notice(const QString &text);
     void recordingChanged();
     void shareChanged();
+    void lockChanged();
 
 private slots:
     void onFinished(QNetworkReply *reply);
@@ -337,6 +345,7 @@ private:
     void loadFlagged();
     void loadPresence();
     void finishMembers();
+    QString pinHash(const QString &salt, const QString &pin) const;
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);
@@ -502,6 +511,7 @@ private:
     QString m_recordPath;
     QString m_shareText;
     QString m_sharePath;
+    bool m_locked;
     QString m_lastPostId;
     QString m_postsSig;
     QString m_threadRoot;

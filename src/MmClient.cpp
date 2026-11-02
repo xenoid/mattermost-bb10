@@ -36,6 +36,8 @@
 #include <QSslError>
 #include <QSslSocket>
 #include <QUrl>
+#include <QUuid>
+#include <QCryptographicHash>
 #include <QtAlgorithms>
 #include <dlfcn.h>
 #include <fcntl.h>
@@ -277,6 +279,7 @@ MmClient::MmClient(QObject *parent)
     m_debugLog = settings.value("debugLog", false).toBool();
     g_traceOn = m_debugLog;
     m_recorder = 0;
+    m_locked = !settings.value("lockHash").toString().isEmpty();
     if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
         setLoggedIn(true);
         ensureLive();
@@ -1473,6 +1476,64 @@ void MmClient::openThreads()
     start(StepThreads, "/api/v4/users/" + m_userId + "/teams/" + m_teamId + "/threads?per_page=30");
 }
 
+bool MmClient::appLock() const
+{
+    return !QSettings("hollweck", "mattermost").value("lockHash").toString().isEmpty();
+}
+
+QString MmClient::pinHash(const QString &salt, const QString &pin) const
+{
+    return QString::fromLatin1(QCryptographicHash::hash((salt + ":" + pin).toUtf8(),
+                                                        QCryptographicHash::Sha1).toHex());
+}
+
+bool MmClient::setAppLock(const QString &pin)
+{
+    // Leere PIN schaltet die Sperre aus. Gespeichert wird nur ein Hash mit Salz.
+    QSettings settings("hollweck", "mattermost");
+    const QString trimmed = pin.trimmed();
+    if (trimmed.isEmpty()) {
+        settings.remove("lockHash");
+        settings.remove("lockSalt");
+        m_locked = false;
+        traceWrite("lock off");
+        emit prefsChanged();
+        emit lockChanged();
+        return true;
+    }
+    if (trimmed.length() < 4) {
+        emit notice(tr("The PIN needs at least 4 characters"));
+        return false;
+    }
+    const QString salt = QUuid::createUuid().toString();
+    settings.setValue("lockSalt", salt);
+    settings.setValue("lockHash", pinHash(salt, trimmed));
+    traceWrite("lock on");
+    emit prefsChanged();
+    emit notice(tr("App lock is on"));
+    return true;
+}
+
+bool MmClient::unlock(const QString &pin)
+{
+    QSettings settings("hollweck", "mattermost");
+    const QString hash = settings.value("lockHash").toString();
+    const bool ok = hash.isEmpty() || pinHash(settings.value("lockSalt").toString(), pin.trimmed()) == hash;
+    traceWrite(QString("unlock ok=%1").arg(ok ? 1 : 0));
+    if (ok) {
+        m_locked = false;
+        emit lockChanged();
+    }
+    return ok;
+}
+
+void MmClient::askUnlockLater()
+{
+    // Abgebrochen oder falsche PIN: die Abfrage kommt kurz danach wieder, solange gesperrt.
+    if (m_locked)
+        QTimer::singleShot(300, this, SIGNAL(lockChanged()));
+}
+
 QString MmClient::takeShareText()
 {
     const QString text = m_shareText;
@@ -1799,6 +1860,11 @@ void MmClient::onForeground()
 
 void MmClient::onBackground()
 {
+    // Mit App-Sperre ist die App nach dem Verkleinern wieder gesperrt.
+    if (appLock() && !m_locked) {
+        m_locked = true;
+        emit lockChanged();
+    }
     m_active = false;
     m_timer.setInterval(kBgPollMs);
     m_timer.start();
