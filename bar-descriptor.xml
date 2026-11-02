@@ -3,7 +3,7 @@
     <id>com.hollweck.mattermost</id>
     <name>Mattermost</name>
     <versionNumber>1.0.0</versionNumber>
-    <buildId>161</buildId>
+    <buildId>162</buildId>
     <description>Mattermost client for BlackBerry 10.</description>
     <author>hollweck</author>
     <initialWindow>
@@ -39,6 +39,16 @@
             <action>bb.action.SHARE</action>
             <mime-type>*</mime-type>
             <property var="uris" value="file://"/>
+        </filter>
+    </invoke-target>
+    <invoke-target id="com.hollweck.mattermost.sso">
+        <entry-point-id>Mattermost</entry-point-id>
+        <type>application</type>
+        <filter>
+            <action>bb.action.OPEN</action>
+            <action>bb.action.VIEW</action>
+            <mime-type>*</mime-type>
+            <property var="uris" value="mmauth://"/>
         </filter>
     </invoke-target>
     <invoke-target id="com.hollweck.mattermost.hub">

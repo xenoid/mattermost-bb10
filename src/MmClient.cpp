@@ -2090,8 +2090,55 @@ void MmClient::onTick()
     flushOutbox();
 }
 
+void MmClient::startSso(const QString &serverUrl, const QString &service)
+{
+    // Wie die Android-App: Anmeldung im Browser, der Server leitet mit dem Token auf mmauth:// zurück.
+    const QString server = normalizeUrl(serverUrl);
+    if (server.isEmpty()) {
+        setStatus(tr("Enter the server first"));
+        return;
+    }
+    QString path;
+    if (service == "saml")
+        path = "/login/sso/saml?action=mobile&redirect_to=";
+    else if (service == "gitlab" || service == "google" || service == "office365" || service == "openid")
+        path = "/oauth/" + service + "/mobile_login?redirect_to=";
+    else
+        return;
+    QSettings("hollweck", "mattermost").setValue("ssoServer", server);
+    traceWrite("sso start service=" + service);
+    setStatus(tr("Signing in in the browser…"));
+    openLink(server + path + QString::fromLatin1(QUrl::toPercentEncoding("mmauth://callback")));
+}
+
+void MmClient::finishSso(const QUrl &url)
+{
+    const QString token = url.queryItemValue("MMAUTHTOKEN");
+    const QString server = QSettings("hollweck", "mattermost").value("ssoServer").toString();
+    traceWrite(QString("sso back token=%1 server=%2").arg(token.isEmpty() ? 0 : 1).arg(server.isEmpty() ? 0 : 1));
+    if (token.isEmpty() || server.isEmpty()) {
+        setStatus(tr("Single sign-on did not return a session"));
+        return;
+    }
+    resetSession();
+    m_serverUrl = server;
+    m_token = token;
+    QSettings settings("hollweck", "mattermost");
+    settings.setValue("serverUrl", m_serverUrl);
+    settings.setValue("token", m_token);
+    settings.remove("ssoServer");
+    setLoggedIn(true);
+    emit sessionChanged();
+    ensureLive();
+    loadMe();
+}
+
 void MmClient::onInvoked(const bb::system::InvokeRequest &request)
 {
+    if (request.uri().scheme() == QLatin1String("mmauth")) {
+        finishSso(request.uri());
+        return;
+    }
     if (request.target() == QLatin1String("com.hollweck.mattermost.share")) {
         // Geteilter Text oder Datei wartet, bis der Nutzer einen Kanal öffnet.
         const QString uri = request.uri().toString();

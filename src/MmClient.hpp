@@ -17,6 +17,7 @@
 #include <QTimer>
 #include <QVariantList>
 #include <QVariantMap>
+#include <QUrl>
 
 namespace bb { namespace system { class InvokeManager; class InvokeRequest; } }
 namespace bb { namespace multimedia { class AudioRecorder; } }
@@ -170,6 +171,7 @@ public:
     Q_INVOKABLE void loadBookmarks(const QString &channelId);
     Q_INVOKABLE void openThreads();
     Q_INVOKABLE void loadRuns();
+    Q_INVOKABLE void startSso(const QString &serverUrl, const QString &service);
     Q_INVOKABLE QVariantList runTasks(const QString &runId) const;
     Q_INVOKABLE void toggleTask(const QString &runId, int checklist, int item, bool done);
     Q_INVOKABLE void loadPlaybooks();
@@ -372,6 +374,7 @@ private:
     QString pinHash(const QString &salt, const QString &pin) const;
     void sendScheduled(const QString &channelId, const QString &message);
     void runAction(const QString &path, const QByteArray &verb, const QVariantMap &body, const QString &doneText);
+    void finishSso(const QUrl &url);
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);

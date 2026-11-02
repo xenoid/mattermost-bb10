@@ -96,6 +96,24 @@ NavigationPane {
                     _mm.selectTeam(teamIds[selectedIndices[0]])
             }
         },
+        SystemListDialog {
+            id: ssoDialog
+            title: qsTr("Single sign-on")
+            dismissOnSelection: true
+            onCreationCompleted: {
+                appendItem("GitLab")
+                appendItem("Google")
+                appendItem("Office 365")
+                appendItem("OpenID Connect")
+                appendItem("SAML")
+            }
+            onFinished: {
+                if (value != SystemUiResult.ItemSelection || selectedIndices.length == 0)
+                    return
+                var services = ["gitlab", "google", "office365", "openid", "saml"]
+                _mm.startSso(serverField.text, services[selectedIndices[0]])
+            }
+        },
         SystemPrompt {
             id: mfaPrompt
             title: qsTr("One-time code")
@@ -318,6 +336,22 @@ NavigationPane {
                                 var server = serverField.text.trim().replace(/\/+$/, "")
                                 if (server.indexOf("http") == 0)
                                     _mm.openLink(server + "/reset_password")
+                            }
+                        }
+                    ]
+                }
+                Label {
+                    text: qsTr("Sign in with GitLab, Google, Office 365 or SAML")
+                    horizontalAlignment: HorizontalAlignment.Center
+                    topMargin: 16
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Small
+                    gestureHandlers: [
+                        TapHandler {
+                            onTapped: {
+                                if (Qt.mm) Qt.mm.traceLog("tap main.qml sso")
+                                ssoDialog.show()
                             }
                         }
                     ]

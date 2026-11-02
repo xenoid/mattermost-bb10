@@ -28,8 +28,8 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Join or leave a team | Built: join an open team and leave the current one, both from Settings, ACCOUNT. Invites to private teams are missing. Not yet tested on the device |
 | 🔴 | Several accounts or servers | `MmClient` is a singleton with fixed settings keys |
 | 🔴 | Authentication secret on server entry | Optional field, server setting |
-| 🔴 | Sign in with GitLab, Google or Entra ID (OAuth) | Needs an in-app browser spike first |
-| 🔴 | SAML (Okta, OneLogin, ADFS) | Same spike as OAuth |
+| 🟡 | Sign in with GitLab, Google or Entra ID (OAuth) | Built: the login page opens the server's mobile OAuth login (GitLab, Google, Office 365/Entra ID, OpenID) in the browser; the mmauth:// callback brings the token back into the app. The server must allow mmauth:// (default). Not yet tested on the device |
+| 🟡 | SAML (Okta, OneLogin, ADFS) | Built: same browser flow with the server's SAML mobile login. Not yet tested on the device |
 | 🔴 | Magic link for guests | Server v11.3 and later |
 | 🟡 | Forgot-password link | Built: opens `/reset_password` of the server in the browser. Not yet tested on the device |
 | 🔴 | AD/LDAP | Probably works through password login. To verify |
