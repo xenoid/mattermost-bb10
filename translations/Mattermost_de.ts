@@ -25,12 +25,12 @@
         <translation>Zertifikat nicht vertrauenswürdig</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1321"/>
+        <location filename="../src/MmClient.cpp" line="1322"/>
         <source>%1 is typing</source>
         <translation>%1 schreibt …</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1322"/>
+        <location filename="../src/MmClient.cpp" line="1323"/>
         <source>%1 are typing</source>
         <translation>%1 schreiben …</translation>
     </message>
@@ -40,672 +40,682 @@
         <translation>Keine Verbindung</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="317"/>
-        <location filename="../src/MmClient.cpp" line="329"/>
+        <location filename="../src/MmClient.cpp" line="318"/>
+        <location filename="../src/MmClient.cpp" line="330"/>
         <source>Yesterday</source>
         <translation>Gestern</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="327"/>
+        <location filename="../src/MmClient.cpp" line="328"/>
         <source>Today</source>
         <translation>Heute</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="418"/>
+        <location filename="../src/MmClient.cpp" line="419"/>
         <source>Channel</source>
         <translation>Kanal</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="433"/>
-        <location filename="../src/MmClient.cpp" line="442"/>
-        <location filename="../src/MmClient.cpp" line="3459"/>
+        <location filename="../src/MmClient.cpp" line="434"/>
+        <location filename="../src/MmClient.cpp" line="443"/>
+        <location filename="../src/MmClient.cpp" line="3519"/>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="554"/>
+        <location filename="../src/MmClient.cpp" line="555"/>
         <source>Restart Mattermost to change the design</source>
         <translation>Mattermost neu starten, um das Design zu wechseln</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="855"/>
-        <location filename="../src/MmClient.cpp" line="4421"/>
+        <location filename="../src/MmClient.cpp" line="856"/>
+        <location filename="../src/MmClient.cpp" line="4502"/>
         <source>No team on this account</source>
         <translation>Kein Team auf diesem Konto</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="875"/>
+        <location filename="../src/MmClient.cpp" line="876"/>
         <source>Choose a team</source>
         <translation>Team wählen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="888"/>
+        <location filename="../src/MmClient.cpp" line="889"/>
         <source>Server, name, and password are missing</source>
         <translation>Server, Name und Passwort fehlen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="892"/>
+        <location filename="../src/MmClient.cpp" line="893"/>
         <source>Trust store missing</source>
         <translation>Vertrauensspeicher fehlt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="903"/>
-        <location filename="../src/MmClient.cpp" line="927"/>
+        <location filename="../src/MmClient.cpp" line="904"/>
+        <location filename="../src/MmClient.cpp" line="928"/>
         <source>Signing in…</source>
         <translation>Melde an…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="911"/>
-        <location filename="../src/MmClient.cpp" line="935"/>
+        <location filename="../src/MmClient.cpp" line="912"/>
+        <location filename="../src/MmClient.cpp" line="936"/>
         <source>Sign-in cancelled</source>
         <translation>Anmeldung abgebrochen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="915"/>
+        <location filename="../src/MmClient.cpp" line="916"/>
         <source>Code missing</source>
         <translation>Code fehlt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1006"/>
+        <location filename="../src/MmClient.cpp" line="1007"/>
         <source>Messages are still waiting to be sent</source>
         <translation>Es warten noch Nachrichten auf das Senden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1058"/>
+        <location filename="../src/MmClient.cpp" line="1059"/>
         <source>Sign in to the other account</source>
         <translation>Beim anderen Konto anmelden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1095"/>
+        <location filename="../src/MmClient.cpp" line="1096"/>
         <source>Switched to %1</source>
         <translation>Gewechselt zu %1</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1458"/>
-        <location filename="../src/MmClient.cpp" line="1778"/>
-        <location filename="../src/MmClient.cpp" line="2022"/>
+        <location filename="../src/MmClient.cpp" line="1459"/>
+        <location filename="../src/MmClient.cpp" line="1779"/>
+        <location filename="../src/MmClient.cpp" line="2023"/>
         <source>Searching…</source>
         <translation>Suche…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1604"/>
-        <location filename="../src/MmClient.cpp" line="2138"/>
-        <location filename="../src/MmClient.cpp" line="2161"/>
-        <location filename="../src/MmClient.cpp" line="2718"/>
-        <location filename="../src/MmClient.cpp" line="2727"/>
-        <location filename="../src/MmClient.cpp" line="4136"/>
-        <location filename="../src/MmClient.cpp" line="4501"/>
+        <location filename="../src/MmClient.cpp" line="1605"/>
+        <location filename="../src/MmClient.cpp" line="2139"/>
+        <location filename="../src/MmClient.cpp" line="2162"/>
+        <location filename="../src/MmClient.cpp" line="2778"/>
+        <location filename="../src/MmClient.cpp" line="2787"/>
+        <location filename="../src/MmClient.cpp" line="4217"/>
+        <location filename="../src/MmClient.cpp" line="4582"/>
         <source>No user with that name</source>
         <translation>Kein Benutzer mit diesem Namen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1687"/>
+        <location filename="../src/MmClient.cpp" line="1688"/>
         <source>Run started</source>
         <translation>Run gestartet</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1696"/>
+        <location filename="../src/MmClient.cpp" line="1697"/>
         <source>Status update posted</source>
         <translation>Statusmeldung gesendet</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1707"/>
+        <location filename="../src/MmClient.cpp" line="1708"/>
         <source>Run updated</source>
         <translation>Run geändert</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1714"/>
+        <location filename="../src/MmClient.cpp" line="1715"/>
         <source>Run finished</source>
         <translation>Run beendet</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1808"/>
+        <location filename="../src/MmClient.cpp" line="1809"/>
         <source>The PIN needs at least 4 characters</source>
         <translation>Die PIN braucht mindestens 4 Zeichen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1816"/>
+        <location filename="../src/MmClient.cpp" line="1817"/>
         <source>App lock is on</source>
         <translation>App-Sperre ist an</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1881"/>
-        <location filename="../src/MmClient.cpp" line="1900"/>
+        <location filename="../src/MmClient.cpp" line="1882"/>
+        <location filename="../src/MmClient.cpp" line="1901"/>
         <source>Recording failed</source>
         <translation>Aufnahme fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1911"/>
+        <location filename="../src/MmClient.cpp" line="1912"/>
         <source>Test notification</source>
         <translation>Test-Benachrichtigung</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1915"/>
+        <location filename="../src/MmClient.cpp" line="1916"/>
         <source>Test notification sent to the hub</source>
         <translation>Test-Benachrichtigung im Hub</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1915"/>
+        <location filename="../src/MmClient.cpp" line="1916"/>
         <source>Notification failed</source>
         <translation>Benachrichtigung fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1924"/>
-        <location filename="../src/MmClient.cpp" line="1926"/>
+        <location filename="../src/MmClient.cpp" line="1925"/>
+        <location filename="../src/MmClient.cpp" line="1927"/>
         <source>Copied</source>
         <translation>Kopiert</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1924"/>
-        <location filename="../src/MmClient.cpp" line="1926"/>
+        <location filename="../src/MmClient.cpp" line="1925"/>
+        <location filename="../src/MmClient.cpp" line="1927"/>
         <source>Could not copy</source>
         <translation>Kopieren fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="1976"/>
+        <location filename="../src/MmClient.cpp" line="1977"/>
         <source>Use a time like 18:30 or minutes like 45</source>
         <translation>Zeit wie 18:30 oder Minuten wie 45 eingeben</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2042"/>
-        <location filename="../src/MmClient.cpp" line="4200"/>
+        <location filename="../src/MmClient.cpp" line="2043"/>
+        <location filename="../src/MmClient.cpp" line="4281"/>
         <source>Could not create the channel</source>
         <translation>Kanal konnte nicht angelegt werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2261"/>
+        <location filename="../src/MmClient.cpp" line="2262"/>
         <source>Enter an email address</source>
         <translation>E-Mail-Adresse eingeben</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2272"/>
+        <location filename="../src/MmClient.cpp" line="2273"/>
         <source>Invitation sent</source>
         <translation>Einladung verschickt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2272"/>
+        <location filename="../src/MmClient.cpp" line="2273"/>
         <source>Could not invite the guest (HTTP %1)</source>
         <translation>Gast konnte nicht eingeladen werden (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2293"/>
+        <location filename="../src/MmClient.cpp" line="2294"/>
         <source>Set</source>
         <translation>Gesetzt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2302"/>
+        <location filename="../src/MmClient.cpp" line="2303"/>
         <source>Could not read the certificate files</source>
         <translation>Zertifikatsdateien konnten nicht gelesen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2312"/>
+        <location filename="../src/MmClient.cpp" line="2313"/>
         <source>Certificate or key not readable (PEM, RSA or DSA)</source>
         <translation>Zertifikat oder Schlüssel nicht lesbar (PEM, RSA oder DSA)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2318"/>
+        <location filename="../src/MmClient.cpp" line="2319"/>
         <source>Could not store the certificate</source>
         <translation>Zertifikat konnte nicht gespeichert werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2329"/>
+        <location filename="../src/MmClient.cpp" line="2330"/>
         <source>Client certificate is set</source>
         <translation>Client-Zertifikat ist eingerichtet</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2376"/>
+        <location filename="../src/MmClient.cpp" line="2377"/>
         <source>Action sent</source>
         <translation>Aktion gesendet</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2376"/>
+        <location filename="../src/MmClient.cpp" line="2377"/>
         <source>The action failed (HTTP %1)</source>
         <translation>Die Aktion ist fehlgeschlagen (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2394"/>
+        <location filename="../src/MmClient.cpp" line="2454"/>
         <source>Enter the server first</source>
         <translation>Zuerst den Server eintragen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2406"/>
+        <location filename="../src/MmClient.cpp" line="2466"/>
         <source>Signing in in the browser…</source>
         <translation>Anmeldung im Browser…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2416"/>
+        <location filename="../src/MmClient.cpp" line="2476"/>
         <source>Single sign-on did not return a session</source>
         <translation>Single Sign-on hat keine Sitzung geliefert</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2449"/>
+        <location filename="../src/MmClient.cpp" line="2509"/>
         <source>Choose a channel to share into</source>
         <translation>Kanal zum Teilen auswählen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2497"/>
+        <location filename="../src/MmClient.cpp" line="2557"/>
         <source>%1 new messages, %2 mentions</source>
         <translation>%1 neue Nachrichten, %2 Erwähnungen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2499"/>
+        <location filename="../src/MmClient.cpp" line="2559"/>
         <source>%1 mentions</source>
         <translation>%1 Erwähnungen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2501"/>
+        <location filename="../src/MmClient.cpp" line="2561"/>
         <source>Mention</source>
         <translation>Erwähnung</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2503"/>
+        <location filename="../src/MmClient.cpp" line="2563"/>
         <source>New message</source>
         <translation>Neue Nachricht</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2505"/>
+        <location filename="../src/MmClient.cpp" line="2565"/>
         <source>%1 new messages</source>
         <translation>%1 neue Nachrichten</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2688"/>
+        <location filename="../src/MmClient.cpp" line="2748"/>
         <source>Invalid response from the server</source>
         <translation>Ungültige Antwort vom Server</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2690"/>
+        <location filename="../src/MmClient.cpp" line="2750"/>
         <source>Server error (HTTP %1)</source>
         <translation>Serverfehler (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2707"/>
-        <location filename="../src/MmClient.cpp" line="4371"/>
+        <location filename="../src/MmClient.cpp" line="2767"/>
+        <location filename="../src/MmClient.cpp" line="4452"/>
         <source>Could not load the members</source>
         <translation>Mitglieder konnten nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2711"/>
+        <location filename="../src/MmClient.cpp" line="2771"/>
         <source>Could not load the teams</source>
         <translation>Teams konnten nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2715"/>
+        <location filename="../src/MmClient.cpp" line="2775"/>
         <source>Could not join the team</source>
         <translation>Team konnte nicht beigetreten werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2721"/>
+        <location filename="../src/MmClient.cpp" line="2781"/>
         <source>Could not add the member</source>
         <translation>Mitglied konnte nicht hinzugefügt werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2724"/>
+        <location filename="../src/MmClient.cpp" line="2784"/>
         <source>Could not remove the member</source>
         <translation>Mitglied konnte nicht entfernt werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2734"/>
+        <location filename="../src/MmClient.cpp" line="2794"/>
         <source>Could not acknowledge</source>
         <translation>Bestätigen fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2737"/>
+        <location filename="../src/MmClient.cpp" line="2797"/>
         <source>Could not load the bookmarks</source>
         <translation>Lesezeichen konnten nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2746"/>
+        <location filename="../src/MmClient.cpp" line="2806"/>
         <source>No agents or bots visible for this account</source>
         <translation>Für dieses Konto sind keine Agenten oder Bots sichtbar</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2750"/>
+        <location filename="../src/MmClient.cpp" line="2810"/>
         <source>Playbooks are not available on this server</source>
         <translation>Playbooks gibt es auf diesem Server nicht</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2750"/>
+        <location filename="../src/MmClient.cpp" line="2810"/>
         <source>Could not load the runs</source>
         <translation>Runs konnten nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2754"/>
+        <location filename="../src/MmClient.cpp" line="2814"/>
         <source>Could not load the playbooks</source>
         <translation>Playbooks konnten nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3981"/>
+        <location filename="../src/MmClient.cpp" line="4041"/>
         <source>The authentication secret is missing or wrong</source>
         <translation>Das Authentifizierungs-Secret fehlt oder ist falsch</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4000"/>
+        <location filename="../src/MmClient.cpp" line="4057"/>
+        <source>Sent</source>
+        <translation>Gesendet</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="4062"/>
+        <source>The dialog could not be sent (HTTP %1)</source>
+        <translation>Der Dialog konnte nicht gesendet werden (HTTP %1)</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="4081"/>
         <source>Could not change the task</source>
         <translation>Aufgabe konnte nicht geändert werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2758"/>
+        <location filename="../src/MmClient.cpp" line="2818"/>
         <source>Could not load the threads</source>
         <translation>Threads konnten nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2768"/>
+        <location filename="../src/MmClient.cpp" line="2828"/>
         <source>Offline. Saved thread.</source>
         <translation>Offline. Gespeicherter Thread.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2779"/>
+        <location filename="../src/MmClient.cpp" line="2839"/>
         <source>Offline. Saved channels.</source>
         <translation>Offline. Gespeicherte Kanäle.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2787"/>
+        <location filename="../src/MmClient.cpp" line="2847"/>
         <source>Offline. Saved messages.</source>
         <translation>Offline. Gespeicherte Nachrichten.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2802"/>
+        <location filename="../src/MmClient.cpp" line="2862"/>
         <source>Loading account…</source>
         <translation>Lade Konto…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2834"/>
+        <location filename="../src/MmClient.cpp" line="2894"/>
         <source>Loading channels…</source>
         <translation>Lade Kanäle…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2877"/>
-        <location filename="../src/MmClient.cpp" line="2934"/>
+        <location filename="../src/MmClient.cpp" line="2937"/>
+        <location filename="../src/MmClient.cpp" line="2994"/>
         <source>Loading messages…</source>
         <translation>Lade Nachrichten…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2894"/>
+        <location filename="../src/MmClient.cpp" line="2954"/>
         <source>Loading older messages…</source>
         <translation>Lade ältere Nachrichten…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3097"/>
+        <location filename="../src/MmClient.cpp" line="3157"/>
         <source>Message not loaded</source>
         <translation>Nachricht nicht geladen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3296"/>
+        <location filename="../src/MmClient.cpp" line="3356"/>
         <source>Urgent</source>
         <translation>Dringend</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3298"/>
+        <location filename="../src/MmClient.cpp" line="3358"/>
         <source>Important</source>
         <translation>Wichtig</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3393"/>
+        <location filename="../src/MmClient.cpp" line="3453"/>
         <source>+%1 more images</source>
         <translation>+%1 weitere Bilder</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3411"/>
+        <location filename="../src/MmClient.cpp" line="3471"/>
         <source>Acknowledged by %1</source>
         <translation>Bestätigt von %1</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3433"/>
+        <location filename="../src/MmClient.cpp" line="3493"/>
         <source>1 reply</source>
         <translation>1 Antwort</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3435"/>
-        <location filename="../src/MmClient.cpp" line="4954"/>
+        <location filename="../src/MmClient.cpp" line="3495"/>
+        <location filename="../src/MmClient.cpp" line="5035"/>
         <source>%1 replies</source>
         <translation>%1 Antworten</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3447"/>
+        <location filename="../src/MmClient.cpp" line="3507"/>
         <source>You</source>
         <translation>Du</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3457"/>
+        <location filename="../src/MmClient.cpp" line="3517"/>
         <source>you</source>
         <translation>dich</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3458"/>
+        <location filename="../src/MmClient.cpp" line="3518"/>
         <source>Reply</source>
         <translation>Antwort</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3460"/>
+        <location filename="../src/MmClient.cpp" line="3520"/>
         <source>Reply to %1</source>
         <translation>Antwort an %1</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3657"/>
+        <location filename="../src/MmClient.cpp" line="3717"/>
         <source>Image could not be loaded</source>
         <translation>Bild konnte nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3660"/>
+        <location filename="../src/MmClient.cpp" line="3720"/>
         <source>Attachment could not be loaded</source>
         <translation>Anhang konnte nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3745"/>
+        <location filename="../src/MmClient.cpp" line="3805"/>
         <source>Loading image…</source>
         <translation>Lade Bild…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3764"/>
+        <location filename="../src/MmClient.cpp" line="3824"/>
         <source>Loading attachment…</source>
         <translation>Lade Anhang…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3800"/>
+        <location filename="../src/MmClient.cpp" line="3860"/>
         <source>Note to self</source>
         <translation>Notiz an mich</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3858"/>
+        <location filename="../src/MmClient.cpp" line="3918"/>
         <source>FAVORITES</source>
         <translation>FAVORITEN</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3860"/>
-        <location filename="../src/MmClient.cpp" line="3885"/>
+        <location filename="../src/MmClient.cpp" line="3920"/>
+        <location filename="../src/MmClient.cpp" line="3945"/>
         <source>CHANNELS</source>
         <translation>KANÄLE</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3862"/>
-        <location filename="../src/MmClient.cpp" line="3893"/>
+        <location filename="../src/MmClient.cpp" line="3922"/>
+        <location filename="../src/MmClient.cpp" line="3953"/>
         <source>DIRECT</source>
         <translation>DIREKT</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4002"/>
+        <location filename="../src/MmClient.cpp" line="4083"/>
         <source>Playbook action failed (HTTP %1)</source>
         <translation>Playbook-Aktion fehlgeschlagen (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4009"/>
+        <location filename="../src/MmClient.cpp" line="4090"/>
         <source>Message scheduled for %1</source>
         <translation>Nachricht geplant für %1</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4011"/>
+        <location filename="../src/MmClient.cpp" line="4092"/>
         <source>Could not schedule the message (HTTP %1)</source>
         <translation>Nachricht konnte nicht geplant werden (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4051"/>
+        <location filename="../src/MmClient.cpp" line="4132"/>
         <source>Code is wrong</source>
         <translation>Code stimmt nicht</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4052"/>
+        <location filename="../src/MmClient.cpp" line="4133"/>
         <source>One-time code required</source>
         <translation>Einmalcode nötig</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4058"/>
+        <location filename="../src/MmClient.cpp" line="4139"/>
         <source>Name or password is wrong</source>
         <translation>Name oder Passwort stimmt nicht</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4061"/>
+        <location filename="../src/MmClient.cpp" line="4142"/>
         <source>Session expired. Please sign in again.</source>
         <translation>Sitzung abgelaufen. Bitte neu anmelden.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4117"/>
+        <location filename="../src/MmClient.cpp" line="4198"/>
         <source>Could not change notifications</source>
         <translation>Benachrichtigungen konnten nicht geändert werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4153"/>
+        <location filename="../src/MmClient.cpp" line="4234"/>
         <source>Left the team</source>
         <translation>Team verlassen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4156"/>
+        <location filename="../src/MmClient.cpp" line="4237"/>
         <source>Could not leave the team</source>
         <translation>Team konnte nicht verlassen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4163"/>
+        <location filename="../src/MmClient.cpp" line="4244"/>
         <source>Channel archived</source>
         <translation>Kanal archiviert</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4169"/>
+        <location filename="../src/MmClient.cpp" line="4250"/>
         <source>Could not archive the channel</source>
         <translation>Kanal konnte nicht archiviert werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4188"/>
+        <location filename="../src/MmClient.cpp" line="4269"/>
         <source>Channel updated</source>
         <translation>Kanal aktualisiert</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4191"/>
+        <location filename="../src/MmClient.cpp" line="4272"/>
         <source>Could not change the channel</source>
         <translation>Kanal konnte nicht geändert werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4351"/>
+        <location filename="../src/MmClient.cpp" line="4432"/>
         <source>Profile saved</source>
         <translation>Profil gespeichert</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4353"/>
+        <location filename="../src/MmClient.cpp" line="4434"/>
         <source>Could not save the profile</source>
         <translation>Profil konnte nicht gespeichert werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4176"/>
+        <location filename="../src/MmClient.cpp" line="4257"/>
         <source>Left the channel</source>
         <translation>Kanal verlassen</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4182"/>
+        <location filename="../src/MmClient.cpp" line="4263"/>
         <source>Could not leave the channel</source>
         <translation>Kanal konnte nicht verlassen werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4197"/>
+        <location filename="../src/MmClient.cpp" line="4278"/>
         <source>Channel created</source>
         <translation>Kanal angelegt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4206"/>
+        <location filename="../src/MmClient.cpp" line="4287"/>
         <source>Direct message ready</source>
         <translation>Direktnachricht ist bereit</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4209"/>
+        <location filename="../src/MmClient.cpp" line="4290"/>
         <source>Could not start the direct message</source>
         <translation>Direktnachricht konnte nicht gestartet werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4229"/>
-        <location filename="../src/MmClient.cpp" line="4239"/>
+        <location filename="../src/MmClient.cpp" line="4310"/>
+        <location filename="../src/MmClient.cpp" line="4320"/>
         <source>Could not change status</source>
         <translation>Status konnte nicht geändert werden</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4316"/>
+        <location filename="../src/MmClient.cpp" line="4397"/>
         <source>No token in the response</source>
         <translation>Kein Token in der Antwort</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4430"/>
+        <location filename="../src/MmClient.cpp" line="4511"/>
         <source>Acknowledged</source>
         <translation>Bestätigt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4447"/>
+        <location filename="../src/MmClient.cpp" line="4528"/>
         <source>File</source>
         <translation>Datei</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4517"/>
+        <location filename="../src/MmClient.cpp" line="4598"/>
         <source>Member added</source>
         <translation>Mitglied hinzugefügt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4519"/>
+        <location filename="../src/MmClient.cpp" line="4600"/>
         <source>Member removed</source>
         <translation>Mitglied entfernt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4572"/>
+        <location filename="../src/MmClient.cpp" line="4653"/>
         <source>Joined the team</source>
         <translation>Team beigetreten</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4598"/>
+        <location filename="../src/MmClient.cpp" line="4679"/>
         <source>Conversation</source>
         <translation>Unterhaltung</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4913"/>
+        <location filename="../src/MmClient.cpp" line="4994"/>
         <source>%1 of %2 tasks done</source>
         <translation>%1 von %2 Aufgaben erledigt</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4957"/>
+        <location filename="../src/MmClient.cpp" line="5038"/>
         <source>%1 new</source>
         <translation>%1 neu</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5062"/>
+        <location filename="../src/MmClient.cpp" line="5143"/>
         <source>Sending…</source>
         <translation>Senden…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5127"/>
+        <location filename="../src/MmClient.cpp" line="5208"/>
         <source>Sending</source>
         <translation>Wird gesendet</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5241"/>
-        <location filename="../src/MmClient.cpp" line="5255"/>
+        <location filename="../src/MmClient.cpp" line="5322"/>
+        <location filename="../src/MmClient.cpp" line="5336"/>
         <source>File is not readable</source>
         <translation>Datei nicht lesbar</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5576"/>
+        <location filename="../src/MmClient.cpp" line="5657"/>
         <source>No connection. It will be sent when you are online.</source>
         <translation>Keine Verbindung. Wird gesendet, sobald du online bist.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5586"/>
+        <location filename="../src/MmClient.cpp" line="5667"/>
         <source>Not sent</source>
         <translation>Nicht gesendet</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5624"/>
+        <location filename="../src/MmClient.cpp" line="5705"/>
         <source>Loading thread…</source>
         <translation>Lade Thread…</translation>
     </message>
@@ -847,6 +857,14 @@
     </message>
 </context>
 <context>
+    <name>dialog</name>
+    <message>
+        <location filename="../assets/dialog.qml" line="58"/>
+        <source>Submit</source>
+        <translation>Absenden</translation>
+    </message>
+</context>
+<context>
     <name>image</name>
     <message>
         <location filename="../assets/image.qml" line="9"/>
@@ -870,120 +888,120 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../assets/main.qml" line="83"/>
+        <location filename="../assets/main.qml" line="87"/>
         <source>React</source>
         <translation>Reagieren</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="92"/>
+        <location filename="../assets/main.qml" line="96"/>
         <source>Team</source>
         <translation>Team</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="134"/>
+        <location filename="../assets/main.qml" line="138"/>
         <source>One-time code</source>
         <translation>Einmalcode</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="135"/>
+        <location filename="../assets/main.qml" line="139"/>
         <source>Code from the authenticator app</source>
         <translation>Code aus der Authenticator-App</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="138"/>
-        <location filename="../assets/main.qml" line="340"/>
+        <location filename="../assets/main.qml" line="142"/>
+        <location filename="../assets/main.qml" line="354"/>
         <source>Sign in</source>
         <translation>Anmelden</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="47"/>
-        <location filename="../assets/main.qml" line="63"/>
-        <location filename="../assets/main.qml" line="75"/>
-        <location filename="../assets/main.qml" line="107"/>
-        <location filename="../assets/main.qml" line="139"/>
+        <location filename="../assets/main.qml" line="51"/>
+        <location filename="../assets/main.qml" line="67"/>
+        <location filename="../assets/main.qml" line="79"/>
+        <location filename="../assets/main.qml" line="111"/>
+        <location filename="../assets/main.qml" line="143"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="42"/>
+        <location filename="../assets/main.qml" line="46"/>
         <source>Mattermost is locked</source>
         <translation>Mattermost ist gesperrt</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="43"/>
+        <location filename="../assets/main.qml" line="47"/>
         <source>Enter your PIN</source>
         <translation>PIN eingeben</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="46"/>
+        <location filename="../assets/main.qml" line="50"/>
         <source>Unlock</source>
         <translation>Entsperren</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="60"/>
-        <location filename="../assets/main.qml" line="556"/>
+        <location filename="../assets/main.qml" line="64"/>
+        <location filename="../assets/main.qml" line="570"/>
         <source>Leave channel</source>
         <translation>Kanal verlassen</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="61"/>
+        <location filename="../assets/main.qml" line="65"/>
         <source>You can join again later.</source>
         <translation>Du kannst dem Kanal später wieder beitreten.</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="62"/>
+        <location filename="../assets/main.qml" line="66"/>
         <source>Leave</source>
         <translation>Verlassen</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="72"/>
-        <location filename="../assets/main.qml" line="564"/>
+        <location filename="../assets/main.qml" line="76"/>
+        <location filename="../assets/main.qml" line="578"/>
         <source>Archive channel</source>
         <translation>Kanal archivieren</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="73"/>
+        <location filename="../assets/main.qml" line="77"/>
         <source>Nobody can post in it afterwards.</source>
         <translation>Danach kann niemand mehr darin schreiben.</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="74"/>
+        <location filename="../assets/main.qml" line="78"/>
         <source>Archive</source>
         <translation>Archivieren</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="102"/>
-        <location filename="../assets/main.qml" line="551"/>
+        <location filename="../assets/main.qml" line="106"/>
+        <location filename="../assets/main.qml" line="565"/>
         <source>Invite guest</source>
         <translation>Gast einladen</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="103"/>
+        <location filename="../assets/main.qml" line="107"/>
         <source>Email address. The guest gets access to this channel only.</source>
         <translation>E-Mail-Adresse. Der Gast bekommt nur Zugang zu diesem Kanal.</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="106"/>
+        <location filename="../assets/main.qml" line="110"/>
         <source>Invite</source>
         <translation>Einladen</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="115"/>
+        <location filename="../assets/main.qml" line="119"/>
         <source>Single sign-on</source>
         <translation>Single Sign-on</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="335"/>
+        <location filename="../assets/main.qml" line="349"/>
         <source>Authentication secret (optional)</source>
         <translation>Authentifizierungs-Secret (optional)</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="366"/>
+        <location filename="../assets/main.qml" line="380"/>
         <source>Sign in with GitLab, Google, Office 365 or SAML</source>
         <translation>Mit GitLab, Google, Office 365 oder SAML anmelden</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="418"/>
+        <location filename="../assets/main.qml" line="432"/>
         <source>Search, also from: in: before: after:</source>
         <translation>Suchen, auch from: in: before: after:</translation>
     </message>
@@ -992,33 +1010,33 @@
         <translation type="obsolete">Sichern</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="258"/>
-        <location filename="../assets/main.qml" line="298"/>
+        <location filename="../assets/main.qml" line="272"/>
+        <location filename="../assets/main.qml" line="312"/>
         <source>Mattermost</source>
         <translation>Mattermost</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="304"/>
+        <location filename="../assets/main.qml" line="318"/>
         <source>Sign in to a server</source>
         <translation>Anmeldung am Server</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="312"/>
+        <location filename="../assets/main.qml" line="326"/>
         <source>Server, for example https://chat.example.com</source>
         <translation>Server, z. B. https://chat.example.de</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="319"/>
+        <location filename="../assets/main.qml" line="333"/>
         <source>Name or email</source>
         <translation>Name oder E-Mail</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="326"/>
+        <location filename="../assets/main.qml" line="340"/>
         <source>Password</source>
         <translation>Passwort</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="347"/>
+        <location filename="../assets/main.qml" line="361"/>
         <source>Forgot password?</source>
         <translation>Passwort vergessen?</translation>
     </message>
@@ -1027,27 +1045,27 @@
         <translation type="obsolete">Nachrichten suchen</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="539"/>
+        <location filename="../assets/main.qml" line="553"/>
         <source>Notifications</source>
         <translation>Benachrichtigungen</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="543"/>
+        <location filename="../assets/main.qml" line="557"/>
         <source>Members</source>
         <translation>Mitglieder</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="547"/>
+        <location filename="../assets/main.qml" line="561"/>
         <source>Bookmarks</source>
         <translation>Lesezeichen</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="572"/>
+        <location filename="../assets/main.qml" line="586"/>
         <source>Edit header</source>
         <translation>Kopfzeile bearbeiten</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="502"/>
+        <location filename="../assets/main.qml" line="516"/>
         <source>Not possible in direct messages</source>
         <translation>Bei Direktnachrichten nicht möglich</translation>
     </message>
@@ -1056,7 +1074,7 @@
         <translation type="obsolete">Kopfzeile des Kanals</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="579"/>
+        <location filename="../assets/main.qml" line="593"/>
         <source>Edit purpose</source>
         <translation>Zweck bearbeiten</translation>
     </message>
@@ -1065,12 +1083,12 @@
         <translation type="obsolete">Zweck des Kanals</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="786"/>
+        <location filename="../assets/main.qml" line="800"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="787"/>
+        <location filename="../assets/main.qml" line="801"/>
         <source>Account, display, diagnostics</source>
         <translation>Konto, Anzeige, Diagnose</translation>
     </message>

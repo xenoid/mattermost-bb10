@@ -180,6 +180,7 @@ public:
     Q_INVOKABLE void switchAccount(const QString &key);
     Q_INVOKABLE void doPostAction(const QString &postId, const QString &actionId);
     Q_INVOKABLE void loadAgents();
+    Q_INVOKABLE void submitDialog(const QVariantMap &values);
     Q_INVOKABLE void inviteGuest(const QString &channelId, const QString &email);
     Q_INVOKABLE bool setClientCertificate(const QString &certPath, const QString &keyPath, const QString &passphrase);
     Q_INVOKABLE void clearClientCertificate();
@@ -258,6 +259,8 @@ signals:
     void runsLoaded(const QVariantList &rows);
     void playbooksLoaded(const QVariantList &rows);
     void agentsLoaded(const QVariantList &rows);
+    void dialogOpened(const QVariantMap &spec);
+    void dialogClosed();
     void notice(const QString &text);
     void recordingChanged();
     void shareChanged();
@@ -275,6 +278,7 @@ private slots:
     void ensureLive();
     void onLiveReady();
     void onLiveFailed();
+    void onDialog(const QString &text);
     void onRemoteTyping(const QString &channelId, const QString &userId, const QString &parentId);
     void sweepTyping();
 
@@ -338,7 +342,8 @@ private:
         StepProfileAttrs,
         StepProfileFields,
         StepAgents,
-        StepBots
+        StepBots,
+        StepDialogSubmit
     };
 
     enum FileKind {
@@ -569,6 +574,9 @@ private:
     QVariantMap m_lookupUser;
     QVariantMap m_lookupAttrs;
     QHash<QString, QString> m_attrFields;
+    QString m_dialogUrl;
+    QString m_dialogCallback;
+    QString m_dialogState;
     bb::multimedia::AudioRecorder *m_recorder;
     QString m_recordPath;
     QString m_shareText;

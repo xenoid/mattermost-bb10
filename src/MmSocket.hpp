@@ -24,6 +24,7 @@ signals:
     void ready();
     void failed();
     void typing(const QString &channelId, const QString &userId, const QString &parentId);
+    void dialog(const QString &json);
 
 private slots:
     void onConnected();

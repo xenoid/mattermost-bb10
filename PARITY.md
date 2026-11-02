@@ -75,7 +75,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🔴 | Edit or delete attachments on existing posts | Android 2.31 |
 | 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Device test 2026-11-02: no preview shows for a Reddit link. Not yet checked whether the server sends previews. Image and permalink previews are missing |
 | 🟡 | Message attachments and interactive buttons | Built: bot attachments (pretext, title, text, fields) show under the message; their buttons are in the long-press menu under Actions. Select menus are missing. Not yet tested on the device |
-| 🔴 | Interactive dialogs | Multiselect, dynamic search, several steps |
+| 🟡 | Interactive dialogs | Built: an open_dialog event from the websocket opens a page with text, text area, select, radio and yes/no fields; Submit posts the values and shows field errors. Dynamic user and channel lists and multi-step dialogs are missing. Not yet tested on the device |
 | 🔴 | Mattermost Blocks | Android 2.43 |
 | 🟡 | Post priority | Built: shows the Urgent and Important labels; the + page sets Important or Urgent for the next channel message. Not for replies or files. Sending not yet tested on the device |
 | 🟡 | Acknowledgements | Built: posts that ask for it show how many acknowledged, and the long-press menu has Acknowledge. Asking for acknowledgement when sending is missing. Not yet tested on the device |

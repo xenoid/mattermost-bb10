@@ -265,6 +265,7 @@ MmClient::MmClient(QObject *parent)
     connect(&m_live, SIGNAL(failed()), this, SLOT(onLiveFailed()));
     connect(&m_live, SIGNAL(typing(QString,QString,QString)),
             this, SLOT(onRemoteTyping(QString,QString,QString)));
+    connect(&m_live, SIGNAL(dialog(QString)), this, SLOT(onDialog(QString)));
     m_liveTimer.setSingleShot(true);
     m_liveTimer.setInterval(8000);
     connect(&m_liveTimer, SIGNAL(timeout()), this, SLOT(ensureLive()));
@@ -2386,6 +2387,65 @@ void MmClient::loadAgents()
     start(StepAgents, "/plugins/mattermost-ai/ai_bots", QByteArray(), "GET", true);
 }
 
+void MmClient::onDialog(const QString &text)
+{
+    JsonDataAccess json;
+    const QVariantMap request = json.loadFromBuffer(text.toUtf8()).toMap();
+    const QVariantMap dialog = request.value("dialog").toMap();
+    if (json.hasError() || dialog.isEmpty())
+        return;
+    m_dialogUrl = request.value("url").toString();
+    m_dialogCallback = dialog.value("callback_id").toString();
+    m_dialogState = dialog.value("state").toString();
+    QVariantList elements;
+    const QVariantList source = dialog.value("elements").toList();
+    for (int i = 0; i < source.size(); ++i) {
+        const QVariantMap e = source.at(i).toMap();
+        QVariantMap row;
+        row["name"] = e.value("name").toString();
+        row["label"] = repairText(e.value("display_name").toString());
+        row["type"] = e.value("type").toString();
+        row["value"] = e.value("default").toString();
+        row["placeholder"] = repairText(e.value("placeholder").toString());
+        row["optional"] = e.value("optional").toBool();
+        QVariantList options;
+        const QVariantList opts = e.value("options").toList();
+        for (int k = 0; k < opts.size(); ++k) {
+            QVariantMap option;
+            option["text"] = repairText(opts.at(k).toMap().value("text").toString());
+            option["value"] = opts.at(k).toMap().value("value").toString();
+            options.append(option);
+        }
+        row["options"] = options;
+        elements.append(row);
+    }
+    QVariantMap spec;
+    spec["title"] = repairText(dialog.value("title").toString());
+    spec["intro"] = repairText(dialog.value("introduction_text").toString());
+    spec["submit"] = repairText(dialog.value("submit_label").toString());
+    spec["elements"] = elements;
+    traceWrite(QString("dialog open elements=%1").arg(elements.size()));
+    emit dialogOpened(spec);
+}
+
+void MmClient::submitDialog(const QVariantMap &values)
+{
+    if (m_dialogUrl.isEmpty())
+        return;
+    QVariantMap body;
+    body["url"] = m_dialogUrl;
+    body["callback_id"] = m_dialogCallback;
+    body["state"] = m_dialogState;
+    body["submission"] = values;
+    body["channel_id"] = m_channelId;
+    body["team_id"] = m_teamId;
+    body["cancelled"] = false;
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    start(StepDialogSubmit, "/api/v4/actions/dialogs/submit", bytes, "POST");
+}
+
 void MmClient::startSso(const QString &serverUrl, const QString &service)
 {
     // Wie die Android-App: Anmeldung im Browser, der Server leitet mit dem Token auf mmauth:// zurück.
@@ -3981,6 +4041,27 @@ void MmClient::onFinished(QNetworkReply *reply)
         setStatus(tr("The authentication secret is missing or wrong"));
         if (step == StepLogin)
             return;
+    }
+    if (step == StepDialogSubmit) {
+        // Der Server antwortet mit 200, auch wenn die Integration Feldfehler meldet.
+        JsonDataAccess answerJson;
+        const QVariantMap answer = answerJson.loadFromBuffer(payload).toMap();
+        QStringList problems;
+        if (!answer.value("error").toString().isEmpty())
+            problems.append(answer.value("error").toString());
+        const QVariantMap fieldErrors = answer.value("errors").toMap();
+        QMap<QString, QVariant>::const_iterator it = fieldErrors.constBegin();
+        for (; it != fieldErrors.constEnd(); ++it)
+            problems.append(it.key() + ": " + it.value().toString());
+        if (http >= 200 && http < 300 && netCode == 0 && problems.isEmpty()) {
+            emit notice(tr("Sent"));
+            emit dialogClosed();
+        } else if (!problems.isEmpty()) {
+            emit notice(problems.join("\n"));
+        } else {
+            emit notice(tr("The dialog could not be sent (HTTP %1)").arg(http));
+        }
+        return;
     }
     if (step == StepNotice) {
         if (http >= 200 && http < 300 && netCode == 0)

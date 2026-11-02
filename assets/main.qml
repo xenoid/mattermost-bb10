@@ -37,6 +37,10 @@ NavigationPane {
             id: bookmarksDef
             source: "asset:///bookmarks.qml"
         },
+        ComponentDefinition {
+            id: dialogDef
+            source: "asset:///dialog.qml"
+        },
         SystemPrompt {
             id: lockPrompt
             title: qsTr("Mattermost is locked")
@@ -179,6 +183,16 @@ NavigationPane {
         page.field = field
         page.current = current ? current : ""
         page.navPane = nav
+        nav.push(page)
+    }
+
+    // Interaktiver Dialog einer Integration, zum Beispiel nach einem Slash-Befehl.
+    function openDialog(spec) {
+        var page = make(dialogDef)
+        if (!page)
+            return
+        page.navPane = nav
+        page.build(spec)
         nav.push(page)
     }
 
@@ -839,6 +853,7 @@ NavigationPane {
         _mm.channelsLoaded.connect(takeChannels)
         _mm.notice.connect(showNotice)
         _mm.lockChanged.connect(askUnlock)
+        _mm.dialogOpened.connect(openDialog)
         askUnlock()
         _mm.avatarReady.connect(takeAvatar)
         _mm.loggedInChanged.connect(function() {

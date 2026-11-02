@@ -264,6 +264,11 @@ void MmSocket::handleText(const QByteArray &payload)
     if (json.hasError())
         return;
     const QVariantMap msg = parsed.toMap();
+    // Interaktive Dialoge kommen als JSON-Text im Feld "dialog".
+    if (msg.value("event").toString() == QLatin1String("open_dialog")) {
+        emit dialog(msg.value("data").toMap().value("dialog").toString());
+        return;
+    }
     if (msg.value("event").toString() != QLatin1String("typing"))
         return;
     const QVariantMap data = msg.value("data").toMap();
