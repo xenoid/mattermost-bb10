@@ -437,18 +437,26 @@ NavigationPane {
                                         }
                                         ActionItem {
                                             title: qsTr("Edit header")
-                                            enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
                                             onTriggered: {
-                                                _mm.traceLog("menu: Edit header tapped")
-                                                nav.openChannelText(ListItemData.channelId, "header", ListItemData.header)
+                                                _mm.traceLog("menu: Edit header tapped kind=" + ListItemData.kind + " channel=" + ListItemData.channelId)
+                                                if (ListItemData.kind == "O" || ListItemData.kind == "P")
+                                                    nav.openChannelText(ListItemData.channelId, "header", ListItemData.header)
+                                                else {
+                                                    toast.body = qsTr("Not possible in direct messages")
+                                                    toast.show()
+                                                }
                                             }
                                         }
                                         ActionItem {
                                             title: qsTr("Edit purpose")
-                                            enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
                                             onTriggered: {
-                                                _mm.traceLog("menu: Edit purpose tapped")
-                                                nav.openChannelText(ListItemData.channelId, "purpose", ListItemData.purpose)
+                                                _mm.traceLog("menu: Edit purpose tapped kind=" + ListItemData.kind + " channel=" + ListItemData.channelId)
+                                                if (ListItemData.kind == "O" || ListItemData.kind == "P")
+                                                    nav.openChannelText(ListItemData.channelId, "purpose", ListItemData.purpose)
+                                                else {
+                                                    toast.body = qsTr("Not possible in direct messages")
+                                                    toast.show()
+                                                }
                                             }
                                         }
                                     }
