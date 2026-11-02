@@ -1,4 +1,5 @@
 import bb.cascades 1.3
+import bb.system 1.2
 
 // Offene Teams, denen der Nutzer noch nicht angehört. Ein Tipp tritt dem Team bei.
 Page {
@@ -32,6 +33,22 @@ Page {
     onCreationCompleted: {
         _mm.openTeamsLoaded.connect(takeRows)
     }
+
+    attachedObjects: [
+        SystemPrompt {
+            id: invitePrompt
+            title: qsTr("Invite link")
+            body: qsTr("Paste the team invite link.")
+            inputField.inputMode: SystemUiInputMode.Url
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Join")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.joinTeamByInvite(inputFieldTextEntry())
+            }
+        }
+    ]
 
     Container {
         background: Color.White
@@ -97,6 +114,21 @@ Page {
                 if (item && item.id)
                     _mm.joinTeam(item.id)
             }
+        }
+
+        Label {
+            text: qsTr("Join with an invite link")
+            horizontalAlignment: HorizontalAlignment.Center
+            verticalAlignment: VerticalAlignment.Bottom
+            bottomMargin: 30
+            textFormat: TextFormat.Plain
+            textStyle.color: Color.create("#1c58d9")
+            textStyle.fontSize: FontSize.Medium
+            gestureHandlers: [
+                TapHandler {
+                    onTapped: { _mm.traceLog("tap jointeam invite"); invitePrompt.show() }
+                }
+            ]
         }
     }
 }

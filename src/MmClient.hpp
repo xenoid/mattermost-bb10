@@ -58,6 +58,8 @@ class MmClient : public QObject
     Q_PROPERTY(QString nextPriority READ nextPriority NOTIFY nextPriorityChanged)
     Q_PROPERTY(QString nextScheduleText READ nextScheduleText NOTIFY nextScheduleChanged)
     Q_PROPERTY(QString channelBanner READ channelBanner NOTIFY channelChanged)
+    Q_PROPERTY(QString channelBannerColor READ channelBannerColor NOTIFY channelChanged)
+    Q_PROPERTY(QString channelBannerText READ channelBannerText NOTIFY channelChanged)
     Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged)
     Q_PROPERTY(bool hasShare READ hasShare NOTIFY shareChanged)
     Q_PROPERTY(bool appLock READ appLock NOTIFY prefsChanged)
@@ -76,6 +78,8 @@ public:
     QString channelId() const { return m_channelId; }
     QString channelName() const { return m_channelName; }
     QString channelBanner() const;
+    QString channelBannerColor() const;
+    QString channelBannerText() const;
     bool recording() const { return !m_recordPath.isEmpty(); }
     bool hasShare() const { return !m_shareText.isEmpty() || !m_sharePath.isEmpty(); }
     bool appLock() const;
@@ -165,7 +169,7 @@ public:
     Q_INVOKABLE void setCustomStatus(const QString &emoji, const QString &text);
     Q_INVOKABLE void clearCustomStatus();
     Q_INVOKABLE void startDirect(const QString &username);
-    Q_INVOKABLE void createChannel(const QString &displayName);
+    Q_INVOKABLE void createChannel(const QString &displayName, bool privateChannel = false);
     Q_INVOKABLE void searchMentions();
     Q_INVOKABLE void openSaved();
     Q_INVOKABLE void traceLog(const QString &line);
@@ -184,6 +188,10 @@ public:
     Q_INVOKABLE void switchAccount(const QString &key);
     Q_INVOKABLE void doPostAction(const QString &postId, const QString &actionId);
     Q_INVOKABLE void loadAgents();
+    Q_INVOKABLE void startGroup(const QString &usernames);
+    Q_INVOKABLE void followThread(const QString &rootId, bool on);
+    Q_INVOKABLE void joinTeamByInvite(const QString &link);
+    Q_INVOKABLE void addBookmark(const QString &channelId, const QString &link);
     Q_INVOKABLE void revealPost(const QString &postId);
     Q_INVOKABLE void burnPost(const QString &postId);
     Q_INVOKABLE void setMyTranslation(const QString &channelId, bool on);
@@ -361,7 +369,8 @@ private:
         StepBots,
         StepDialogSubmit,
         StepToolCalls,
-        StepRewrite
+        StepRewrite,
+        StepGroupUsers
     };
 
     enum FileKind {

@@ -25,7 +25,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | MFA code | |
 | 🟢 | Log out | |
 | 🟢 | Choose a team | |
-| 🟡 | Join or leave a team | Built: join an open team and leave the current one, both from Settings, ACCOUNT. Invites to private teams are missing. Not yet tested on the device |
+| 🟡 | Join or leave a team | Built: join an open team, join with an invite link, and leave the current team, all from Settings, ACCOUNT. Team list confirmed on the device 2026-11-02; joining and leaving not yet confirmed |
 | 🟡 | Several accounts or servers | Built: Settings, ACCOUNT, Accounts and servers keeps several signed-in accounts and switches between them; Add account opens the login for the next. Only the active account gets Hub alerts. Not yet tested on the device |
 | 🟡 | Authentication secret on server entry | Built: optional field on the login page; sent as X-Mattermost-Preauth-Secret on every request (server 10.12+ behind a proxy). A proxy rejection shows a message. The websocket does not send it yet. Not yet tested on the device |
 | 🟡 | Sign in with GitLab, Google or Entra ID (OAuth) | Built: the login page opens the server's mobile OAuth login (GitLab, Google, Office 365/Entra ID, OpenID) in the browser; the mmauth:// callback brings the token back into the app. The server must allow mmauth:// (default). Not yet tested on the device |
@@ -41,13 +41,13 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | --- | --- | --- |
 | 🟢 | Channel list: public, private, direct, unread, mentions | |
 | 🟢 | Hide the channel subtitle | |
-| 🟡 | Create a channel | Built: Settings, MESSAGES, New channel. Public channels only. Not yet tested on the device |
+| 🟡 | Create a channel | Built: Settings, MESSAGES, New channel, public or private. Not yet tested on the device |
 | 🟡 | Show, add and remove members | Built: show members from the long-press menu, add by username, remove by tap and confirm. Only public and private channels. Device 2026-11-02: list opens after the fixes in 1.0.0.142 and 1.0.0.149; adding and removing not yet tested |
 | 🟡 | Leave, archive, edit header and purpose | Built: leave, archive, edit header and purpose from the long-press menu. Device 2026-11-02: the menu entries never fired, because list items cannot reach outer ids; fixed in 1.0.0.149, header and purpose pages now open. Saving, leave and archive not yet tested |
-| 🟡 | New direct message | Built: Settings, MESSAGES, enter a username. Group messages still missing. Not yet tested on the device |
+| 🟡 | New direct message | Built: Settings, MESSAGES, a direct message by username and a group message with several usernames. Not yet tested on the device |
 | 🟡 | Admin-managed sidebar categories | Built: the channel list follows the server's sidebar categories (favourites, custom and admin-managed ones) in their order. Collapsing and moving channels are missing. Not yet tested on the device |
-| 🟡 | Channel bookmarks | Built: read-only list from the channel long-press menu, a tap opens the link. Not yet tested on the device |
-| 🟡 | Channel banners | Built: the banner text shows at the top of the channel. The banner colour from the server is not used. Not tested: no channel with a banner on the test server |
+| 🟡 | Channel bookmarks | Built: list from the channel long-press menu, a tap opens the link, Add link creates one. Editing and file bookmarks are missing. Not yet tested on the device |
+| 🟡 | Channel banners | Built: the banner text shows at the top of the channel in the server's colour, with readable text colour. Not tested: no channel with a banner on the test server |
 | 🟡 | Guest invitations | Built: channel long-press menu, Invite guest by email for that channel. Needs guest accounts on the server. Not yet tested on the device |
 | 🟡 | Shared-channel system messages | Built: system_shared_chan_state posts read "This channel is now shared with …" or "no longer shared", as in the Android app. Not yet tested on the device |
 
@@ -68,10 +68,10 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Reactions | Swipe, twelve names, chips. Swipe not confirmed on the device since build 123 |
 | 🟡 | Emoji panel with server emoji | No flags, skin tones or ZWJ sequences |
 | 🟡 | Date and time formats | 24-hour setting exists. Full regional formats to verify |
-| 🟡 | Collapsed reply threads and global threads list | Built: Settings, MESSAGES, Threads lists followed threads with reply and unread counts; a tap opens the root post. Follow and unfollow are missing. Device 2026-11-02: the list loads |
+| 🟡 | Collapsed reply threads and global threads list | Built: Settings, MESSAGES, Threads lists followed threads with reply and unread counts (device 2026-11-02: loads); Follow thread and Unfollow thread in the post menu. Replies still show in the channel, not collapsed |
 | 🟡 | Scheduled posts | Built: + page, Send later sends the next channel message at a time (18:30) or after minutes (45). Needs server 10.3, possibly a licence. Listing and editing scheduled messages is missing. Not yet tested on the device |
 | 🟡 | Drafts tab | Built: one draft per channel stays on the phone and comes back when the channel opens. Device test 2026-11-02: works. The list of all drafts is missing |
-| 🟡 | Copy code block, copy email address | Built: Copy text in the post long-press menu copies the whole message. Copying only a code block or an address is missing. Not yet tested on the device |
+| 🟡 | Copy code block, copy email address | Built: the post menu copies the whole text, the first code block or the first email address. Not yet tested on the device |
 | 🟡 | Edit or delete attachments on existing posts | Built: Remove attachments in the menu of your own post (PUT patch with empty file_ids). Adding files to an existing post is missing. Not yet tested on the device |
 | 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Device test 2026-11-02: no preview shows for a Reddit link. Not yet checked whether the server sends previews. Image and permalink previews are missing |
 | 🟡 | Message attachments and interactive buttons | Built: bot attachments (pretext, title, text, fields) show under the message; their buttons are in the long-press menu under Actions. Select menus are missing. Not yet tested on the device |

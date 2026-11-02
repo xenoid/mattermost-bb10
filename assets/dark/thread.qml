@@ -105,7 +105,7 @@ Page {
         Container {
             visible: rootId == "" && _mm.channelBanner != ""
             horizontalAlignment: HorizontalAlignment.Fill
-            background: Color.create("#3a3220")
+            background: Color.create(_mm.channelBannerColor != "" ? _mm.channelBannerColor : "#3a3220")
             leftPadding: 20
             rightPadding: 20
             topPadding: 8
@@ -114,7 +114,7 @@ Page {
                 text: _mm.channelBanner
                 textFormat: TextFormat.Plain
                 multiline: true
-                textStyle.color: Color.create("#f0d58a")
+                textStyle.color: Color.create(_mm.channelBannerText)
                 textStyle.fontSize: FontSize.Small
             }
         }
@@ -199,6 +199,9 @@ Page {
             }
             function copyText(text) {
                 _mm.copyText(text)
+            }
+            function followThread(rootId, on) {
+                _mm.followThread(rootId, on)
             }
             function ackPost(postId) {
                 _mm.acknowledgePost(postId)
@@ -352,6 +355,26 @@ Page {
                                     title: qsTr("Acknowledge")
                                     enabled: ListItemData.ackAsk == "1" && ListItemData.ackMine != "1"
                                     onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml acknowledge"); postItem.ListItem.view.ackPost(ListItemData.id) }
+                                }
+                                ActionItem {
+                                    title: qsTr("Copy code")
+                                    enabled: ListItemData.code ? true : false
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml copy code"); postItem.ListItem.view.copyText(ListItemData.code) }
+                                }
+                                ActionItem {
+                                    title: qsTr("Copy email address")
+                                    enabled: ListItemData.email ? true : false
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml copy email"); postItem.ListItem.view.copyText(ListItemData.email) }
+                                }
+                                ActionItem {
+                                    title: qsTr("Follow thread")
+                                    enabled: ListItemData.pending != "1"
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml follow"); postItem.ListItem.view.followThread(ListItemData.threadRoot, true) }
+                                }
+                                ActionItem {
+                                    title: qsTr("Unfollow thread")
+                                    enabled: ListItemData.pending != "1"
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml unfollow"); postItem.ListItem.view.followThread(ListItemData.threadRoot, false) }
                                 }
                                 ActionItem {
                                     title: qsTr("Copy text")

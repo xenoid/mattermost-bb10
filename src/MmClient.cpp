@@ -1900,6 +1900,28 @@ QString MmClient::takeSharePath()
     return path;
 }
 
+QString MmClient::channelBannerColor() const
+{
+    for (int i = 0; i < m_channelRows.size(); ++i) {
+        const QVariantMap row = m_channelRows.at(i).toMap();
+        if (row.value("channelId").toString() == m_channelId)
+            return row.value("bannerColor").toString();
+    }
+    return QString();
+}
+
+QString MmClient::channelBannerText() const
+{
+    // Heller Hintergrund: dunkle Schrift, sonst weiße. Ohne Farbe vom Server bleibt das Gelb der App.
+    const QString color = channelBannerColor();
+    if (color.isEmpty())
+        return QString("#5c4400");
+    const int r = color.mid(1, 2).toInt(0, 16);
+    const int g = color.mid(3, 2).toInt(0, 16);
+    const int b = color.mid(5, 2).toInt(0, 16);
+    return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? QString("#1b1f23") : QString("#ffffff");
+}
+
 QString MmClient::channelBanner() const
 {
     for (int i = 0; i < m_channelRows.size(); ++i) {
@@ -2077,7 +2099,7 @@ void MmClient::searchMentions()
     search("@" + m_handle);
 }
 
-void MmClient::createChannel(const QString &displayName)
+void MmClient::createChannel(const QString &displayName, bool privateChannel)
 {
     // Mattermost verlangt einen kurzen Namen aus Kleinbuchstaben, Ziffern und Bindestrichen.
     const QString title = displayName.trimmed().left(64);
@@ -2092,7 +2114,7 @@ void MmClient::createChannel(const QString &displayName)
     body["team_id"] = m_teamId;
     body["name"] = slug;
     body["display_name"] = title;
-    body["type"] = QString("O");
+    body["type"] = privateChannel ? QString("P") : QString("O");
     JsonDataAccess json;
     QByteArray bytes;
     json.saveToBuffer(body, &bytes);
@@ -2567,6 +2589,74 @@ void MmClient::setMyTranslation(const QString &channelId, bool on)
                  on ? QByteArray("{\"autotranslation_disabled\":false}") : QByteArray("{\"autotranslation_disabled\":true}"),
                  on ? tr("Auto-translation on") : tr("Auto-translation off"),
                  tr("Auto-translation is not available (HTTP %1)"));
+}
+
+void MmClient::startGroup(const QString &usernames)
+{
+    QStringList names;
+    const QStringList parts = usernames.split(QRegExp("[,;\\s]+"), QString::SkipEmptyParts);
+    for (int i = 0; i < parts.size(); ++i) {
+        QString name = parts.at(i).trimmed();
+        if (name.startsWith("@"))
+            name = name.mid(1);
+        if (QRegExp("^[A-Za-z0-9._-]+$").exactMatch(name) && !names.contains(name))
+            names.append(name);
+    }
+    if (!m_loggedIn || names.size() < 2) {
+        emit notice(tr("A group needs at least two other people"));
+        return;
+    }
+    QVariantList list;
+    for (int i = 0; i < names.size(); ++i)
+        list.append(names.at(i));
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(list, &bytes);
+    start(StepGroupUsers, "/api/v4/users/usernames", bytes, "POST");
+}
+
+void MmClient::followThread(const QString &rootId, bool on)
+{
+    if (!m_loggedIn || rootId.isEmpty() || m_teamId.isEmpty())
+        return;
+    noticeAction("/api/v4/users/" + m_userId + "/teams/" + m_teamId + "/threads/" + rootId + "/following",
+                 on ? "PUT" : "DELETE", QByteArray(),
+                 on ? tr("You follow this thread") : tr("You no longer follow this thread"),
+                 tr("Could not change following (HTTP %1)"));
+}
+
+void MmClient::joinTeamByInvite(const QString &link)
+{
+    // Einladungslink wie .../signup_user_complete/?id=<invite_id> oder nur die ID.
+    QString id = QUrl(link.trimmed()).queryItemValue("id");
+    if (id.isEmpty())
+        id = link.trimmed();
+    if (!m_loggedIn || !QRegExp("^[A-Za-z0-9]{20,40}$").exactMatch(id)) {
+        emit notice(tr("This is not an invite link"));
+        return;
+    }
+    noticeAction("/api/v4/teams/members/invite?invite_id=" + id, "POST", QByteArray(),
+                 tr("Joined the team"), tr("Could not join the team (HTTP %1)"))
+        ->setProperty("reloadTeams", true);
+}
+
+void MmClient::addBookmark(const QString &channelId, const QString &link)
+{
+    const QString url = link.trimmed();
+    if (!m_loggedIn || channelId.isEmpty() || !url.startsWith("http")) {
+        emit notice(tr("Enter a link starting with http"));
+        return;
+    }
+    QVariantMap body;
+    body["display_name"] = QUrl(url).host();
+    body["link_url"] = url;
+    body["type"] = QString("link");
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    noticeAction("/api/v4/channels/" + channelId + "/bookmarks", "POST", bytes,
+                 tr("Bookmark added"), tr("Could not add the bookmark (HTTP %1)"))
+        ->setProperty("reloadBookmarks", channelId);
 }
 
 void MmClient::loadAgents()
@@ -3732,6 +3822,12 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["bor"] = borState;
     row["preview"] = previewText;
     row["botText"] = botLines.join("\n");
+    // Zum Kopieren: der erste Codeblock und die erste E-Mail-Adresse im Text.
+    QRegExp codeBlock("```[^\\n]*\\n(.*)```");
+    codeBlock.setMinimal(true);
+    row["code"] = codeBlock.indexIn(source) >= 0 ? codeBlock.cap(1).trimmed() : QString();
+    QRegExp mail("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}");
+    row["email"] = mail.indexIn(source) >= 0 ? mail.cap(0) : QString();
     row["aiPost"] = post.value("props").toMap().contains("llm_requester_user_id") ? QString("1") : QString();
     row["aiConv"] = post.value("props").toMap().value("conversation_id").toString();
     row["actionIds"] = actionIds.join("|");
@@ -4357,6 +4453,10 @@ void MmClient::onFinished(QNetworkReply *reply)
             emit notice(reply->property("doneText").toString());
             if (reply->property("reload").toBool())
                 loadPosts(true);
+            if (reply->property("reloadTeams").toBool())
+                loadTeams();
+            if (!reply->property("reloadBookmarks").toString().isEmpty())
+                loadBookmarks(reply->property("reloadBookmarks").toString());
         } else
             emit notice(reply->property("failText").toString().arg(http));
         return;
@@ -4571,6 +4671,27 @@ void MmClient::onFinished(QNetworkReply *reply)
         } else {
             setStatus(tr("Could not create the channel"));
         }
+        return;
+    }
+    if (step == StepGroupUsers) {
+        // Gruppennachricht: die gefundenen IDs plus die eigene.
+        QVariantList ids;
+        const QVariantList users = QVariant(JsonDataAccess().loadFromBuffer(payload)).toList();
+        for (int i = 0; i < users.size(); ++i) {
+            const QString id = users.at(i).toMap().value("id").toString();
+            if (!id.isEmpty() && id != m_userId)
+                ids.append(id);
+        }
+        if (http < 200 || http >= 300 || ids.size() < 2) {
+            setStatus(tr("A group needs at least two other people"));
+            emit notice(tr("A group needs at least two other people"));
+            return;
+        }
+        ids.append(m_userId);
+        JsonDataAccess groupJson;
+        QByteArray bytes;
+        groupJson.saveToBuffer(ids, &bytes);
+        start(StepDirectOpen, "/api/v4/channels/group", bytes, "POST");
         return;
     }
     if (step == StepDirectOpen) {
@@ -4985,6 +5106,8 @@ void MmClient::onFinished(QNetworkReply *reply)
             row["purpose"] = channel.value("purpose").toString();
             const QVariantMap banner = channel.value("banner_info").toMap();
             row["banner"] = banner.value("enabled").toBool() ? repairText(banner.value("text").toString()) : QString();
+            const QString bannerColor = banner.value("background_color").toString();
+            row["bannerColor"] = QRegExp("^#[0-9a-fA-F]{6}$").exactMatch(bannerColor) ? bannerColor : QString();
             row["last"] = channel.value("last_post_at").toLongLong();
             row["total"] = channel.value("total_msg_count").toLongLong();
             const qint64 last = channel.value("last_post_at").toLongLong();
@@ -5498,6 +5621,8 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["priority"] = QString();
     row["preview"] = QString();
     row["botText"] = QString();
+    row["code"] = QString();
+    row["email"] = QString();
     row["aiPost"] = QString();
     row["aiConv"] = QString();
     row["bor"] = QString();

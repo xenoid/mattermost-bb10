@@ -1,4 +1,5 @@
 import bb.cascades 1.3
+import bb.system 1.2
 
 // Lesezeichen eines Kanals, nur lesen. Ein Tipp öffnet den Link im Browser.
 Page {
@@ -34,6 +35,22 @@ Page {
     onCreationCompleted: {
         _mm.bookmarksLoaded.connect(takeRows)
     }
+
+    attachedObjects: [
+        SystemPrompt {
+            id: addPrompt
+            title: qsTr("Add link")
+            body: qsTr("Address of the link")
+            inputField.inputMode: SystemUiInputMode.Url
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Add")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.addBookmark(pageRoot.channelId, inputFieldTextEntry())
+            }
+        }
+    ]
 
     Container {
         background: Color.create("#16191d")
@@ -98,6 +115,21 @@ Page {
                 if (item && item.url != "")
                     _mm.openLink(item.url)
             }
+        }
+
+        Label {
+            text: qsTr("Add link")
+            horizontalAlignment: HorizontalAlignment.Center
+            verticalAlignment: VerticalAlignment.Bottom
+            bottomMargin: 30
+            textFormat: TextFormat.Plain
+            textStyle.color: Color.create("#6b9bf2")
+            textStyle.fontSize: FontSize.Medium
+            gestureHandlers: [
+                TapHandler {
+                    onTapped: { _mm.traceLog("tap bookmarks add"); addPrompt.show() }
+                }
+            ]
         }
     }
 }

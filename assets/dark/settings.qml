@@ -9,6 +9,7 @@ Page {
     property variant navPane: null
     property string certPath: ""
     property string keyPath: ""
+    property string pendingChannel: ""
 
     titleBar: TitleBar {
         title: qsTr("Settings")
@@ -137,7 +138,10 @@ Page {
             cancelButton.label: qsTr("Cancel")
             onFinished: {
                 if (value == SystemUiResult.ConfirmButtonSelection)
-                    _mm.createChannel(inputFieldTextEntry())
+                {
+                    pageRoot.pendingChannel = inputFieldTextEntry()
+                    channelTypeDialog.show()
+                }
             }
         },
         SystemPrompt {
@@ -158,6 +162,32 @@ Page {
             title: qsTr("Profile")
             confirmButton.label: qsTr("OK")
             cancelButton.label: qsTr("Cancel")
+        },
+        SystemListDialog {
+            id: channelTypeDialog
+            title: qsTr("New channel")
+            dismissOnSelection: true
+            onCreationCompleted: {
+                appendItem(qsTr("Public channel"))
+                appendItem(qsTr("Private channel"))
+            }
+            onFinished: {
+                if (value == SystemUiResult.ItemSelection && selectedIndices.length > 0)
+                    _mm.createChannel(pageRoot.pendingChannel, selectedIndices[0] == 1)
+            }
+        },
+        SystemPrompt {
+            id: groupPrompt
+            title: qsTr("Group message")
+            body: qsTr("Usernames, separated by commas")
+            inputField.inputMode: SystemUiInputMode.Default
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Start")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.startGroup(inputFieldTextEntry())
+            }
         },
         SystemPrompt {
             id: dmPrompt
@@ -604,6 +634,26 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:472 onTapped"); dmPrompt.show() }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("New group message")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b9bf2")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings group"); groupPrompt.show() }
                     }
                 ]
             }
