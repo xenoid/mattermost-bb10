@@ -33,6 +33,10 @@ NavigationPane {
             id: channelTextDef
             source: "asset:///channeltext.qml"
         },
+        ComponentDefinition {
+            id: bookmarksDef
+            source: "asset:///bookmarks.qml"
+        },
         SystemToast {
             id: toast
         },
@@ -129,6 +133,12 @@ NavigationPane {
         page.current = current ? current : ""
         page.navPane = nav
         nav.push(page)
+    }
+
+    // Kurze Meldung über jeder Seite, zum Beispiel nach dem Kopieren.
+    function showNotice(text) {
+        toast.body = text
+        toast.show()
     }
 
     // Seite erzeugen; bei QML-Fehlern den Text sichtbar machen statt still zu scheitern.
@@ -381,6 +391,15 @@ NavigationPane {
                         nav.push(page)
                     }
                     // Listeneinträge sehen keine äußeren IDs. Dialoge und Seiten öffnet deshalb die Liste.
+                    function openBookmarks(channelId, title) {
+                        var page = nav.make(bookmarksDef)
+                        if (!page)
+                            return
+                        page.channelId = channelId
+                        page.channelTitle = title
+                        page.load()
+                        nav.push(page)
+                    }
                     function askLeave(channelId) {
                         leaveDialog.leaveId = channelId
                         leaveDialog.show()
@@ -437,6 +456,10 @@ NavigationPane {
                                         ActionItem {
                                             title: qsTr("Members")
                                             onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap main.qml:420 onTriggered"); channelItem.ListItem.view.openMembers(ListItemData.channelId, ListItemData.title, ListItemData.kind) }
+                                        }
+                                        ActionItem {
+                                            title: qsTr("Bookmarks")
+                                            onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap main.qml bookmarks"); channelItem.ListItem.view.openBookmarks(ListItemData.channelId, ListItemData.title) }
                                         }
                                         ActionItem {
                                             title: qsTr("Leave channel")
@@ -723,6 +746,7 @@ NavigationPane {
         applyPreview()
         _mm.prefsChanged.connect(applyPreview)
         _mm.channelsLoaded.connect(takeChannels)
+        _mm.notice.connect(showNotice)
         _mm.avatarReady.connect(takeAvatar)
         _mm.loggedInChanged.connect(function() {
             if (!_mm.loggedIn && nav.count() > 1)

@@ -1445,6 +1445,22 @@ QString MmClient::draftFor(const QString &channelId) const
     return settings.value("draft_" + channelId).toString();
 }
 
+void MmClient::acknowledgePost(const QString &postId)
+{
+    if (!m_loggedIn || m_userId.isEmpty() || postId.isEmpty())
+        return;
+    start(StepAck, "/api/v4/users/" + m_userId + "/posts/" + postId + "/ack", QByteArray(), "POST");
+}
+
+void MmClient::loadBookmarks(const QString &channelId)
+{
+    if (!m_loggedIn || channelId.isEmpty()) {
+        emit bookmarksLoaded(QVariantList());
+        return;
+    }
+    start(StepBookmarks, "/api/v4/channels/" + channelId + "/bookmarks");
+}
+
 void MmClient::copyText(const QString &text)
 {
     bb::system::Clipboard clipboard;
@@ -1452,6 +1468,8 @@ void MmClient::copyText(const QString &text)
     const bool ok = !text.isEmpty() && clipboard.insert("text/plain", text.toUtf8());
     traceWrite(QString("clipboard copy chars=%1 ok=%2").arg(text.size()).arg(ok ? 1 : 0));
     setStatus(ok ? tr("Copied") : tr("Could not copy"));
+    // Die Statuszeile ist nicht auf jeder Seite sichtbar, die Meldung schon.
+    emit notice(ok ? tr("Copied") : tr("Could not copy"));
 }
 
 void MmClient::copyProblemReport()
@@ -1984,6 +2002,13 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
     case StepLookupUser:
         setStatus(http == 404 ? tr("No user with that name") : text);
         return;
+    case StepAck:
+        setStatus(tr("Could not acknowledge"));
+        return;
+    case StepBookmarks:
+        setStatus(tr("Could not load the bookmarks"));
+        emit bookmarksLoaded(QVariantList());
+        return;
     case StepSend:
     case StepUpload:
         return;
@@ -2505,6 +2530,13 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     // Dringlichkeit und Vorschau einer Verlinkung. Der Server schickt beides nur, wenn es gilt.
     const QVariantMap meta = post.value("metadata").toMap();
     const QString priority = meta.value("priority").toMap().value("priority").toString();
+    const bool ackAsked = meta.value("priority").toMap().value("requested_ack").toBool();
+    const QVariantList acks = meta.value("acknowledgements").toList();
+    bool ackMine = false;
+    for (int i = 0; i < acks.size(); ++i) {
+        if (acks.at(i).toMap().value("user_id").toString() == m_userId)
+            ackMine = true;
+    }
     QString priorityText;
     if (priority == "urgent")
         priorityText = tr("Urgent");
@@ -2583,7 +2615,11 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["linkOnly"] = linkOnly;
     row["priority"] = priorityText;
     row["preview"] = previewText;
-    row["rev"] = post.value("update_at").toString() + ":" + QString::number(replyCount) + ":" + row["react"].toString();
+    row["ackAsk"] = ackAsked ? QString("1") : QString();
+    row["ackMine"] = ackMine ? QString("1") : QString();
+    row["ackInfo"] = ackAsked ? tr("Acknowledged by %1").arg(acks.size()) : QString();
+    row["rev"] = post.value("update_at").toString() + ":" + QString::number(replyCount) + ":" + row["react"].toString()
+                 + ":" + QString::number(acks.size());
 
     if (!imageId.isEmpty()) {
         const QString pv = ImageStore::dir() + "/" + imageId + ".pv";
@@ -3506,6 +3542,32 @@ void MmClient::onFinished(QNetworkReply *reply)
         return;
     }
 
+    if (step == StepAck) {
+        setStatus(tr("Acknowledged"));
+        loadPosts(true);
+        return;
+    }
+
+    if (step == StepBookmarks) {
+        // Links öffnen im Browser. Datei-Lesezeichen haben keine URL und bleiben nur sichtbar.
+        const QVariantList marks = parsed.toList();
+        QVariantList rows;
+        for (int i = 0; i < marks.size(); ++i) {
+            const QVariantMap mark = marks.at(i).toMap();
+            if (mark.value("delete_at").toLongLong() > 0)
+                continue;
+            const QString url = mark.value("link_url").toString();
+            const QString name = repairText(mark.value("display_name").toString());
+            QVariantMap row;
+            row["title"] = name.isEmpty() ? url : name;
+            row["subtitle"] = url.isEmpty() ? tr("File") : url;
+            row["url"] = url;
+            rows.append(row);
+        }
+        emit bookmarksLoaded(rows);
+        return;
+    }
+
     if (step == StepLookupUser) {
         // Die Felder, die der Server für diesen Benutzer liefert. Leere Felder bleiben leer.
         const QVariantMap found = parsed.toMap();
@@ -3978,6 +4040,9 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["pending"] = QString("1");
     row["priority"] = QString();
     row["preview"] = QString();
+    row["ackAsk"] = QString();
+    row["ackMine"] = QString();
+    row["ackInfo"] = QString();
     row["pinned"] = QString();
     row["saved"] = QString();
     row["react"] = QString();

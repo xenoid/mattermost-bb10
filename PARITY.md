@@ -46,7 +46,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Leave, archive, edit header and purpose | Built: leave, archive, edit header and purpose from the long-press menu. Device 2026-11-02: the menu entries never fired, because list items cannot reach outer ids; fixed in 1.0.0.149, header and purpose pages now open. Saving, leave and archive not yet tested |
 | 🟡 | New direct message | Built: Settings, MESSAGES, enter a username. Group messages still missing. Not yet tested on the device |
 | 🔴 | Admin-managed sidebar categories | Android 2.41 |
-| 🔴 | Channel bookmarks | Read-only display is enough at first |
+| 🟡 | Channel bookmarks | Built: read-only list from the channel long-press menu, a tap opens the link. Not yet tested on the device |
 | 🔴 | Channel banners | Enterprise Advanced. Show only |
 | 🔴 | Guest invitations | |
 | 🔴 | Shared-channel system messages | Low priority |
@@ -78,7 +78,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🔴 | Interactive dialogs | Multiselect, dynamic search, several steps |
 | 🔴 | Mattermost Blocks | Android 2.43 |
 | 🟡 | Post priority | Built: shows the Urgent and Important labels; the + page sets Important or Urgent for the next channel message. Not for replies or files. Sending not yet tested on the device |
-| 🔴 | Acknowledgements | To verify |
+| 🟡 | Acknowledgements | Built: posts that ask for it show how many acknowledged, and the long-press menu has Acknowledge. Asking for acknowledgement when sending is missing. Not yet tested on the device |
 | 🔴 | Burn on read | Enterprise Advanced. Display and send. To verify |
 | 🔴 | Auto-translation of messages | Enterprise Advanced beta |
 | 🔴 | AI rewrite of a draft | Only with Agents on the server |

@@ -149,6 +149,8 @@ public:
     Q_INVOKABLE void traceLog(const QString &line);
     Q_INVOKABLE void setNextPriority(const QString &value);
     Q_INVOKABLE void copyText(const QString &text);
+    Q_INVOKABLE void acknowledgePost(const QString &postId);
+    Q_INVOKABLE void loadBookmarks(const QString &channelId);
     Q_INVOKABLE void copyProblemReport();
     Q_INVOKABLE void saveDraft(const QString &channelId, const QString &text);
     Q_INVOKABLE QString draftFor(const QString &channelId) const;
@@ -203,6 +205,8 @@ signals:
     void membersLoaded(const QVariantList &rows);
     void openTeamsLoaded(const QVariantList &rows);
     void userFound(const QVariantMap &user);
+    void bookmarksLoaded(const QVariantList &rows);
+    void notice(const QString &text);
 
 private slots:
     void onFinished(QNetworkReply *reply);
@@ -265,7 +269,9 @@ private:
         StepMemberAddUser,
         StepMemberAdd,
         StepMemberRemove,
-        StepLookupUser
+        StepLookupUser,
+        StepAck,
+        StepBookmarks
     };
 
     enum FileKind {

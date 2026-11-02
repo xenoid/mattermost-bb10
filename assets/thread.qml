@@ -159,6 +159,9 @@ Page {
             function copyText(text) {
                 _mm.copyText(text)
             }
+            function ackPost(postId) {
+                _mm.acknowledgePost(postId)
+            }
             function askReplies(rootId) {
                 _mm.askReplies(rootId)
             }
@@ -244,6 +247,11 @@ Page {
                                     title: ListItemData.saved == "1" ? qsTr("Unsave") : qsTr("Save")
                                     enabled: ListItemData.pending != "1"
                                     onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml:243 onTriggered"); postItem.ListItem.view.savePost(ListItemData.id) }
+                                }
+                                ActionItem {
+                                    title: qsTr("Acknowledge")
+                                    enabled: ListItemData.ackAsk == "1" && ListItemData.ackMine != "1"
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml acknowledge"); postItem.ListItem.view.ackPost(ListItemData.id) }
                                 }
                                 ActionItem {
                                     title: qsTr("Copy text")
@@ -376,7 +384,7 @@ Page {
                                 }
 
                                 Label {
-                                    visible: ListItemData.priority != ""
+                                    visible: ListItemData.priority ? true : false
                                     text: ListItemData.priority
                                     textFormat: TextFormat.Plain
                                     textStyle.color: Color.create("#d6322e")
@@ -394,7 +402,15 @@ Page {
                                 }
 
                                 Label {
-                                    visible: ListItemData.preview != ""
+                                    visible: ListItemData.ackInfo ? true : false
+                                    text: ListItemData.ackInfo + (ListItemData.ackMine == "1" ? " ✓" : "")
+                                    textFormat: TextFormat.Plain
+                                    textStyle.color: Color.create("#b9822a")
+                                    textStyle.fontSize: FontSize.XSmall
+                                }
+
+                                Label {
+                                    visible: ListItemData.preview ? true : false
                                     text: ListItemData.preview
                                     textFormat: TextFormat.Plain
                                     multiline: true
