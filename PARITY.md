@@ -49,7 +49,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Channel bookmarks | Built: read-only list from the channel long-press menu, a tap opens the link. Not yet tested on the device |
 | 🟡 | Channel banners | Built: the banner text shows at the top of the channel. The banner colour from the server is not used. Not tested: no channel with a banner on the test server |
 | 🟡 | Guest invitations | Built: channel long-press menu, Invite guest by email for that channel. Needs guest accounts on the server. Not yet tested on the device |
-| 🔴 | Shared-channel system messages | Low priority |
+| 🟡 | Shared-channel system messages | Built: system_shared_chan_state posts read "This channel is now shared with …" or "no longer shared", as in the Android app. Not yet tested on the device |
 
 ## Messages
 
@@ -79,8 +79,8 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🔴 | Mattermost Blocks | Android 2.43 |
 | 🟡 | Post priority | Built: shows the Urgent and Important labels; the + page sets Important or Urgent for the next channel message. Not for replies or files. Sending not yet tested on the device |
 | 🟡 | Acknowledgements | Built: posts that ask for it show how many acknowledged, and the long-press menu has Acknowledge. Asking for acknowledgement when sending is missing. Not yet tested on the device |
-| 🔴 | Burn on read | Enterprise Advanced. Display and send. To verify |
-| 🔴 | Auto-translation of messages | Enterprise Advanced beta |
+| 🟡 | Burn on read | Built: burn-on-read posts stay hidden until Reveal in the long-press menu (GET reveal), show when they burn, read as burned afterwards; your own can be burned at once. Sending one is missing. Not yet tested on the device |
+| 🟡 | Auto-translation of messages | Built: the channel long-press menu switches auto-translation for yourself (members/me/autotranslation). Showing both original and translation is missing. Not yet tested on the device |
 | 🟡 | AI rewrite of a draft | Built: the + page offers Rewrite with AI (shorten, elaborate, improve, fix spelling, simplify) through POST /api/v4/posts/rewrite, as the Android app does; the result replaces the draft. Custom prompt and agent choice are missing. Not yet tested on the device |
 
 ## Files and media

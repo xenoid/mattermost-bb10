@@ -100,6 +100,20 @@ NavigationPane {
                     _mm.selectTeam(teamIds[selectedIndices[0]])
             }
         },
+        SystemListDialog {
+            id: translationDialog
+            property string channelId: ""
+            title: qsTr("Auto-translation")
+            dismissOnSelection: true
+            onCreationCompleted: {
+                appendItem(qsTr("Translate this channel for me"))
+                appendItem(qsTr("Show original messages"))
+            }
+            onFinished: {
+                if (value == SystemUiResult.ItemSelection && selectedIndices.length > 0)
+                    _mm.setMyTranslation(translationDialog.channelId, selectedIndices[0] == 0)
+            }
+        },
         SystemPrompt {
             id: guestPrompt
             property string channelId: ""
@@ -496,6 +510,10 @@ NavigationPane {
                         page.load()
                         nav.push(page)
                     }
+                    function askTranslation(channelId) {
+                        translationDialog.channelId = channelId
+                        translationDialog.show()
+                    }
                     function askGuest(channelId) {
                         guestPrompt.channelId = channelId
                         guestPrompt.show()
@@ -560,6 +578,10 @@ NavigationPane {
                                         ActionItem {
                                             title: qsTr("Bookmarks")
                                             onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap main.qml bookmarks"); channelItem.ListItem.view.openBookmarks(ListItemData.channelId, ListItemData.title) }
+                                        }
+                                        ActionItem {
+                                            title: qsTr("Auto-translation")
+                                            onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap main.qml translation"); channelItem.ListItem.view.askTranslation(ListItemData.channelId) }
                                         }
                                         ActionItem {
                                             title: qsTr("Invite guest")

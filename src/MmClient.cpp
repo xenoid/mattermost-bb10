@@ -2261,12 +2261,13 @@ void MmClient::onTick()
     flushOutbox();
 }
 
-void MmClient::noticeAction(const QString &path, const QByteArray &verb, const QByteArray &body,
-                            const QString &doneText, const QString &failText)
+QNetworkReply *MmClient::noticeAction(const QString &path, const QByteArray &verb, const QByteArray &body,
+                                     const QString &doneText, const QString &failText)
 {
     QNetworkReply *reply = start(StepNotice, path, body, verb);
     reply->setProperty("doneText", doneText);
     reply->setProperty("failText", failText);
+    return reply;
 }
 
 void MmClient::inviteGuest(const QString &channelId, const QString &email)
@@ -2451,6 +2452,35 @@ void MmClient::rewriteDraft(const QString &text, const QString &action, const QS
     QNetworkReply *reply = start(StepRewrite, "/api/v4/posts/rewrite", bytes, "POST");
     reply->setProperty("root", rootId);
     emit notice(tr("Rewriting…"));
+}
+
+void MmClient::revealPost(const QString &postId)
+{
+    if (!m_loggedIn || postId.isEmpty())
+        return;
+    noticeAction("/api/v4/posts/" + postId + "/reveal", "GET", QByteArray(),
+                 tr("Revealed. The message burns after its time."), tr("Could not reveal (HTTP %1)"))
+        ->setProperty("reload", true);
+}
+
+void MmClient::burnPost(const QString &postId)
+{
+    if (!m_loggedIn || postId.isEmpty())
+        return;
+    noticeAction("/api/v4/posts/" + postId + "/burn", "DELETE", QByteArray(),
+                 tr("Burned"), tr("Could not burn the message (HTTP %1)"))
+        ->setProperty("reload", true);
+}
+
+void MmClient::setMyTranslation(const QString &channelId, bool on)
+{
+    // Auto-Übersetzung nur für mich in diesem Kanal (Enterprise Advanced).
+    if (!m_loggedIn || channelId.isEmpty())
+        return;
+    noticeAction("/api/v4/channels/" + channelId + "/members/me/autotranslation", "PUT",
+                 on ? QByteArray("{\"autotranslation_disabled\":false}") : QByteArray("{\"autotranslation_disabled\":true}"),
+                 on ? tr("Auto-translation on") : tr("Auto-translation off"),
+                 tr("Auto-translation is not available (HTTP %1)"));
 }
 
 void MmClient::loadAgents()
@@ -3337,7 +3367,38 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     const QString rootId = post.value("root_id").toString();
     const int replyCount = post.value("reply_count").toInt();
     const qint64 created = post.value("create_at").toLongLong();
-    const QString source = repairText(post.value("message").toString());
+    QString source = repairText(post.value("message").toString());
+    // Sondertypen wie in der Android-App: Freigabe-Status geteilter Kanäle und Burn-on-Read.
+    const QString postType = post.value("type").toString();
+    const QVariantMap postProps = post.value("props").toMap();
+    QString borState;
+    QString borInfo;
+    if (postType == "system_shared_chan_state") {
+        const QString state = postProps.value("shared_channel_state").toString();
+        const QString workspace = postProps.value("workspace_name").toString();
+        if (state == "shared")
+            source = tr("This channel is now shared with %1.").arg(workspace);
+        else if (workspace.isEmpty())
+            source = tr("This channel is no longer shared with another workspace.");
+        else
+            source = tr("This channel is no longer shared with %1.").arg(workspace);
+    } else if (postType == "burn_on_read") {
+        const qint64 now = QDateTime::currentMSecsSinceEpoch();
+        const qint64 mine = post.value("metadata").toMap().value("expire_at").toLongLong();
+        const qint64 all = postProps.value("expire_at").toLongLong();
+        if ((all > 0 && all < now) || (mine > 0 && mine < now)) {
+            borState = "gone";
+            source = tr("This message has burned.");
+        } else if (mine <= 0 && post.value("user_id").toString() != m_userId) {
+            borState = "hidden";
+            source = tr("Burn-on-read message. Long-press and choose Reveal.");
+        } else {
+            borState = "open";
+            const qint64 end = mine > 0 ? mine : all;
+            borInfo = end > 0 ? tr("Burns at %1").arg(clockTime(QDateTime::fromMSecsSinceEpoch(end)))
+                              : tr("Burn on read");
+        }
+    }
     const QString message = Emoji::apply(source);
 
     QString imageId;
@@ -3573,7 +3634,10 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["attachInfo2"] = attachInfo2;
     row["link"] = link;
     row["linkOnly"] = linkOnly;
+    if (!borInfo.isEmpty())
+        priorityText = priorityText.isEmpty() ? borInfo : priorityText + QString::fromUtf8(" · ") + borInfo;
     row["priority"] = priorityText;
+    row["bor"] = borState;
     row["preview"] = previewText;
     row["botText"] = botLines.join("\n");
     row["aiPost"] = post.value("props").toMap().contains("llm_requester_user_id") ? QString("1") : QString();
@@ -4197,9 +4261,11 @@ void MmClient::onFinished(QNetworkReply *reply)
         return;
     }
     if (step == StepNotice) {
-        if (http >= 200 && http < 300 && netCode == 0)
+        if (http >= 200 && http < 300 && netCode == 0) {
             emit notice(reply->property("doneText").toString());
-        else
+            if (reply->property("reload").toBool())
+                loadPosts(true);
+        } else
             emit notice(reply->property("failText").toString().arg(http));
         return;
     }
@@ -5342,6 +5408,7 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["botText"] = QString();
     row["aiPost"] = QString();
     row["aiConv"] = QString();
+    row["bor"] = QString();
     row["actionIds"] = QString();
     row["actionNames"] = QString();
     row["ackAsk"] = QString();

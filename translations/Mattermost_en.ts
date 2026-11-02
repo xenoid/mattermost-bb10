@@ -58,7 +58,7 @@
     <message>
         <location filename="../src/MmClient.cpp" line="440"/>
         <location filename="../src/MmClient.cpp" line="449"/>
-        <location filename="../src/MmClient.cpp" line="3633"/>
+        <location filename="../src/MmClient.cpp" line="3697"/>
         <source>Unknown</source>
         <translation>Unknown</translation>
     </message>
@@ -69,7 +69,7 @@
     </message>
     <message>
         <location filename="../src/MmClient.cpp" line="871"/>
-        <location filename="../src/MmClient.cpp" line="4635"/>
+        <location filename="../src/MmClient.cpp" line="4701"/>
         <source>No team on this account</source>
         <translation>No team on this account</translation>
     </message>
@@ -131,10 +131,10 @@
         <location filename="../src/MmClient.cpp" line="1620"/>
         <location filename="../src/MmClient.cpp" line="2154"/>
         <location filename="../src/MmClient.cpp" line="2177"/>
-        <location filename="../src/MmClient.cpp" line="2887"/>
-        <location filename="../src/MmClient.cpp" line="2896"/>
-        <location filename="../src/MmClient.cpp" line="4350"/>
-        <location filename="../src/MmClient.cpp" line="4715"/>
+        <location filename="../src/MmClient.cpp" line="2917"/>
+        <location filename="../src/MmClient.cpp" line="2926"/>
+        <location filename="../src/MmClient.cpp" line="4416"/>
+        <location filename="../src/MmClient.cpp" line="4781"/>
         <source>No user with that name</source>
         <translation>No user with that name</translation>
     </message>
@@ -208,576 +208,646 @@
     </message>
     <message>
         <location filename="../src/MmClient.cpp" line="2058"/>
-        <location filename="../src/MmClient.cpp" line="4414"/>
+        <location filename="../src/MmClient.cpp" line="4480"/>
         <source>Could not create the channel</source>
         <translation>Could not create the channel</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2277"/>
+        <location filename="../src/MmClient.cpp" line="2278"/>
         <source>Enter an email address</source>
         <translation>Enter an email address</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2288"/>
+        <location filename="../src/MmClient.cpp" line="2289"/>
         <source>Invitation sent</source>
         <translation>Invitation sent</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2288"/>
+        <location filename="../src/MmClient.cpp" line="2289"/>
         <source>Could not invite the guest (HTTP %1)</source>
         <translation>Could not invite the guest (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2309"/>
+        <location filename="../src/MmClient.cpp" line="2310"/>
         <source>Set</source>
         <translation>Set</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2318"/>
+        <location filename="../src/MmClient.cpp" line="2319"/>
         <source>Could not read the certificate files</source>
         <translation>Could not read the certificate files</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2328"/>
+        <location filename="../src/MmClient.cpp" line="2329"/>
         <source>Certificate or key not readable (PEM, RSA or DSA)</source>
         <translation>Certificate or key not readable (PEM, RSA or DSA)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2334"/>
+        <location filename="../src/MmClient.cpp" line="2335"/>
         <source>Could not store the certificate</source>
         <translation>Could not store the certificate</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2345"/>
+        <location filename="../src/MmClient.cpp" line="2346"/>
         <source>Client certificate is set</source>
         <translation>Client certificate is set</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2392"/>
+        <location filename="../src/MmClient.cpp" line="2393"/>
         <source>Action sent</source>
         <translation>Action sent</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2392"/>
+        <location filename="../src/MmClient.cpp" line="2393"/>
         <source>The action failed (HTTP %1)</source>
         <translation>The action failed (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2401"/>
+        <location filename="../src/MmClient.cpp" line="2402"/>
         <source>Generation stopped</source>
         <translation>Generation stopped</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2401"/>
+        <location filename="../src/MmClient.cpp" line="2402"/>
         <source>New answer requested</source>
         <translation>New answer requested</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2402"/>
-        <location filename="../src/MmClient.cpp" line="2437"/>
+        <location filename="../src/MmClient.cpp" line="2403"/>
+        <location filename="../src/MmClient.cpp" line="2438"/>
         <source>The agent did not accept it (HTTP %1)</source>
         <translation>The agent did not accept it (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2411"/>
+        <location filename="../src/MmClient.cpp" line="2412"/>
         <source>Attachments removed</source>
         <translation>Attachments removed</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2411"/>
+        <location filename="../src/MmClient.cpp" line="2412"/>
         <source>Could not remove the attachments (HTTP %1)</source>
         <translation>Could not remove the attachments (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2418"/>
-        <location filename="../src/MmClient.cpp" line="5098"/>
+        <location filename="../src/MmClient.cpp" line="2419"/>
+        <location filename="../src/MmClient.cpp" line="5164"/>
         <source>No tool calls are waiting</source>
         <translation>No tool calls are waiting</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2436"/>
+        <location filename="../src/MmClient.cpp" line="2437"/>
         <source>Tool calls rejected</source>
         <translation>Tool calls rejected</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2436"/>
+        <location filename="../src/MmClient.cpp" line="2437"/>
         <source>Tool calls approved</source>
         <translation>Tool calls approved</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2453"/>
+        <location filename="../src/MmClient.cpp" line="2454"/>
         <source>Rewriting…</source>
         <translation>Rewriting…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2563"/>
+        <location filename="../src/MmClient.cpp" line="2462"/>
+        <source>Revealed. The message burns after its time.</source>
+        <translation>Revealed. The message burns after its time.</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="2462"/>
+        <source>Could not reveal (HTTP %1)</source>
+        <translation>Could not reveal (HTTP %1)</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="2471"/>
+        <source>Burned</source>
+        <translation>Burned</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="2471"/>
+        <source>Could not burn the message (HTTP %1)</source>
+        <translation>Could not burn the message (HTTP %1)</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="2482"/>
+        <source>Auto-translation on</source>
+        <translation>Auto-translation on</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="2482"/>
+        <source>Auto-translation off</source>
+        <translation>Auto-translation off</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="2483"/>
+        <source>Auto-translation is not available (HTTP %1)</source>
+        <translation>Auto-translation is not available (HTTP %1)</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="2593"/>
         <source>Enter the server first</source>
         <translation>Enter the server first</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2575"/>
+        <location filename="../src/MmClient.cpp" line="2605"/>
         <source>Signing in in the browser…</source>
         <translation>Signing in in the browser…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2585"/>
+        <location filename="../src/MmClient.cpp" line="2615"/>
         <source>Single sign-on did not return a session</source>
         <translation>Single sign-on did not return a session</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2618"/>
+        <location filename="../src/MmClient.cpp" line="2648"/>
         <source>Choose a channel to share into</source>
         <translation>Choose a channel to share into</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2666"/>
+        <location filename="../src/MmClient.cpp" line="2696"/>
         <source>%1 new messages, %2 mentions</source>
         <translation>%1 new messages, %2 mentions</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2668"/>
+        <location filename="../src/MmClient.cpp" line="2698"/>
         <source>%1 mentions</source>
         <translation>%1 mentions</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2670"/>
+        <location filename="../src/MmClient.cpp" line="2700"/>
         <source>Mention</source>
         <translation>Mention</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2672"/>
+        <location filename="../src/MmClient.cpp" line="2702"/>
         <source>New message</source>
         <translation>New message</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2674"/>
+        <location filename="../src/MmClient.cpp" line="2704"/>
         <source>%1 new messages</source>
         <translation>%1 new messages</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2857"/>
+        <location filename="../src/MmClient.cpp" line="2887"/>
         <source>Invalid response from the server</source>
         <translation>Invalid response from the server</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2859"/>
+        <location filename="../src/MmClient.cpp" line="2889"/>
         <source>Server error (HTTP %1)</source>
         <translation>Server error (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2876"/>
-        <location filename="../src/MmClient.cpp" line="4585"/>
+        <location filename="../src/MmClient.cpp" line="2906"/>
+        <location filename="../src/MmClient.cpp" line="4651"/>
         <source>Could not load the members</source>
         <translation>Could not load the members</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2880"/>
+        <location filename="../src/MmClient.cpp" line="2910"/>
         <source>Could not load the teams</source>
         <translation>Could not load the teams</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2884"/>
+        <location filename="../src/MmClient.cpp" line="2914"/>
         <source>Could not join the team</source>
         <translation>Could not join the team</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2890"/>
+        <location filename="../src/MmClient.cpp" line="2920"/>
         <source>Could not add the member</source>
         <translation>Could not add the member</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2893"/>
+        <location filename="../src/MmClient.cpp" line="2923"/>
         <source>Could not remove the member</source>
         <translation>Could not remove the member</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2903"/>
+        <location filename="../src/MmClient.cpp" line="2933"/>
         <source>Could not acknowledge</source>
         <translation>Could not acknowledge</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2906"/>
+        <location filename="../src/MmClient.cpp" line="2936"/>
         <source>Could not load the bookmarks</source>
         <translation>Could not load the bookmarks</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2915"/>
+        <location filename="../src/MmClient.cpp" line="2945"/>
         <source>Could not load the tool calls</source>
         <translation>Could not load the tool calls</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2918"/>
+        <location filename="../src/MmClient.cpp" line="2948"/>
         <source>No agents or bots visible for this account</source>
         <translation>No agents or bots visible for this account</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2922"/>
+        <location filename="../src/MmClient.cpp" line="2952"/>
         <source>Playbooks are not available on this server</source>
         <translation>Playbooks are not available on this server</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2922"/>
+        <location filename="../src/MmClient.cpp" line="2952"/>
         <source>Could not load the runs</source>
         <translation>Could not load the runs</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2926"/>
+        <location filename="../src/MmClient.cpp" line="2956"/>
         <source>Could not load the playbooks</source>
         <translation>Could not load the playbooks</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4155"/>
+        <location filename="../src/MmClient.cpp" line="3380"/>
+        <source>This channel is now shared with %1.</source>
+        <translation>This channel is now shared with %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="3382"/>
+        <source>This channel is no longer shared with another workspace.</source>
+        <translation>This channel is no longer shared with another workspace.</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="3384"/>
+        <source>This channel is no longer shared with %1.</source>
+        <translation>This channel is no longer shared with %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="3391"/>
+        <source>This message has burned.</source>
+        <translation>This message has burned.</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="3394"/>
+        <source>Burn-on-read message. Long-press and choose Reveal.</source>
+        <translation>Burn-on-read message. Long-press and choose Reveal.</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="3398"/>
+        <source>Burns at %1</source>
+        <translation>Burns at %1</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="3399"/>
+        <source>Burn on read</source>
+        <translation>Burn on read</translation>
+    </message>
+    <message>
+        <location filename="../src/MmClient.cpp" line="4219"/>
         <source>The authentication secret is missing or wrong</source>
         <translation>The authentication secret is missing or wrong</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4170"/>
+        <location filename="../src/MmClient.cpp" line="4234"/>
         <source>The agent returned no text</source>
         <translation>The agent returned no text</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4174"/>
+        <location filename="../src/MmClient.cpp" line="4238"/>
         <source>Rewrite failed (HTTP %1)</source>
         <translation>Rewrite failed (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4190"/>
+        <location filename="../src/MmClient.cpp" line="4254"/>
         <source>Sent</source>
         <translation>Sent</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4195"/>
+        <location filename="../src/MmClient.cpp" line="4259"/>
         <source>The dialog could not be sent (HTTP %1)</source>
         <translation>The dialog could not be sent (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4214"/>
+        <location filename="../src/MmClient.cpp" line="4280"/>
         <source>Could not change the task</source>
         <translation>Could not change the task</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2930"/>
+        <location filename="../src/MmClient.cpp" line="2960"/>
         <source>Could not load the threads</source>
         <translation>Could not load the threads</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2940"/>
+        <location filename="../src/MmClient.cpp" line="2970"/>
         <source>Offline. Saved thread.</source>
         <translation>Offline. Saved thread.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2951"/>
+        <location filename="../src/MmClient.cpp" line="2981"/>
         <source>Offline. Saved channels.</source>
         <translation>Offline. Saved channels.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2959"/>
+        <location filename="../src/MmClient.cpp" line="2989"/>
         <source>Offline. Saved messages.</source>
         <translation>Offline. Saved messages.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="2974"/>
+        <location filename="../src/MmClient.cpp" line="3004"/>
         <source>Loading account…</source>
         <translation>Loading account…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3006"/>
+        <location filename="../src/MmClient.cpp" line="3036"/>
         <source>Loading channels…</source>
         <translation>Loading channels…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3049"/>
-        <location filename="../src/MmClient.cpp" line="3106"/>
+        <location filename="../src/MmClient.cpp" line="3079"/>
+        <location filename="../src/MmClient.cpp" line="3136"/>
         <source>Loading messages…</source>
         <translation>Loading messages…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3066"/>
+        <location filename="../src/MmClient.cpp" line="3096"/>
         <source>Loading older messages…</source>
         <translation>Loading older messages…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3269"/>
+        <location filename="../src/MmClient.cpp" line="3299"/>
         <source>Message not loaded</source>
         <translation>Message not loaded</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3468"/>
+        <location filename="../src/MmClient.cpp" line="3529"/>
         <source>Urgent</source>
         <translation>Urgent</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3470"/>
+        <location filename="../src/MmClient.cpp" line="3531"/>
         <source>Important</source>
         <translation>Important</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3565"/>
+        <location filename="../src/MmClient.cpp" line="3626"/>
         <source>+%1 more images</source>
         <translation>+%1 more images</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3585"/>
+        <location filename="../src/MmClient.cpp" line="3649"/>
         <source>Acknowledged by %1</source>
         <translation>Acknowledged by %1</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3607"/>
+        <location filename="../src/MmClient.cpp" line="3671"/>
         <source>1 reply</source>
         <translation>1 reply</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3609"/>
-        <location filename="../src/MmClient.cpp" line="5213"/>
+        <location filename="../src/MmClient.cpp" line="3673"/>
+        <location filename="../src/MmClient.cpp" line="5279"/>
         <source>%1 replies</source>
         <translation>%1 replies</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3621"/>
+        <location filename="../src/MmClient.cpp" line="3685"/>
         <source>You</source>
         <translation>You</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3631"/>
+        <location filename="../src/MmClient.cpp" line="3695"/>
         <source>you</source>
         <translation>you</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3632"/>
+        <location filename="../src/MmClient.cpp" line="3696"/>
         <source>Reply</source>
         <translation>Reply</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3634"/>
+        <location filename="../src/MmClient.cpp" line="3698"/>
         <source>Reply to %1</source>
         <translation>Reply to %1</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3831"/>
+        <location filename="../src/MmClient.cpp" line="3895"/>
         <source>Image could not be loaded</source>
         <translation>Image could not be loaded</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3834"/>
+        <location filename="../src/MmClient.cpp" line="3898"/>
         <source>Attachment could not be loaded</source>
         <translation>Attachment could not be loaded</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3919"/>
+        <location filename="../src/MmClient.cpp" line="3983"/>
         <source>Loading image…</source>
         <translation>Loading image…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3938"/>
+        <location filename="../src/MmClient.cpp" line="4002"/>
         <source>Loading attachment…</source>
         <translation>Loading attachment…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="3974"/>
+        <location filename="../src/MmClient.cpp" line="4038"/>
         <source>Note to self</source>
         <translation>Note to self</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4032"/>
+        <location filename="../src/MmClient.cpp" line="4096"/>
         <source>FAVORITES</source>
         <translation>FAVORITES</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4034"/>
-        <location filename="../src/MmClient.cpp" line="4059"/>
+        <location filename="../src/MmClient.cpp" line="4098"/>
+        <location filename="../src/MmClient.cpp" line="4123"/>
         <source>CHANNELS</source>
         <translation>CHANNELS</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4036"/>
-        <location filename="../src/MmClient.cpp" line="4067"/>
+        <location filename="../src/MmClient.cpp" line="4100"/>
+        <location filename="../src/MmClient.cpp" line="4131"/>
         <source>DIRECT</source>
         <translation>DIRECT</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4216"/>
+        <location filename="../src/MmClient.cpp" line="4282"/>
         <source>Playbook action failed (HTTP %1)</source>
         <translation>Playbook action failed (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4223"/>
+        <location filename="../src/MmClient.cpp" line="4289"/>
         <source>Message scheduled for %1</source>
         <translation>Message scheduled for %1</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4225"/>
+        <location filename="../src/MmClient.cpp" line="4291"/>
         <source>Could not schedule the message (HTTP %1)</source>
         <translation>Could not schedule the message (HTTP %1)</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4265"/>
+        <location filename="../src/MmClient.cpp" line="4331"/>
         <source>Code is wrong</source>
         <translation>Code is wrong</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4266"/>
+        <location filename="../src/MmClient.cpp" line="4332"/>
         <source>One-time code required</source>
         <translation>One-time code required</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4272"/>
+        <location filename="../src/MmClient.cpp" line="4338"/>
         <source>Name or password is wrong</source>
         <translation>Name or password is wrong</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4275"/>
+        <location filename="../src/MmClient.cpp" line="4341"/>
         <source>Session expired. Please sign in again.</source>
         <translation>Session expired. Please sign in again.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4331"/>
+        <location filename="../src/MmClient.cpp" line="4397"/>
         <source>Could not change notifications</source>
         <translation>Could not change notifications</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4367"/>
+        <location filename="../src/MmClient.cpp" line="4433"/>
         <source>Left the team</source>
         <translation>Left the team</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4370"/>
+        <location filename="../src/MmClient.cpp" line="4436"/>
         <source>Could not leave the team</source>
         <translation>Could not leave the team</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4377"/>
+        <location filename="../src/MmClient.cpp" line="4443"/>
         <source>Channel archived</source>
         <translation>Channel archived</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4383"/>
+        <location filename="../src/MmClient.cpp" line="4449"/>
         <source>Could not archive the channel</source>
         <translation>Could not archive the channel</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4402"/>
+        <location filename="../src/MmClient.cpp" line="4468"/>
         <source>Channel updated</source>
         <translation>Channel updated</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4405"/>
+        <location filename="../src/MmClient.cpp" line="4471"/>
         <source>Could not change the channel</source>
         <translation>Could not change the channel</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4565"/>
+        <location filename="../src/MmClient.cpp" line="4631"/>
         <source>Profile saved</source>
         <translation>Profile saved</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4567"/>
+        <location filename="../src/MmClient.cpp" line="4633"/>
         <source>Could not save the profile</source>
         <translation>Could not save the profile</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4390"/>
+        <location filename="../src/MmClient.cpp" line="4456"/>
         <source>Left the channel</source>
         <translation>Left the channel</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4396"/>
+        <location filename="../src/MmClient.cpp" line="4462"/>
         <source>Could not leave the channel</source>
         <translation>Could not leave the channel</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4411"/>
+        <location filename="../src/MmClient.cpp" line="4477"/>
         <source>Channel created</source>
         <translation>Channel created</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4420"/>
+        <location filename="../src/MmClient.cpp" line="4486"/>
         <source>Direct message ready</source>
         <translation>Direct message ready</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4423"/>
+        <location filename="../src/MmClient.cpp" line="4489"/>
         <source>Could not start the direct message</source>
         <translation>Could not start the direct message</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4443"/>
-        <location filename="../src/MmClient.cpp" line="4453"/>
+        <location filename="../src/MmClient.cpp" line="4509"/>
+        <location filename="../src/MmClient.cpp" line="4519"/>
         <source>Could not change status</source>
         <translation>Could not change status</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4530"/>
+        <location filename="../src/MmClient.cpp" line="4596"/>
         <source>No token in the response</source>
         <translation>No token in the response</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4644"/>
+        <location filename="../src/MmClient.cpp" line="4710"/>
         <source>Acknowledged</source>
         <translation>Acknowledged</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4661"/>
+        <location filename="../src/MmClient.cpp" line="4727"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4731"/>
+        <location filename="../src/MmClient.cpp" line="4797"/>
         <source>Member added</source>
         <translation>Member added</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4733"/>
+        <location filename="../src/MmClient.cpp" line="4799"/>
         <source>Member removed</source>
         <translation>Member removed</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4786"/>
+        <location filename="../src/MmClient.cpp" line="4852"/>
         <source>Joined the team</source>
         <translation>Joined the team</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="4812"/>
+        <location filename="../src/MmClient.cpp" line="4878"/>
         <source>Conversation</source>
         <translation>Conversation</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5172"/>
+        <location filename="../src/MmClient.cpp" line="5238"/>
         <source>%1 of %2 tasks done</source>
         <translation>%1 of %2 tasks done</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5216"/>
+        <location filename="../src/MmClient.cpp" line="5282"/>
         <source>%1 new</source>
         <translation>%1 new</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5321"/>
+        <location filename="../src/MmClient.cpp" line="5387"/>
         <source>Sending…</source>
         <translation>Sending…</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5388"/>
+        <location filename="../src/MmClient.cpp" line="5455"/>
         <source>Sending</source>
         <translation>Sending</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5502"/>
-        <location filename="../src/MmClient.cpp" line="5516"/>
+        <location filename="../src/MmClient.cpp" line="5569"/>
+        <location filename="../src/MmClient.cpp" line="5583"/>
         <source>File is not readable</source>
         <translation>File is not readable</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5837"/>
+        <location filename="../src/MmClient.cpp" line="5904"/>
         <source>No connection. It will be sent when you are online.</source>
         <translation>No connection. It will be sent when you are online.</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5847"/>
+        <location filename="../src/MmClient.cpp" line="5914"/>
         <source>Not sent</source>
         <translation>Not sent</translation>
     </message>
     <message>
-        <location filename="../src/MmClient.cpp" line="5885"/>
+        <location filename="../src/MmClient.cpp" line="5952"/>
         <source>Loading thread…</source>
         <translation>Loading thread…</translation>
     </message>
@@ -991,18 +1061,18 @@
         <translation>Team</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="138"/>
+        <location filename="../assets/main.qml" line="152"/>
         <source>One-time code</source>
         <translation>One-time code</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="139"/>
+        <location filename="../assets/main.qml" line="153"/>
         <source>Code from the authenticator app</source>
         <translation>Code from the authenticator app</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="142"/>
-        <location filename="../assets/main.qml" line="354"/>
+        <location filename="../assets/main.qml" line="156"/>
+        <location filename="../assets/main.qml" line="368"/>
         <source>Sign in</source>
         <translation>Sign in</translation>
     </message>
@@ -1010,8 +1080,8 @@
         <location filename="../assets/main.qml" line="51"/>
         <location filename="../assets/main.qml" line="67"/>
         <location filename="../assets/main.qml" line="79"/>
-        <location filename="../assets/main.qml" line="111"/>
-        <location filename="../assets/main.qml" line="143"/>
+        <location filename="../assets/main.qml" line="125"/>
+        <location filename="../assets/main.qml" line="157"/>
         <source>Cancel</source>
         <translation>Cancel</translation>
     </message>
@@ -1032,7 +1102,7 @@
     </message>
     <message>
         <location filename="../assets/main.qml" line="64"/>
-        <location filename="../assets/main.qml" line="570"/>
+        <location filename="../assets/main.qml" line="592"/>
         <source>Leave channel</source>
         <translation>Leave channel</translation>
     </message>
@@ -1048,7 +1118,7 @@
     </message>
     <message>
         <location filename="../assets/main.qml" line="76"/>
-        <location filename="../assets/main.qml" line="578"/>
+        <location filename="../assets/main.qml" line="600"/>
         <source>Archive channel</source>
         <translation>Archive channel</translation>
     </message>
@@ -1064,37 +1134,53 @@
     </message>
     <message>
         <location filename="../assets/main.qml" line="106"/>
-        <location filename="../assets/main.qml" line="565"/>
+        <location filename="../assets/main.qml" line="583"/>
+        <source>Auto-translation</source>
+        <translation>Auto-translation</translation>
+    </message>
+    <message>
+        <location filename="../assets/main.qml" line="109"/>
+        <source>Translate this channel for me</source>
+        <translation>Translate this channel for me</translation>
+    </message>
+    <message>
+        <location filename="../assets/main.qml" line="110"/>
+        <source>Show original messages</source>
+        <translation>Show original messages</translation>
+    </message>
+    <message>
+        <location filename="../assets/main.qml" line="120"/>
+        <location filename="../assets/main.qml" line="587"/>
         <source>Invite guest</source>
         <translation>Invite guest</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="107"/>
+        <location filename="../assets/main.qml" line="121"/>
         <source>Email address. The guest gets access to this channel only.</source>
         <translation>Email address. The guest gets access to this channel only.</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="110"/>
+        <location filename="../assets/main.qml" line="124"/>
         <source>Invite</source>
         <translation>Invite</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="119"/>
+        <location filename="../assets/main.qml" line="133"/>
         <source>Single sign-on</source>
         <translation>Single sign-on</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="349"/>
+        <location filename="../assets/main.qml" line="363"/>
         <source>Authentication secret (optional)</source>
         <translation>Authentication secret (optional)</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="380"/>
+        <location filename="../assets/main.qml" line="394"/>
         <source>Sign in with GitLab, Google, Office 365 or SAML</source>
         <translation>Sign in with GitLab, Google, Office 365 or SAML</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="432"/>
+        <location filename="../assets/main.qml" line="446"/>
         <source>Search, also from: in: before: after:</source>
         <translation>Search, also from: in: before: after:</translation>
     </message>
@@ -1103,33 +1189,33 @@
         <translation type="obsolete">Save</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="272"/>
-        <location filename="../assets/main.qml" line="312"/>
+        <location filename="../assets/main.qml" line="286"/>
+        <location filename="../assets/main.qml" line="326"/>
         <source>Mattermost</source>
         <translation>Mattermost</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="318"/>
+        <location filename="../assets/main.qml" line="332"/>
         <source>Sign in to a server</source>
         <translation>Sign in to a server</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="326"/>
+        <location filename="../assets/main.qml" line="340"/>
         <source>Server, for example https://chat.example.com</source>
         <translation>Server, for example https://chat.example.com</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="333"/>
+        <location filename="../assets/main.qml" line="347"/>
         <source>Name or email</source>
         <translation>Name or email</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="340"/>
+        <location filename="../assets/main.qml" line="354"/>
         <source>Password</source>
         <translation>Password</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="361"/>
+        <location filename="../assets/main.qml" line="375"/>
         <source>Forgot password?</source>
         <translation>Forgot password?</translation>
     </message>
@@ -1138,27 +1224,27 @@
         <translation type="obsolete">Search messages</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="553"/>
+        <location filename="../assets/main.qml" line="571"/>
         <source>Notifications</source>
         <translation>Notifications</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="557"/>
+        <location filename="../assets/main.qml" line="575"/>
         <source>Members</source>
         <translation>Members</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="561"/>
+        <location filename="../assets/main.qml" line="579"/>
         <source>Bookmarks</source>
         <translation>Bookmarks</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="586"/>
+        <location filename="../assets/main.qml" line="608"/>
         <source>Edit header</source>
         <translation>Edit header</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="516"/>
+        <location filename="../assets/main.qml" line="534"/>
         <source>Not possible in direct messages</source>
         <translation>Not possible in direct messages</translation>
     </message>
@@ -1167,7 +1253,7 @@
         <translation type="obsolete">Channel header</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="593"/>
+        <location filename="../assets/main.qml" line="615"/>
         <source>Edit purpose</source>
         <translation>Edit purpose</translation>
     </message>
@@ -1176,12 +1262,12 @@
         <translation type="obsolete">Channel purpose</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="800"/>
+        <location filename="../assets/main.qml" line="822"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../assets/main.qml" line="801"/>
+        <location filename="../assets/main.qml" line="823"/>
         <source>Account, display, diagnostics</source>
         <translation>Account, display, diagnostics</translation>
     </message>
@@ -1824,29 +1910,29 @@
         <translation>Newer messages</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="279"/>
+        <location filename="../assets/thread.qml" line="285"/>
         <source>Message</source>
         <translation>Message</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="281"/>
+        <location filename="../assets/thread.qml" line="287"/>
         <source>Reply</source>
         <translation>Reply</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="286"/>
+        <location filename="../assets/thread.qml" line="292"/>
         <source>React</source>
         <translation>React</translation>
     </message>
     <message>
         <location filename="../assets/thread.qml" line="16"/>
-        <location filename="../assets/thread.qml" line="291"/>
+        <location filename="../assets/thread.qml" line="297"/>
         <source>Edit</source>
         <translation>Edit</translation>
     </message>
     <message>
         <location filename="../assets/thread.qml" line="17"/>
-        <location filename="../assets/thread.qml" line="306"/>
+        <location filename="../assets/thread.qml" line="312"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
@@ -1858,13 +1944,13 @@
     </message>
     <message>
         <location filename="../assets/thread.qml" line="28"/>
-        <location filename="../assets/thread.qml" line="321"/>
+        <location filename="../assets/thread.qml" line="337"/>
         <source>Tool calls</source>
         <translation>Tool calls</translation>
     </message>
     <message>
         <location filename="../assets/thread.qml" line="40"/>
-        <location filename="../assets/thread.qml" line="331"/>
+        <location filename="../assets/thread.qml" line="347"/>
         <source>Actions</source>
         <translation>Actions</translation>
     </message>
@@ -1880,128 +1966,138 @@
     </message>
     <message>
         <location filename="../assets/thread.qml" line="51"/>
-        <location filename="../assets/thread.qml" line="296"/>
+        <location filename="../assets/thread.qml" line="302"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="301"/>
+        <location filename="../assets/thread.qml" line="307"/>
         <source>Pin</source>
         <translation>Pin</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="301"/>
+        <location filename="../assets/thread.qml" line="307"/>
         <source>Unpin</source>
         <translation>Unpin</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="306"/>
+        <location filename="../assets/thread.qml" line="312"/>
         <source>Unsave</source>
         <translation>Unsave</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="311"/>
+        <location filename="../assets/thread.qml" line="317"/>
         <source>Stop generating</source>
         <translation>Stop generating</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="316"/>
+        <location filename="../assets/thread.qml" line="322"/>
         <source>Regenerate</source>
         <translation>Regenerate</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="326"/>
+        <location filename="../assets/thread.qml" line="327"/>
+        <source>Reveal</source>
+        <translation>Reveal</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="332"/>
+        <source>Burn now</source>
+        <translation>Burn now</translation>
+    </message>
+    <message>
+        <location filename="../assets/thread.qml" line="342"/>
         <source>Remove attachments</source>
         <translation>Remove attachments</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="336"/>
+        <location filename="../assets/thread.qml" line="352"/>
         <source>Acknowledge</source>
         <translation>Acknowledge</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="341"/>
+        <location filename="../assets/thread.qml" line="357"/>
         <source>Copy text</source>
         <translation>Copy text</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="346"/>
+        <location filename="../assets/thread.qml" line="362"/>
         <source>Open image</source>
         <translation>Open image</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="351"/>
+        <location filename="../assets/thread.qml" line="367"/>
         <source>Image 2</source>
         <translation>Image 2</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="356"/>
+        <location filename="../assets/thread.qml" line="372"/>
         <source>Open attachment</source>
         <translation>Open attachment</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="361"/>
+        <location filename="../assets/thread.qml" line="377"/>
         <source>Attachment 2</source>
         <translation>Attachment 2</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="366"/>
+        <location filename="../assets/thread.qml" line="382"/>
         <source>Open link</source>
         <translation>Open link</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="525"/>
+        <location filename="../assets/thread.qml" line="541"/>
         <source>Image loading</source>
         <translation>Image loading</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1008"/>
+        <location filename="../assets/thread.qml" line="1024"/>
         <source>Search emoji</source>
         <translation>Search emoji</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1197"/>
+        <location filename="../assets/thread.qml" line="1213"/>
         <source>Remove</source>
         <translation>Remove</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1217"/>
+        <location filename="../assets/thread.qml" line="1233"/>
         <source>Scheduled for %1</source>
         <translation>Scheduled for %1</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1237"/>
+        <location filename="../assets/thread.qml" line="1253"/>
         <source>Urgent</source>
         <translation>Urgent</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1237"/>
+        <location filename="../assets/thread.qml" line="1253"/>
         <source>Important</source>
         <translation>Important</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1739"/>
+        <location filename="../assets/thread.qml" line="1755"/>
         <source>Allow: %1</source>
         <translation>Allow: %1</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1740"/>
+        <location filename="../assets/thread.qml" line="1756"/>
         <source>Reject all</source>
         <translation>Reject all</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1217"/>
-        <location filename="../assets/thread.qml" line="1237"/>
+        <location filename="../assets/thread.qml" line="1233"/>
+        <location filename="../assets/thread.qml" line="1253"/>
         <source>Tap to remove</source>
         <translation>Tap to remove</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1274"/>
+        <location filename="../assets/thread.qml" line="1290"/>
         <source>Write a message</source>
         <translation>Write a message</translation>
     </message>
     <message>
-        <location filename="../assets/thread.qml" line="1274"/>
+        <location filename="../assets/thread.qml" line="1290"/>
         <source>Write a reply</source>
         <translation>Write a reply</translation>
     </message>

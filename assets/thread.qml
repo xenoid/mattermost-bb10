@@ -212,6 +212,12 @@ Page {
             function askTools(postId, conversationId) {
                 _mm.loadToolCalls(postId, conversationId)
             }
+            function revealPost(postId) {
+                _mm.revealPost(postId)
+            }
+            function burnPost(postId) {
+                _mm.burnPost(postId)
+            }
             function askActions(postId, ids, names) {
                 var nameList = names.split("|")
                 actionDialog.postId = postId
@@ -316,6 +322,16 @@ Page {
                                     title: qsTr("Regenerate")
                                     enabled: ListItemData.aiPost == "1"
                                     onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml ai regenerate"); postItem.ListItem.view.agentPost(ListItemData.id, "regenerate") }
+                                }
+                                ActionItem {
+                                    title: qsTr("Reveal")
+                                    enabled: ListItemData.bor == "hidden"
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml reveal"); postItem.ListItem.view.revealPost(ListItemData.id) }
+                                }
+                                ActionItem {
+                                    title: qsTr("Burn now")
+                                    enabled: ListItemData.bor == "open" && ListItemData.mine
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml burn"); postItem.ListItem.view.burnPost(ListItemData.id) }
                                 }
                                 ActionItem {
                                     title: qsTr("Tool calls")

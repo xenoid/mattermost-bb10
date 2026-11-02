@@ -183,6 +183,9 @@ public:
     Q_INVOKABLE void switchAccount(const QString &key);
     Q_INVOKABLE void doPostAction(const QString &postId, const QString &actionId);
     Q_INVOKABLE void loadAgents();
+    Q_INVOKABLE void revealPost(const QString &postId);
+    Q_INVOKABLE void burnPost(const QString &postId);
+    Q_INVOKABLE void setMyTranslation(const QString &channelId, bool on);
     Q_INVOKABLE void rewriteDraft(const QString &text, const QString &action, const QString &rootId);
     Q_INVOKABLE void agentPost(const QString &postId, const QString &what);
     Q_INVOKABLE void loadToolCalls(const QString &postId, const QString &conversationId);
@@ -411,8 +414,8 @@ private:
     void sendScheduled(const QString &channelId, const QString &message);
     void runAction(const QString &path, const QByteArray &verb, const QVariantMap &body, const QString &doneText);
     void finishSso(const QUrl &url);
-    void noticeAction(const QString &path, const QByteArray &verb, const QByteArray &body,
-                      const QString &doneText, const QString &failText);
+    QNetworkReply *noticeAction(const QString &path, const QByteArray &verb, const QByteArray &body,
+                                const QString &doneText, const QString &failText);
     void loadClientCertificate();
     void emitLookup();
     QVariantList savedAccounts() const;
