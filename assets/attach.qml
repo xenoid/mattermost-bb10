@@ -1,4 +1,5 @@
 import bb.cascades 1.3
+import bb.system 1.2
 import bb.cascades.pickers 1.0
 
 // Anhang wie in den BlackBerry-Messengern: eigene Seite, zurück per Chevron.
@@ -17,6 +18,19 @@ Page {
     actionBarVisibility: ChromeVisibility.Default
 
     attachedObjects: [
+        SystemPrompt {
+            id: schedulePrompt
+            title: qsTr("Send later")
+            body: qsTr("Time like 18:30, or minutes like 45")
+            inputField.inputMode: SystemUiInputMode.Default
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Schedule")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection && _mm.setNextSchedule(inputFieldTextEntry()) && navPane)
+                    navPane.pop()
+            }
+        },
         FilePicker {
             id: picturePicker
             type: FileType.Picture
@@ -146,6 +160,35 @@ Page {
             preferredHeight: 1
             background: Color.create("#e6eaee")
             horizontalAlignment: HorizontalAlignment.Fill
+        }
+
+        // Später senden: die nächste Nachricht im Kanal geht zur gewählten Zeit raus (Server ab 10.3).
+        Container {
+            visible: replyRoot == ""
+            horizontalAlignment: HorizontalAlignment.Fill
+            preferredHeight: 100
+            layout: StackLayout {
+                orientation: LayoutOrientation.LeftToRight
+            }
+            gestureHandlers: [
+                TapHandler {
+                    onTapped: { _mm.traceLog("tap attach.qml schedule"); schedulePrompt.show() }
+                }
+            ]
+            Container {
+                preferredWidth: 8
+                preferredHeight: 48
+                background: Color.create("#6a4fb3")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+            }
+            Label {
+                text: qsTr("Send later")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+                textStyle.fontSize: FontSize.Large
+                textStyle.color: Color.create("#1b1f23")
+            }
         }
 
         // Priorität gilt für die nächste Nachricht im Kanal. Antworten haben keine Priorität.

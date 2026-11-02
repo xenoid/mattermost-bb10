@@ -69,7 +69,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Emoji panel with server emoji | No flags, skin tones or ZWJ sequences |
 | 🟡 | Date and time formats | 24-hour setting exists. Full regional formats to verify |
 | 🟡 | Collapsed reply threads and global threads list | Built: Settings, MESSAGES, Threads lists followed threads with reply and unread counts; a tap opens the root post. Follow and unfollow are missing. Device 2026-11-02: the list loads |
-| 🔴 | Scheduled posts | Server API |
+| 🟡 | Scheduled posts | Built: + page, Send later sends the next channel message at a time (18:30) or after minutes (45). Needs server 10.3, possibly a licence. Listing and editing scheduled messages is missing. Not yet tested on the device |
 | 🟡 | Drafts tab | Built: one draft per channel stays on the phone and comes back when the channel opens. Device test 2026-11-02: works. The list of all drafts is missing |
 | 🟡 | Copy code block, copy email address | Built: Copy text in the post long-press menu copies the whole message. Copying only a code block or an address is missing. Not yet tested on the device |
 | 🔴 | Edit or delete attachments on existing posts | Android 2.31 |

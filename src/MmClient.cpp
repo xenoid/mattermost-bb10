@@ -30,6 +30,7 @@
 #include <QSet>
 #include <QSettings>
 #include <QTimer>
+#include <QTime>
 #include <QNetworkProxy>
 #include <QSslCertificate>
 #include <QSslConfiguration>
@@ -280,6 +281,7 @@ MmClient::MmClient(QObject *parent)
     g_traceOn = m_debugLog;
     m_recorder = 0;
     m_locked = !settings.value("lockHash").toString().isEmpty();
+    m_nextScheduleAt = 0;
     if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
         setLoggedIn(true);
         ensureLive();
@@ -1639,6 +1641,60 @@ void MmClient::copyProblemReport()
         report += "\n(no debug.log; turn on Protocol log first)\n";
     }
     copyText(report);
+}
+
+QString MmClient::nextScheduleText() const
+{
+    if (m_nextScheduleAt <= 0)
+        return QString();
+    const QDateTime when = QDateTime::fromMSecsSinceEpoch(m_nextScheduleAt);
+    const QString time = when.toString(m_clock24 ? "HH:mm" : "h:mm AP");
+    return when.date() == QDate::currentDate() ? time : when.toString("dd.MM. ") + time;
+}
+
+bool MmClient::setNextSchedule(const QString &input)
+{
+    // "18:30" heißt heute um 18:30 oder morgen, wenn die Zeit vorbei ist. Eine Zahl sind Minuten ab jetzt.
+    const QString text = input.trimmed();
+    qint64 at = 0;
+    QRegExp clock("^(\\d{1,2})[:.](\\d{2})$");
+    QRegExp minutes("^(\\d{1,4})$");
+    const QDateTime now = QDateTime::currentDateTime();
+    if (clock.exactMatch(text)) {
+        const QTime time(clock.cap(1).toInt(), clock.cap(2).toInt());
+        if (time.isValid()) {
+            QDateTime when(now.date(), time);
+            if (when <= now)
+                when = when.addDays(1);
+            at = when.toMSecsSinceEpoch();
+        }
+    } else if (minutes.exactMatch(text) && minutes.cap(1).toInt() > 0) {
+        at = now.addSecs(minutes.cap(1).toInt() * 60).toMSecsSinceEpoch();
+    }
+    if (!text.isEmpty() && at <= 0) {
+        emit notice(tr("Use a time like 18:30 or minutes like 45"));
+        return false;
+    }
+    m_nextScheduleAt = at;
+    traceWrite(QString("schedule next=%1").arg(at));
+    emit nextScheduleChanged();
+    return true;
+}
+
+void MmClient::sendScheduled(const QString &channelId, const QString &message)
+{
+    QVariantMap body;
+    body["channel_id"] = channelId;
+    body["message"] = message;
+    body["scheduled_at"] = m_nextScheduleAt;
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    QNetworkReply *reply = start(StepSchedule, "/api/v4/posts/schedule", bytes, "POST");
+    reply->setProperty("msg", message);
+    reply->setProperty("when", nextScheduleText());
+    m_nextScheduleAt = 0;
+    emit nextScheduleChanged();
 }
 
 void MmClient::setNextPriority(const QString &value)
@@ -3330,6 +3386,16 @@ void MmClient::onFinished(QNetworkReply *reply)
                .arg(QString::fromUtf8(payload.left(300)).replace('\n', ' ')));
     if (m_debugLog)
         qDebug("mm-net step %d http %d net %d", int(step), http, netCode);
+    if (step == StepSchedule) {
+        // Geplante Nachricht: bei Erfolg nur eine Meldung, sonst kommt der Text zurück ins Eingabefeld.
+        if (http >= 200 && http < 300 && netCode == 0) {
+            emit notice(tr("Message scheduled for %1").arg(reply->property("when").toString()));
+        } else {
+            emit notice(tr("Could not schedule the message (HTTP %1)").arg(http));
+            emit sendFailed(msg);
+        }
+        return;
+    }
     if (m_headless && netCode != 0) {
         QString why = reply->errorString();
         why.replace(QRegExp("https?://\\S+"), "");
@@ -4390,6 +4456,10 @@ void MmClient::submit(const QString &channelId, const QString &rootId,
 {
     if (channelId.isEmpty() || (message.isEmpty() && filePath.isEmpty()))
         return;
+    if (filePath.isEmpty() && rootId.isEmpty() && m_nextScheduleAt > 0) {
+        sendScheduled(channelId, message);
+        return;
+    }
     ensureStore();
     OutItem item;
     item.id = "local-" + QString::number(QDateTime::currentMSecsSinceEpoch());

@@ -52,6 +52,7 @@ class MmClient : public QObject
     Q_PROPERTY(QString customText READ customText NOTIFY presenceChanged)
     Q_PROPERTY(QString customEmoji READ customEmoji NOTIFY presenceChanged)
     Q_PROPERTY(QString nextPriority READ nextPriority NOTIFY nextPriorityChanged)
+    Q_PROPERTY(QString nextScheduleText READ nextScheduleText NOTIFY nextScheduleChanged)
     Q_PROPERTY(QString channelBanner READ channelBanner NOTIFY channelChanged)
     Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged)
     Q_PROPERTY(bool hasShare READ hasShare NOTIFY shareChanged)
@@ -95,6 +96,7 @@ public:
     QString customText() const { return m_statusText; }
     QString customEmoji() const { return m_statusEmoji; }
     QString nextPriority() const { return m_nextPriority; }
+    QString nextScheduleText() const;
     QVariantMap profile() const;
     QString appVersion() const;
     void setShowPreview(bool on);
@@ -159,6 +161,7 @@ public:
     Q_INVOKABLE void openSaved();
     Q_INVOKABLE void traceLog(const QString &line);
     Q_INVOKABLE void setNextPriority(const QString &value);
+    Q_INVOKABLE bool setNextSchedule(const QString &input);
     Q_INVOKABLE void copyText(const QString &text);
     Q_INVOKABLE void acknowledgePost(const QString &postId);
     Q_INVOKABLE void loadBookmarks(const QString &channelId);
@@ -221,6 +224,7 @@ signals:
     void prefsChanged();
     void presenceChanged();
     void nextPriorityChanged();
+    void nextScheduleChanged();
     void profileChanged();
     void membersLoaded(const QVariantList &rows);
     void openTeamsLoaded(const QVariantList &rows);
@@ -295,7 +299,8 @@ private:
         StepLookupUser,
         StepAck,
         StepBookmarks,
-        StepThreads
+        StepThreads,
+        StepSchedule
     };
 
     enum FileKind {
@@ -346,6 +351,7 @@ private:
     void loadPresence();
     void finishMembers();
     QString pinHash(const QString &salt, const QString &pin) const;
+    void sendScheduled(const QString &channelId, const QString &message);
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);
@@ -507,6 +513,7 @@ private:
 
     QString m_lastSent;
     QString m_nextPriority;
+    qint64 m_nextScheduleAt;
     bb::multimedia::AudioRecorder *m_recorder;
     QString m_recordPath;
     QString m_shareText;

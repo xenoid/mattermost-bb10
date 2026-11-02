@@ -1141,6 +1141,26 @@ Page {
                 }
             }
             Container {
+                visible: rootId == "" && _mm.nextScheduleText != ""
+                horizontalAlignment: HorizontalAlignment.Fill
+                leftPadding: 20
+                rightPadding: 20
+                topPadding: 6
+                background: Color.create("#f4f6f8")
+                Label {
+                    text: qsTr("Scheduled for %1").arg(_mm.nextScheduleText) + " · " + qsTr("Tap to remove")
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6a4fb3")
+                    textStyle.fontSize: FontSize.Small
+                    textStyle.fontWeight: FontWeight.Bold
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml schedule clear"); _mm.setNextSchedule("") }
+                    }
+                ]
+            }
+            Container {
                 visible: rootId == "" && _mm.nextPriority != ""
                 horizontalAlignment: HorizontalAlignment.Fill
                 leftPadding: 20
