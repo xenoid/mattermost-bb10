@@ -707,6 +707,7 @@ NavigationPane {
     }
 
     onCreationCompleted: {
+        _mm.traceLog("app start, main page created")
         applyPreview()
         _mm.prefsChanged.connect(applyPreview)
         _mm.channelsLoaded.connect(takeChannels)
