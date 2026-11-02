@@ -104,6 +104,63 @@ Page {
             background: Color.create("#e6eaee")
             horizontalAlignment: HorizontalAlignment.Fill
         }
+
+        // Priorität gilt für die nächste Nachricht im Kanal. Antworten haben keine Priorität.
+        Container {
+            visible: replyRoot == ""
+            horizontalAlignment: HorizontalAlignment.Fill
+            preferredHeight: 100
+            layout: StackLayout {
+                orientation: LayoutOrientation.LeftToRight
+            }
+            gestureHandlers: [
+                TapHandler {
+                    onTapped: { _mm.traceLog("tap attach.qml important"); _mm.setNextPriority("important"); if (navPane) navPane.pop() }
+                }
+            ]
+            Container {
+                preferredWidth: 8
+                preferredHeight: 48
+                background: Color.create("#b9822a")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+            }
+            Label {
+                text: qsTr("Send as important")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+                textStyle.fontSize: FontSize.Large
+                textStyle.color: Color.create("#1b1f23")
+            }
+        }
+
+        Container {
+            visible: replyRoot == ""
+            horizontalAlignment: HorizontalAlignment.Fill
+            preferredHeight: 100
+            layout: StackLayout {
+                orientation: LayoutOrientation.LeftToRight
+            }
+            gestureHandlers: [
+                TapHandler {
+                    onTapped: { _mm.traceLog("tap attach.qml urgent"); _mm.setNextPriority("urgent"); if (navPane) navPane.pop() }
+                }
+            ]
+            Container {
+                preferredWidth: 8
+                preferredHeight: 48
+                background: Color.create("#d6322e")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+            }
+            Label {
+                text: qsTr("Send as urgent")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+                textStyle.fontSize: FontSize.Large
+                textStyle.color: Color.create("#1b1f23")
+            }
+        }
     }
 
     function chosen(files) {

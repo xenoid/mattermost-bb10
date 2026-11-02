@@ -50,6 +50,7 @@ class MmClient : public QObject
     Q_PROPERTY(QString presence READ presence NOTIFY presenceChanged)
     Q_PROPERTY(QString customText READ customText NOTIFY presenceChanged)
     Q_PROPERTY(QString customEmoji READ customEmoji NOTIFY presenceChanged)
+    Q_PROPERTY(QString nextPriority READ nextPriority NOTIFY nextPriorityChanged)
     Q_PROPERTY(QVariantMap profile READ profile NOTIFY profileChanged)
     Q_PROPERTY(bool trustReady READ trustReady CONSTANT)
     Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
@@ -82,6 +83,7 @@ public:
     bool trustReady() const { return m_trustReady; }
     QString customText() const { return m_statusText; }
     QString customEmoji() const { return m_statusEmoji; }
+    QString nextPriority() const { return m_nextPriority; }
     QVariantMap profile() const;
     QString appVersion() const;
     void setShowPreview(bool on);
@@ -145,6 +147,7 @@ public:
     Q_INVOKABLE void searchMentions();
     Q_INVOKABLE void openSaved();
     Q_INVOKABLE void traceLog(const QString &line);
+    Q_INVOKABLE void setNextPriority(const QString &value);
     Q_INVOKABLE void saveDraft(const QString &channelId, const QString &text);
     Q_INVOKABLE QString draftFor(const QString &channelId) const;
     Q_INVOKABLE void leaveChannel(const QString &channelId);
@@ -193,6 +196,7 @@ signals:
     void inboxRequested(const QString &id, const QString &name);
     void prefsChanged();
     void presenceChanged();
+    void nextPriorityChanged();
     void profileChanged();
     void membersLoaded(const QVariantList &rows);
     void openTeamsLoaded(const QVariantList &rows);
@@ -469,6 +473,7 @@ private:
     QVariantList m_teamChoices;
 
     QString m_lastSent;
+    QString m_nextPriority;
     QString m_lastPostId;
     QString m_postsSig;
     QString m_threadRoot;

@@ -1090,6 +1090,26 @@ Page {
                 }
             }
             Container {
+                visible: rootId == "" && _mm.nextPriority != ""
+                horizontalAlignment: HorizontalAlignment.Fill
+                leftPadding: 20
+                rightPadding: 20
+                topPadding: 6
+                background: Color.create("#f4f6f8")
+                Label {
+                    text: (_mm.nextPriority == "urgent" ? qsTr("Urgent") : qsTr("Important")) + " · " + qsTr("Tap to remove")
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#d6322e")
+                    textStyle.fontSize: FontSize.Small
+                    textStyle.fontWeight: FontWeight.Bold
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml priority clear"); _mm.setNextPriority("") }
+                    }
+                ]
+            }
+            Container {
                 horizontalAlignment: HorizontalAlignment.Fill
                 leftPadding: 6
                 rightPadding: 8

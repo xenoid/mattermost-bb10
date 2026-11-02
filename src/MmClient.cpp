@@ -1444,6 +1444,17 @@ QString MmClient::draftFor(const QString &channelId) const
     return settings.value("draft_" + channelId).toString();
 }
 
+void MmClient::setNextPriority(const QString &value)
+{
+    // Gilt für die nächste Nachricht im Kanal, nicht für Antworten. Leer heißt normal.
+    const QString next = (value == "important" || value == "urgent") ? value : QString();
+    if (next == m_nextPriority)
+        return;
+    m_nextPriority = next;
+    traceWrite("priority next=" + next);
+    emit nextPriorityChanged();
+}
+
 void MmClient::traceLog(const QString &line)
 {
     // Ereignisse aus der Oberfläche: Tipps und Seiten.
@@ -4062,6 +4073,12 @@ void MmClient::submit(const QString &channelId, const QString &rootId,
     item.message = message;
     item.filePath = filePath;
     item.fileName = fileName;
+    // Bei Textbeiträgen ist das Feld emoji frei. Es trägt die Priorität bis zum Senden.
+    if (item.kind == "post" && rootId.isEmpty() && !m_nextPriority.isEmpty()) {
+        item.emoji = m_nextPriority;
+        m_nextPriority.clear();
+        emit nextPriorityChanged();
+    }
     m_store.enqueue(item);
     m_lastSent = message;
     if (channelId == m_channelId)
@@ -4326,6 +4343,13 @@ void MmClient::sendOut(const OutItem &item)
     body["pending_post_id"] = item.id;
     if (!item.rootId.isEmpty())
         body["root_id"] = item.rootId;
+    if (item.emoji == "important" || item.emoji == "urgent") {
+        QVariantMap priority;
+        priority["priority"] = item.emoji;
+        QVariantMap meta;
+        meta["priority"] = priority;
+        body["metadata"] = meta;
+    }
     QByteArray bytes;
     JsonDataAccess json;
     json.saveToBuffer(body, &bytes);

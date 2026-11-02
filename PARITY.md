@@ -42,8 +42,8 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Channel list: public, private, direct, unread, mentions | |
 | 🟢 | Hide the channel subtitle | |
 | 🟡 | Create a channel | Built: Settings, MESSAGES, New channel. Public channels only. Not yet tested on the device |
-| 🟡 | Show, add and remove members | Built: show members from the long-press menu, add by username, remove by tap and confirm. Only public and private channels. Device test 2026-11-02: opening the member list showed "SystemPrompt is not a type" (missing `import bb.system`). Fixed in 1.0.0.142, waiting for a new device test |
-| 🟡 | Leave, archive, edit header and purpose | Built: leave, archive, edit header and purpose from the long-press menu. Device test 2026-11-02: edit header and purpose do nothing in the channel tried. The menu entries are greyed out for direct messages; not yet checked for a public or private channel |
+| 🟡 | Show, add and remove members | Built: show members from the long-press menu, add by username, remove by tap and confirm. Only public and private channels. Device 2026-11-02: list opens after the fixes in 1.0.0.142 and 1.0.0.149; adding and removing not yet tested |
+| 🟡 | Leave, archive, edit header and purpose | Built: leave, archive, edit header and purpose from the long-press menu. Device 2026-11-02: the menu entries never fired, because list items cannot reach outer ids; fixed in 1.0.0.149, header and purpose pages now open. Saving, leave and archive not yet tested |
 | 🟡 | New direct message | Built: Settings, MESSAGES, enter a username. Group messages still missing. Not yet tested on the device |
 | 🔴 | Admin-managed sidebar categories | Android 2.41 |
 | 🔴 | Channel bookmarks | Read-only display is enough at first |
@@ -77,7 +77,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🔴 | Message attachments and interactive buttons | `mmaction://` links |
 | 🔴 | Interactive dialogs | Multiselect, dynamic search, several steps |
 | 🔴 | Mattermost Blocks | Android 2.43 |
-| 🟡 | Post priority | Built: shows the Urgent and Important labels from the server. Sending a priority is missing. Not yet tested on the device |
+| 🟡 | Post priority | Built: shows the Urgent and Important labels; the + page sets Important or Urgent for the next channel message. Not for replies or files. Sending not yet tested on the device |
 | 🔴 | Acknowledgements | To verify |
 | 🔴 | Burn on read | Enterprise Advanced. Display and send. To verify |
 | 🔴 | Auto-translation of messages | Enterprise Advanced beta |
