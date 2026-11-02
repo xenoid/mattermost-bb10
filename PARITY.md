@@ -142,7 +142,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | --- | --- | --- |
 | 🟡 | Agent chat with threads and bot selector | Built: Settings, MESSAGES, Chat with an agent lists the AI plugin's agents (or the server's bots) and opens a direct message with the chosen one; threads work as in any chat. Not yet tested on the device |
 | 🟡 | Streaming, citations, stop and regenerate | Built: agent replies fill in with the normal refresh; Stop generating and Regenerate are in the post menu (Agents plugin). Live streaming and citations are missing. Not yet tested on the device |
-| 🔴 | Tool-call approval | Android 2.36 and 2.44 |
+| 🟡 | Tool-call approval | Built: Tool calls in the menu of an agent reply reads the pending tool_use blocks from the conversation and allows or rejects them all. Single choices and question answers are missing. Not yet tested on the device |
 
 ## Settings and language
 

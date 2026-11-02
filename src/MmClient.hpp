@@ -184,6 +184,8 @@ public:
     Q_INVOKABLE void doPostAction(const QString &postId, const QString &actionId);
     Q_INVOKABLE void loadAgents();
     Q_INVOKABLE void agentPost(const QString &postId, const QString &what);
+    Q_INVOKABLE void loadToolCalls(const QString &postId, const QString &conversationId);
+    Q_INVOKABLE void answerToolCalls(const QString &postId, const QStringList &acceptedIds);
     Q_INVOKABLE void removeAttachments(const QString &postId);
     Q_INVOKABLE void submitDialog(const QVariantMap &values);
     Q_INVOKABLE void inviteGuest(const QString &channelId, const QString &email);
@@ -266,6 +268,7 @@ signals:
     void agentsLoaded(const QVariantList &rows);
     void dialogOpened(const QVariantMap &spec);
     void dialogClosed();
+    void toolCallsLoaded(const QString &postId, const QVariantList &calls);
     void notice(const QString &text);
     void recordingChanged();
     void shareChanged();
@@ -350,7 +353,8 @@ private:
         StepProfileFields,
         StepAgents,
         StepBots,
-        StepDialogSubmit
+        StepDialogSubmit,
+        StepToolCalls
     };
 
     enum FileKind {

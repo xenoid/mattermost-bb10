@@ -22,6 +22,18 @@ Page {
             }
         },
         SystemListDialog {
+            id: toolDialog
+            property string postId: ""
+            property variant ids: []
+            title: qsTr("Tool calls")
+            dismissOnSelection: true
+            onFinished: {
+                if (value != SystemUiResult.ItemSelection || selectedIndices.length == 0)
+                    return
+                _mm.answerToolCalls(toolDialog.postId, selectedIndices[0] == 0 ? toolDialog.ids : [])
+            }
+        },
+        SystemListDialog {
             id: actionDialog
             property string postId: ""
             property variant ids: []
@@ -197,6 +209,9 @@ Page {
             function removeAttachments(postId) {
                 _mm.removeAttachments(postId)
             }
+            function askTools(postId, conversationId) {
+                _mm.loadToolCalls(postId, conversationId)
+            }
             function askActions(postId, ids, names) {
                 var nameList = names.split("|")
                 actionDialog.postId = postId
@@ -301,6 +316,11 @@ Page {
                                     title: qsTr("Regenerate")
                                     enabled: ListItemData.aiPost == "1"
                                     onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml ai regenerate"); postItem.ListItem.view.agentPost(ListItemData.id, "regenerate") }
+                                }
+                                ActionItem {
+                                    title: qsTr("Tool calls")
+                                    enabled: ListItemData.aiConv ? true : false
+                                    onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap thread.qml tool calls"); postItem.ListItem.view.askTools(ListItemData.id, ListItemData.aiConv) }
                                 }
                                 ActionItem {
                                     title: qsTr("Remove attachments")
@@ -1699,6 +1719,22 @@ Page {
         postList.showImages = _mm.showImages
     }
 
+    // Wartende Tool-Aufrufe eines Agenten: alle erlauben oder alle ablehnen.
+    function takeToolCalls(postId, calls) {
+        var ids = []
+        var names = []
+        for (var i = 0; i < calls.length; ++i) {
+            ids.push(String(calls[i].id))
+            names.push(String(calls[i].name))
+        }
+        toolDialog.postId = postId
+        toolDialog.ids = ids
+        toolDialog.clearList()
+        toolDialog.appendItem(qsTr("Allow: %1").arg(names.join(", ")))
+        toolDialog.appendItem(qsTr("Reject all"))
+        toolDialog.show()
+    }
+
     function dropSignals() {
         clearHeld()
         _mm.prefsChanged.disconnect(applyDisplay)
@@ -1713,6 +1749,7 @@ Page {
         _mm.avatarReady.disconnect(takeAvatar)
         _mm.sendFailed.disconnect(restoreText)
         _mm.channelChanged.disconnect(restoreDraft)
+        _mm.toolCallsLoaded.disconnect(takeToolCalls)
     }
 
     onCreationCompleted: {
@@ -1730,5 +1767,6 @@ Page {
         _mm.avatarReady.connect(takeAvatar)
         _mm.sendFailed.connect(restoreText)
         _mm.channelChanged.connect(restoreDraft)
+        _mm.toolCallsLoaded.connect(takeToolCalls)
     }
 }

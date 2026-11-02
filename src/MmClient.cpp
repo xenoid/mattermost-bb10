@@ -2411,6 +2411,32 @@ void MmClient::removeAttachments(const QString &postId)
                  tr("Attachments removed"), tr("Could not remove the attachments (HTTP %1)"));
 }
 
+void MmClient::loadToolCalls(const QString &postId, const QString &conversationId)
+{
+    // Wartende Tool-Aufrufe stehen in der Konversation des Agents-Plugins, nicht am Beitrag.
+    if (!m_loggedIn || postId.isEmpty() || conversationId.isEmpty()) {
+        emit notice(tr("No tool calls are waiting"));
+        return;
+    }
+    QNetworkReply *reply = start(StepToolCalls, "/plugins/mattermost-ai/conversations/" + conversationId);
+    reply->setProperty("postId", postId);
+}
+
+void MmClient::answerToolCalls(const QString &postId, const QStringList &acceptedIds)
+{
+    QVariantList ids;
+    for (int i = 0; i < acceptedIds.size(); ++i)
+        ids.append(acceptedIds.at(i));
+    QVariantMap body;
+    body["accepted_tool_ids"] = ids;
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    noticeAction("/plugins/mattermost-ai/post/" + postId + "/tool_call", "POST", bytes,
+                 ids.isEmpty() ? tr("Tool calls rejected") : tr("Tool calls approved"),
+                 tr("The agent did not accept it (HTTP %1)"));
+}
+
 void MmClient::loadAgents()
 {
     // Erst die Agenten des KI-Plugins, sonst alle Bots, die der Server zeigt.
@@ -2868,6 +2894,9 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         return;
     case StepAgents:
         start(StepBots, "/api/v4/bots?per_page=200", QByteArray(), "GET", true);
+        return;
+    case StepToolCalls:
+        emit notice(tr("Could not load the tool calls"));
         return;
     case StepBots:
         emit notice(tr("No agents or bots visible for this account"));
@@ -3532,6 +3561,7 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["preview"] = previewText;
     row["botText"] = botLines.join("\n");
     row["aiPost"] = post.value("props").toMap().contains("llm_requester_user_id") ? QString("1") : QString();
+    row["aiConv"] = post.value("props").toMap().value("conversation_id").toString();
     row["actionIds"] = actionIds.join("|");
     row["actionNames"] = actionNames.join("|");
     row["ackAsk"] = ackAsked ? QString("1") : QString();
@@ -4991,6 +5021,51 @@ void MmClient::onFinished(QNetworkReply *reply)
         return;
     }
 
+    if (step == StepToolCalls) {
+        // Wie die Weboberfläche: vom Antwort-Turn rückwärts bis zur Nutzerfrage, offene tool_use-Blöcke sammeln.
+        const QString postId = reply->property("postId").toString();
+        QList<QVariantMap> turns;
+        const QVariantList list = parsed.toMap().value("turns").toList();
+        for (int i = 0; i < list.size(); ++i)
+            turns.append(list.at(i).toMap());
+        for (int a = 0; a < turns.size(); ++a) {
+            for (int b = a + 1; b < turns.size(); ++b) {
+                if (turns.at(b).value("sequence").toLongLong() < turns.at(a).value("sequence").toLongLong())
+                    turns.swap(a, b);
+            }
+        }
+        int anchor = -1;
+        for (int i = 0; i < turns.size(); ++i) {
+            if (turns.at(i).value("post_id").toString() == postId)
+                anchor = i;
+        }
+        QVariantList rows;
+        for (int i = anchor; i >= 0; --i) {
+            const QVariantMap turn = turns.at(i);
+            if (i < anchor && (turn.value("role").toString() == "user"
+                               || (!turn.value("post_id").toString().isEmpty() && turn.value("post_id").toString() != postId)))
+                break;
+            const QVariantList blocks = turn.value("content").toList();
+            for (int k = 0; k < blocks.size(); ++k) {
+                const QVariantMap block = blocks.at(k).toMap();
+                if (block.value("type").toString() != "tool_use" || block.value("status").toString() != "pending")
+                    continue;
+                QVariantMap row;
+                row["id"] = block.value("id").toString();
+                QString name = block.value("title").toString();
+                if (name.isEmpty())
+                    name = block.value("name").toString();
+                row["name"] = name;
+                rows.append(row);
+            }
+        }
+        if (rows.isEmpty())
+            emit notice(tr("No tool calls are waiting"));
+        else
+            emit toolCallsLoaded(postId, rows);
+        return;
+    }
+
     if (step == StepAgents || step == StepBots) {
         QVariantList list = parsed.toList();
         if (list.isEmpty())
@@ -5231,6 +5306,7 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["preview"] = QString();
     row["botText"] = QString();
     row["aiPost"] = QString();
+    row["aiConv"] = QString();
     row["actionIds"] = QString();
     row["actionNames"] = QString();
     row["ackAsk"] = QString();
