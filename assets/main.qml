@@ -360,12 +360,13 @@ NavigationPane {
                         page.load()
                         nav.push(page)
                     }
-                    function openMembers(channelId, title) {
+                    function openMembers(channelId, title, kind) {
                         var page = nav.make(membersDef)
                         if (!page)
                             return
                         page.channelId = channelId
                         page.channelTitle = title
+                        page.canManage = kind == "O" || kind == "P"
                         page.load()
                         nav.push(page)
                     }
@@ -407,7 +408,7 @@ NavigationPane {
                                         }
                                         ActionItem {
                                             title: qsTr("Members")
-                                            onTriggered: channelItem.ListItem.view.openMembers(ListItemData.channelId, ListItemData.title)
+                                            onTriggered: channelItem.ListItem.view.openMembers(ListItemData.channelId, ListItemData.title, ListItemData.kind)
                                         }
                                         ActionItem {
                                             title: qsTr("Leave channel")

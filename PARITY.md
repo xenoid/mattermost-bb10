@@ -42,7 +42,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Channel list: public, private, direct, unread, mentions | |
 | 🟢 | Hide the channel subtitle | |
 | 🟡 | Create a channel | Built: Settings, MESSAGES, New channel. Public channels only. Not yet tested on the device |
-| 🟡 | Show, add and remove members | Built: show members from the long-press menu. Add and remove missing. Not yet tested on the device |
+| 🟡 | Show, add and remove members | Built: show members from the long-press menu, add by username, remove by tap and confirm. Only public and private channels. Not yet tested on the device |
 | 🟡 | Leave, archive, edit header and purpose | Built: leave, archive, edit header and purpose from the long-press menu. Not yet tested on the device |
 | 🟡 | New direct message | Built: Settings, MESSAGES, enter a username. Group messages still missing. Not yet tested on the device |
 | 🔴 | Admin-managed sidebar categories | Android 2.41 |

@@ -150,6 +150,8 @@ public:
     Q_INVOKABLE void loadMembers(const QString &channelId);
     Q_INVOKABLE void loadOpenTeams();
     Q_INVOKABLE void joinTeam(const QString &teamId);
+    Q_INVOKABLE void addMember(const QString &channelId, const QString &username);
+    Q_INVOKABLE void removeMember(const QString &channelId, const QString &userId);
     Q_INVOKABLE void saveProfile(const QString &firstName, const QString &lastName,
                                  const QString &nickname, const QString &position);
     Q_INVOKABLE void setChannelText(const QString &channelId, const QString &field, const QString &text);
@@ -248,7 +250,10 @@ private:
         StepMemberList,
         StepMemberListUsers,
         StepOpenTeams,
-        StepTeamJoin
+        StepTeamJoin,
+        StepMemberAddUser,
+        StepMemberAdd,
+        StepMemberRemove
     };
 
     enum FileKind {

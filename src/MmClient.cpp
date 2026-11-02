@@ -1515,6 +1515,29 @@ void MmClient::joinTeam(const QString &teamId)
     reply->setProperty("teamId", teamId);
 }
 
+void MmClient::addMember(const QString &channelId, const QString &username)
+{
+    // Erst den Benutzer per Name suchen, dann in den Kanal aufnehmen.
+    QString name = username.trimmed();
+    if (name.startsWith("@"))
+        name = name.mid(1);
+    if (!m_loggedIn || channelId.isEmpty() || !QRegExp("^[A-Za-z0-9._-]+$").exactMatch(name)) {
+        setStatus(tr("No user with that name"));
+        return;
+    }
+    QNetworkReply *reply = start(StepMemberAddUser, "/api/v4/users/username/" + name);
+    reply->setProperty("channelId", channelId);
+}
+
+void MmClient::removeMember(const QString &channelId, const QString &userId)
+{
+    if (!m_loggedIn || channelId.isEmpty() || userId.isEmpty())
+        return;
+    QNetworkReply *reply = start(StepMemberRemove, "/api/v4/channels/" + channelId + "/members/" + userId,
+                                 QByteArray(), "DELETE");
+    reply->setProperty("channelId", channelId);
+}
+
 void MmClient::archiveChannel(const QString &channelId)
 {
     // DELETE auf einen Kanal archiviert ihn. Er verschwindet aus der Liste.
@@ -1846,6 +1869,15 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         return;
     case StepTeamJoin:
         setStatus(tr("Could not join the team"));
+        return;
+    case StepMemberAddUser:
+        setStatus(http == 404 ? tr("No user with that name") : text);
+        return;
+    case StepMemberAdd:
+        setStatus(tr("Could not add the member"));
+        return;
+    case StepMemberRemove:
+        setStatus(tr("Could not remove the member"));
         return;
     case StepSend:
     case StepUpload:
@@ -3341,6 +3373,34 @@ void MmClient::onFinished(QNetworkReply *reply)
             return;
         }
         offerTeams(teams);
+        return;
+    }
+
+    if (step == StepMemberAddUser) {
+        // Der Name ist bekannt: der Benutzer kommt in den Kanal.
+        const QString channelId = reply->property("channelId").toString();
+        const QString otherId = parsed.toMap().value("id").toString();
+        if (otherId.isEmpty()) {
+            setStatus(tr("No user with that name"));
+            return;
+        }
+        QVariantMap body;
+        body["user_id"] = otherId;
+        JsonDataAccess memberJson;
+        QByteArray bytes;
+        memberJson.saveToBuffer(body, &bytes);
+        QNetworkReply *added = start(StepMemberAdd, "/api/v4/channels/" + channelId + "/members", bytes, "POST");
+        added->setProperty("channelId", channelId);
+        return;
+    }
+
+    if (step == StepMemberAdd || step == StepMemberRemove) {
+        // Die Liste kommt neu vom Server, damit der Eintrag sofort stimmt.
+        if (step == StepMemberAdd)
+            setStatus(tr("Member added"));
+        else
+            setStatus(tr("Member removed"));
+        loadMembers(reply->property("channelId").toString());
         return;
     }
 
