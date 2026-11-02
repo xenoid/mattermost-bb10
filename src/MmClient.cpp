@@ -1487,6 +1487,63 @@ void MmClient::loadBookmarks(const QString &channelId)
     start(StepBookmarks, "/api/v4/channels/" + channelId + "/bookmarks");
 }
 
+void MmClient::loadRuns()
+{
+    // Playbook-Runs, an denen der Nutzer teilnimmt. Ohne Playbooks-Plugin antwortet der Server mit 404.
+    if (!m_loggedIn || m_teamId.isEmpty()) {
+        emit runsLoaded(QVariantList());
+        return;
+    }
+    start(StepRuns, "/plugins/playbooks/api/v0/runs?participant_id=me&team_id=" + m_teamId
+                        + "&per_page=50&sort=last_status_update_at&direction=desc");
+}
+
+QVariantList MmClient::runTasks(const QString &runId) const
+{
+    QVariantList rows;
+    for (int r = 0; r < m_runs.size(); ++r) {
+        const QVariantMap run = m_runs.at(r).toMap();
+        if (run.value("id").toString() != runId)
+            continue;
+        const QVariantList lists = run.value("checklists").toList();
+        for (int c = 0; c < lists.size(); ++c) {
+            const QVariantMap list = lists.at(c).toMap();
+            QVariantMap head;
+            head["type"] = QString("head");
+            head["title"] = repairText(list.value("title").toString());
+            rows.append(head);
+            const QVariantList items = list.value("items").toList();
+            for (int i = 0; i < items.size(); ++i) {
+                const QVariantMap item = items.at(i).toMap();
+                const QString state = item.value("state").toString();
+                QVariantMap row;
+                row["type"] = QString("task");
+                row["title"] = repairText(item.value("title").toString());
+                row["done"] = state == "closed";
+                row["skipped"] = state == "skipped";
+                row["checklist"] = c;
+                row["item"] = i;
+                rows.append(row);
+            }
+        }
+    }
+    return rows;
+}
+
+void MmClient::toggleTask(const QString &runId, int checklist, int item, bool done)
+{
+    // Offen <-> erledigt. Übersprungene Aufgaben werden beim Tippen wieder offen.
+    if (!m_loggedIn || runId.isEmpty())
+        return;
+    QVariantMap body;
+    body["new_state"] = done ? QString("") : QString("closed");
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    start(StepTaskState, QString("/plugins/playbooks/api/v0/runs/%1/checklists/%2/item/%3/state")
+                             .arg(runId).arg(checklist).arg(item), bytes, "PUT");
+}
+
 void MmClient::openThreads()
 {
     // Verfolgte Threads des Teams, neueste Antwort zuerst. Die Liste nutzt die Suchseite.
@@ -2254,6 +2311,13 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         emit bookmarksLoaded(QVariantList());
         return;
     case StepCategories:
+        return;
+    case StepRuns:
+        emit notice(http == 404 ? tr("Playbooks are not available on this server") : tr("Could not load the runs"));
+        emit runsLoaded(QVariantList());
+        return;
+    case StepTaskState:
+        emit notice(tr("Could not change the task"));
         return;
     case StepThreads:
         setStatus(tr("Could not load the threads"));
@@ -4271,6 +4335,46 @@ void MmClient::onFinished(QNetworkReply *reply)
     if (step == StepSearchUsers) {
         learnUsers(parsed.toList());
         finishSearch();
+        return;
+    }
+
+    if (step == StepRuns) {
+        const QVariantList items = parsed.toMap().value("items").toList();
+        m_runs.clear();
+        QVariantList rows;
+        for (int i = 0; i < items.size(); ++i) {
+            const QVariantMap run = items.at(i).toMap();
+            const QString status = run.value("current_status").toString();
+            if (status == "Finished")
+                continue;
+            m_runs.append(run);
+            int total = 0;
+            int done = 0;
+            const QVariantList lists = run.value("checklists").toList();
+            for (int c = 0; c < lists.size(); ++c) {
+                const QVariantList tasks = lists.at(c).toMap().value("items").toList();
+                for (int t = 0; t < tasks.size(); ++t) {
+                    const QString state = tasks.at(t).toMap().value("state").toString();
+                    if (state == "skipped")
+                        continue;
+                    ++total;
+                    if (state == "closed")
+                        ++done;
+                }
+            }
+            QVariantMap row;
+            row["type"] = QString("run");
+            row["id"] = run.value("id").toString();
+            row["title"] = repairText(run.value("name").toString());
+            row["subtitle"] = tr("%1 of %2 tasks done").arg(done).arg(total);
+            rows.append(row);
+        }
+        emit runsLoaded(rows);
+        return;
+    }
+
+    if (step == StepTaskState) {
+        loadRuns();
         return;
     }
 

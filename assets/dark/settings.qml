@@ -86,6 +86,10 @@ Page {
             source: "asset:///dark/search.qml"
         },
         ComponentDefinition {
+            id: runsDef
+            source: "asset:///dark/runs.qml"
+        },
+        ComponentDefinition {
             id: joinTeamDef
             source: "asset:///dark/jointeam.qml"
         },
@@ -604,6 +608,36 @@ Page {
                             page.heading = qsTr("Threads")
                             navPane.push(page)
                             _mm.openThreads()
+                        }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Playbook runs")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b9bf2")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: {
+                            if (Qt.mm) Qt.mm.traceLog("tap settings playbook runs")
+                            if (!navPane)
+                                return
+                            var page = navPane.make(runsDef)
+                            if (!page)
+                                return
+                            page.navPane = navPane
+                            page.load()
+                            navPane.push(page)
                         }
                     }
                 ]

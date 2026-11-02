@@ -169,6 +169,9 @@ public:
     Q_INVOKABLE void acknowledgePost(const QString &postId);
     Q_INVOKABLE void loadBookmarks(const QString &channelId);
     Q_INVOKABLE void openThreads();
+    Q_INVOKABLE void loadRuns();
+    Q_INVOKABLE QVariantList runTasks(const QString &runId) const;
+    Q_INVOKABLE void toggleTask(const QString &runId, int checklist, int item, bool done);
     Q_INVOKABLE void testNotification();
     Q_INVOKABLE bool startRecording();
     Q_INVOKABLE QString stopRecording();
@@ -233,6 +236,7 @@ signals:
     void openTeamsLoaded(const QVariantList &rows);
     void userFound(const QVariantMap &user);
     void bookmarksLoaded(const QVariantList &rows);
+    void runsLoaded(const QVariantList &rows);
     void notice(const QString &text);
     void recordingChanged();
     void shareChanged();
@@ -304,7 +308,9 @@ private:
         StepBookmarks,
         StepThreads,
         StepSchedule,
-        StepCategories
+        StepCategories,
+        StepRuns,
+        StepTaskState
     };
 
     enum FileKind {
@@ -519,6 +525,7 @@ private:
     QString m_nextPriority;
     qint64 m_nextScheduleAt;
     QVariantList m_categories;
+    QVariantList m_runs;
     bb::multimedia::AudioRecorder *m_recorder;
     QString m_recordPath;
     QString m_shareText;
