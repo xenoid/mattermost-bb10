@@ -4,7 +4,7 @@ CONFIG += qt warn_on device cascades10
 
 QT += network sql
 
-LIBS += -lbb -lbbdata -lbbsystem -lbbplatform -lslog2 -lssl -lcrypto
+LIBS += -lbb -lbbdata -lbbsystem -lbbplatform -lbbmultimedia -lslog2 -lssl -lcrypto
 
 # Der Hub ist ein echtes ELF-Programm. Eine .so lässt sich als Qnx/Elf nicht starten.
 hub.target = o.le-v7/MattermostHub

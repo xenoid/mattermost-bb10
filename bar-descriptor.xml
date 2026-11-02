@@ -3,7 +3,7 @@
     <id>com.hollweck.mattermost</id>
     <name>Mattermost</name>
     <versionNumber>1.0.0</versionNumber>
-    <buildId>153</buildId>
+    <buildId>154</buildId>
     <description>Mattermost client for BlackBerry 10.</description>
     <author>hollweck</author>
     <initialWindow>
@@ -16,6 +16,7 @@
     <permission>access_internet</permission>
     <permission>access_shared</permission>
     <permission>post_notification</permission>
+    <permission>record_audio</permission>
     <permission system="true">_sys_run_headless</permission>
     <permission system="true">_sys_headless_nostop</permission>
     <invoke-target id="com.hollweck.mattermost.open">

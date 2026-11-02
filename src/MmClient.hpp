@@ -19,6 +19,7 @@
 #include <QVariantMap>
 
 namespace bb { namespace system { class InvokeManager; class InvokeRequest; } }
+namespace bb { namespace multimedia { class AudioRecorder; } }
 
 // Fassade für die QML-Oberfläche: Anmeldung, Mattermost-API v4, Bild-Cache.
 // Alles Netz läuft über einen einzigen QNetworkAccessManager.
@@ -51,6 +52,8 @@ class MmClient : public QObject
     Q_PROPERTY(QString customText READ customText NOTIFY presenceChanged)
     Q_PROPERTY(QString customEmoji READ customEmoji NOTIFY presenceChanged)
     Q_PROPERTY(QString nextPriority READ nextPriority NOTIFY nextPriorityChanged)
+    Q_PROPERTY(QString channelBanner READ channelBanner NOTIFY channelChanged)
+    Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged)
     Q_PROPERTY(QVariantMap profile READ profile NOTIFY profileChanged)
     Q_PROPERTY(bool trustReady READ trustReady CONSTANT)
     Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
@@ -64,6 +67,8 @@ public:
     QString username() const { return m_username; }
     QString channelId() const { return m_channelId; }
     QString channelName() const { return m_channelName; }
+    QString channelBanner() const;
+    bool recording() const { return !m_recordPath.isEmpty(); }
     QString teamName() const { return m_teamName; }
     QString iconSend() const { return m_iconSend; }
     QString iconSearch() const { return m_iconSearch; }
@@ -153,6 +158,8 @@ public:
     Q_INVOKABLE void loadBookmarks(const QString &channelId);
     Q_INVOKABLE void openThreads();
     Q_INVOKABLE void testNotification();
+    Q_INVOKABLE bool startRecording();
+    Q_INVOKABLE QString stopRecording();
     Q_INVOKABLE void copyProblemReport();
     Q_INVOKABLE void saveDraft(const QString &channelId, const QString &text);
     Q_INVOKABLE QString draftFor(const QString &channelId) const;
@@ -209,6 +216,7 @@ signals:
     void userFound(const QVariantMap &user);
     void bookmarksLoaded(const QVariantList &rows);
     void notice(const QString &text);
+    void recordingChanged();
 
 private slots:
     void onFinished(QNetworkReply *reply);
@@ -485,6 +493,8 @@ private:
 
     QString m_lastSent;
     QString m_nextPriority;
+    bb::multimedia::AudioRecorder *m_recorder;
+    QString m_recordPath;
     QString m_lastPostId;
     QString m_postsSig;
     QString m_threadRoot;

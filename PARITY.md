@@ -47,7 +47,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | New direct message | Built: Settings, MESSAGES, enter a username. Group messages still missing. Not yet tested on the device |
 | 🔴 | Admin-managed sidebar categories | Android 2.41 |
 | 🟡 | Channel bookmarks | Built: read-only list from the channel long-press menu, a tap opens the link. Not yet tested on the device |
-| 🔴 | Channel banners | Enterprise Advanced. Show only |
+| 🟡 | Channel banners | Built: the banner text shows at the top of the channel. The banner colour from the server is not used. Not yet tested on the device |
 | 🔴 | Guest invitations | |
 | 🔴 | Shared-channel system messages | Low priority |
 
@@ -68,7 +68,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Reactions | Swipe, twelve names, chips. Swipe not confirmed on the device since build 123 |
 | 🟡 | Emoji panel with server emoji | No flags, skin tones or ZWJ sequences |
 | 🟡 | Date and time formats | 24-hour setting exists. Full regional formats to verify |
-| 🟡 | Collapsed reply threads and global threads list | Built: Settings, MESSAGES, Threads lists followed threads with reply and unread counts; a tap opens the root post. Follow and unfollow are missing. Not yet tested on the device |
+| 🟡 | Collapsed reply threads and global threads list | Built: Settings, MESSAGES, Threads lists followed threads with reply and unread counts; a tap opens the root post. Follow and unfollow are missing. Device 2026-11-02: the list loads |
 | 🔴 | Scheduled posts | Server API |
 | 🟡 | Drafts tab | Built: one draft per channel stays on the phone and comes back when the channel opens. Device test 2026-11-02: works. The list of all drafts is missing |
 | 🟡 | Copy code block, copy email address | Built: Copy text in the post long-press menu copies the whole message. Copying only a code block or an address is missing. Not yet tested on the device |
@@ -91,9 +91,9 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Open other files | |
 | 🟢 | Upload under the original name | |
 | 🟢 | Show images, on or off | Setting |
-| 🔴 | Audio playback in chat | `bb::multimedia`. Android 2.27 |
-| 🔴 | Video playback in chat | |
-| 🔴 | Voice message recording | To verify |
+| 🟡 | Audio playback in chat | Open attachment hands audio files to the system player. No player inside the chat. To verify on the device |
+| 🟡 | Video playback in chat | Open attachment hands video files to the system player. No player inside the chat. To verify on the device |
+| 🟡 | Voice message recording | Built: the + page records an AAC voice message and attaches it to the next message. Not yet tested on the device |
 | 🔴 | Share into the app from other apps | Invoke target for `bb.action.SHARE` |
 
 ## Notifications and background
@@ -105,7 +105,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Background refresh every six minutes | Hub process |
 | 🔴 | Realtime in background over websocket | Hub holds the socket. Costs battery. Needs a setting |
 | 🟡 | Notification settings per channel | Built: long-press a channel, then Notifications (push, desktop, mark as unread). Hub honours desktop setting. Not yet tested on the device |
-| 🟡 | Test notification tool | Built: Settings, DIAGNOSTICS, Test notification puts a local alert in the Hub. Not yet tested on the device |
+| 🟢 | Test notification tool | Settings, DIAGNOSTICS, Test notification puts a local alert in the Hub. Device 2026-11-02: works |
 | ⚪ | Push notifications | No FCM on BlackBerry 10 |
 
 ## Search and navigation
@@ -168,7 +168,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | | Feature | Notes |
 | --- | --- | --- |
 | 🟢 | Protocol log | Setting |
-| 🟡 | Problem report | Built: Settings, DIAGNOSTICS, Copy problem report puts version, server and the end of debug.log on the clipboard. Not yet tested on the device |
+| 🟢 | Problem report | Settings, DIAGNOSTICS, Copy problem report puts version, server and the end of debug.log on the clipboard instead of opening an email. Device 2026-11-02: works |
 
 ## Out of scope
 

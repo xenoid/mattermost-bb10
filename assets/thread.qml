@@ -78,6 +78,24 @@ Page {
         StatusBanner {
         }
 
+        // Kanal-Banner aus den Kanaleinstellungen des Servers, nur im Kanal, nicht im Thread.
+        Container {
+            visible: rootId == "" && _mm.channelBanner != ""
+            horizontalAlignment: HorizontalAlignment.Fill
+            background: Color.create("#fff4d6")
+            leftPadding: 20
+            rightPadding: 20
+            topPadding: 8
+            bottomPadding: 8
+            Label {
+                text: _mm.channelBanner
+                textFormat: TextFormat.Plain
+                multiline: true
+                textStyle.color: Color.create("#5c4400")
+                textStyle.fontSize: FontSize.Small
+            }
+        }
+
         Label {
             visible: rootId == "" && _mm.hasOlder
             text: qsTr("Older messages")

@@ -7,6 +7,8 @@
 #include <bb/platform/Notification.hpp>
 #include <bb/system/ApplicationStartupMode.hpp>
 #include <bb/system/Clipboard>
+#include <bb/multimedia/AudioRecorder>
+#include <bb/multimedia/MediaError>
 #include <bb/system/InvokeManager.hpp>
 #include <bb/system/InvokeRecurrenceRule.hpp>
 #include <bb/system/InvokeReply.hpp>
@@ -274,6 +276,7 @@ MmClient::MmClient(QObject *parent)
     m_notifyMentions = settings.value("notifyMentions", false).toBool();
     m_debugLog = settings.value("debugLog", false).toBool();
     g_traceOn = m_debugLog;
+    m_recorder = 0;
     if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
         setLoggedIn(true);
         ensureLive();
@@ -1468,6 +1471,55 @@ void MmClient::openThreads()
         return;
     setStatus(tr("Searching…"));
     start(StepThreads, "/api/v4/users/" + m_userId + "/teams/" + m_teamId + "/threads?per_page=30");
+}
+
+QString MmClient::channelBanner() const
+{
+    for (int i = 0; i < m_channelRows.size(); ++i) {
+        const QVariantMap row = m_channelRows.at(i).toMap();
+        if (row.value("channelId").toString() == m_channelId)
+            return row.value("banner").toString();
+    }
+    return QString();
+}
+
+bool MmClient::startRecording()
+{
+    // Sprachnachricht als AAC in den Cache. Die Endung bestimmt das Format.
+    if (!m_recordPath.isEmpty())
+        return true;
+    if (!m_recorder)
+        m_recorder = new bb::multimedia::AudioRecorder(this);
+    const QString path = ImageStore::dir() + "/voice-" + QString::number(QDateTime::currentMSecsSinceEpoch()) + ".m4a";
+    m_recorder->setOutputUrl(QUrl::fromLocalFile(path));
+    const bool ok = m_recorder->prepare() == bb::multimedia::MediaError::None
+                    && m_recorder->record() == bb::multimedia::MediaError::None;
+    traceWrite(QString("voice start ok=%1 path=%2").arg(ok ? 1 : 0).arg(path));
+    if (!ok) {
+        m_recorder->reset();
+        emit notice(tr("Recording failed"));
+        return false;
+    }
+    m_recordPath = path;
+    emit recordingChanged();
+    return true;
+}
+
+QString MmClient::stopRecording()
+{
+    if (m_recordPath.isEmpty() || !m_recorder)
+        return QString();
+    m_recorder->reset();
+    const QString path = m_recordPath;
+    m_recordPath.clear();
+    emit recordingChanged();
+    const qint64 size = QFileInfo(path).size();
+    traceWrite(QString("voice stop bytes=%1").arg(size));
+    if (size <= 0) {
+        emit notice(tr("Recording failed"));
+        return QString();
+    }
+    return path;
 }
 
 void MmClient::testNotification()
@@ -3750,6 +3802,8 @@ void MmClient::onFinished(QNetworkReply *reply)
             row["peerId"] = peer;
             row["header"] = channel.value("header").toString();
             row["purpose"] = channel.value("purpose").toString();
+            const QVariantMap banner = channel.value("banner_info").toMap();
+            row["banner"] = banner.value("enabled").toBool() ? repairText(banner.value("text").toString()) : QString();
             row["last"] = channel.value("last_post_at").toLongLong();
             row["total"] = channel.value("total_msg_count").toLongLong();
             const qint64 last = channel.value("last_post_at").toLongLong();

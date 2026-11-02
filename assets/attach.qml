@@ -105,6 +105,49 @@ Page {
             horizontalAlignment: HorizontalAlignment.Fill
         }
 
+        // Sprachnachricht: erster Tipp startet, zweiter beendet und hängt die Datei an.
+        Container {
+            horizontalAlignment: HorizontalAlignment.Fill
+            preferredHeight: 100
+            layout: StackLayout {
+                orientation: LayoutOrientation.LeftToRight
+            }
+            gestureHandlers: [
+                TapHandler {
+                    onTapped: {
+                        _mm.traceLog("tap attach.qml voice recording=" + _mm.recording)
+                        if (!_mm.recording) {
+                            _mm.startRecording()
+                            return
+                        }
+                        var path = _mm.stopRecording()
+                        if (path != "")
+                            chosen([path])
+                    }
+                }
+            ]
+            Container {
+                preferredWidth: 8
+                preferredHeight: 48
+                background: Color.create(_mm.recording ? "#d6322e" : "#2e7d32")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+            }
+            Label {
+                text: _mm.recording ? qsTr("Recording… tap to stop and attach") : qsTr("Record voice message")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+                textStyle.fontSize: FontSize.Large
+                textStyle.color: Color.create(_mm.recording ? "#d6322e" : "#1b1f23")
+            }
+        }
+
+        Container {
+            preferredHeight: 1
+            background: Color.create("#e6eaee")
+            horizontalAlignment: HorizontalAlignment.Fill
+        }
+
         // Priorität gilt für die nächste Nachricht im Kanal. Antworten haben keine Priorität.
         Container {
             visible: replyRoot == ""
@@ -161,6 +204,12 @@ Page {
                 textStyle.color: Color.create("#1b1f23")
             }
         }
+    }
+
+    // Verlässt man die Seite während der Aufnahme, endet sie ohne Anhang.
+    function dropSignals() {
+        if (_mm.recording)
+            _mm.stopRecording()
     }
 
     function chosen(files) {
