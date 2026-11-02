@@ -175,6 +175,9 @@ public:
     Q_INVOKABLE void loadRuns();
     Q_INVOKABLE void startSso(const QString &serverUrl, const QString &service);
     Q_INVOKABLE void setPreauthSecret(const QString &secret);
+    Q_INVOKABLE QVariantList accounts() const;
+    Q_INVOKABLE void addAccount();
+    Q_INVOKABLE void switchAccount(const QString &key);
     Q_INVOKABLE void inviteGuest(const QString &channelId, const QString &email);
     Q_INVOKABLE bool setClientCertificate(const QString &certPath, const QString &keyPath, const QString &passphrase);
     Q_INVOKABLE void clearClientCertificate();
@@ -388,6 +391,11 @@ private:
                       const QString &doneText, const QString &failText);
     void loadClientCertificate();
     void emitLookup();
+    QVariantList savedAccounts() const;
+    void storeAccounts(const QVariantList &list);
+    void rememberCurrent();
+    void forgetCurrent();
+    bool outboxBusy();
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);

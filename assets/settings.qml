@@ -63,6 +63,20 @@ Page {
         _mm.userFound.connect(showUser)
     }
 
+    // Gespeicherte Konten und als letzter Eintrag "Konto hinzufügen".
+    function showAccounts() {
+        var rows = _mm.accounts()
+        var keys = []
+        accountDialog.clearList()
+        for (var i = 0; i < rows.length; ++i) {
+            keys.push(String(rows[i].key))
+            accountDialog.appendItem(rows[i].title + (rows[i].current ? " ✓" : ""))
+        }
+        accountDialog.appendItem(qsTr("Add account"))
+        accountDialog.keys = keys
+        accountDialog.show()
+    }
+
     function profileName() {
         var name = (_mm.profile.first + " " + _mm.profile.last).trim()
         return name != "" ? name : qsTr("Not set")
@@ -228,6 +242,23 @@ Page {
             onFinished: {
                 if (value == SystemUiResult.ConfirmButtonSelection)
                     _mm.clearClientCertificate()
+            }
+        },
+        SystemListDialog {
+            id: accountDialog
+            property variant keys: []
+            title: qsTr("Accounts")
+            dismissOnSelection: true
+            onFinished: {
+                if (value != SystemUiResult.ItemSelection || selectedIndices.length == 0)
+                    return
+                var i = selectedIndices[0]
+                if (i >= accountDialog.keys.length)
+                    _mm.addAccount()
+                else
+                    _mm.switchAccount(accountDialog.keys[i])
+                if (navPane)
+                    navPane.pop()
             }
         },
         SystemPrompt {
@@ -851,6 +882,26 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:711 onTapped"); leaveTeamDialog.show() }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Accounts and servers")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings accounts"); showAccounts() }
                     }
                 ]
             }

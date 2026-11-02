@@ -26,7 +26,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Log out | |
 | 🟢 | Choose a team | |
 | 🟡 | Join or leave a team | Built: join an open team and leave the current one, both from Settings, ACCOUNT. Invites to private teams are missing. Not yet tested on the device |
-| 🔴 | Several accounts or servers | `MmClient` is a singleton with fixed settings keys |
+| 🟡 | Several accounts or servers | Built: Settings, ACCOUNT, Accounts and servers keeps several signed-in accounts and switches between them; Add account opens the login for the next. Only the active account gets Hub alerts. Not yet tested on the device |
 | 🟡 | Authentication secret on server entry | Built: optional field on the login page; sent as X-Mattermost-Preauth-Secret on every request (server 10.12+ behind a proxy). A proxy rejection shows a message. The websocket does not send it yet. Not yet tested on the device |
 | 🟡 | Sign in with GitLab, Google or Entra ID (OAuth) | Built: the login page opens the server's mobile OAuth login (GitLab, Google, Office 365/Entra ID, OpenID) in the browser; the mmauth:// callback brings the token back into the app. The server must allow mmauth:// (default). Not yet tested on the device |
 | 🟡 | SAML (Okta, OneLogin, ADFS) | Built: same browser flow with the server's SAML mobile login. Not yet tested on the device |

@@ -951,8 +951,153 @@ QVariantList MmClient::teamChoices() const
     return m_teamChoices;
 }
 
+// ---------------------------------------------------------------- Mehrere Konten
+
+// Das aktive Konto steht in den Hauptschlüsseln. "accounts" hält alle gespeicherten mit Token.
+QVariantList MmClient::savedAccounts() const
+{
+    return QSettings("hollweck", "mattermost").value("accounts").toList();
+}
+
+void MmClient::storeAccounts(const QVariantList &list)
+{
+    QSettings("hollweck", "mattermost").setValue("accounts", list);
+}
+
+void MmClient::rememberCurrent()
+{
+    if (m_token.isEmpty() || m_serverUrl.isEmpty() || m_userId.isEmpty())
+        return;
+    const QString key = m_serverUrl + "|" + m_userId;
+    QVariantMap entry;
+    entry["key"] = key;
+    entry["server"] = m_serverUrl;
+    entry["token"] = m_token;
+    entry["userId"] = m_userId;
+    entry["username"] = m_username;
+    QVariantList list = savedAccounts();
+    bool found = false;
+    for (int i = 0; i < list.size(); ++i) {
+        if (list.at(i).toMap().value("key").toString() == key) {
+            list[i] = entry;
+            found = true;
+        }
+    }
+    if (!found)
+        list.append(entry);
+    storeAccounts(list);
+}
+
+void MmClient::forgetCurrent()
+{
+    const QString key = m_serverUrl + "|" + m_userId;
+    QVariantList list = savedAccounts();
+    for (int i = list.size() - 1; i >= 0; --i) {
+        if (list.at(i).toMap().value("key").toString() == key)
+            list.removeAt(i);
+    }
+    storeAccounts(list);
+}
+
+bool MmClient::outboxBusy()
+{
+    ensureStore();
+    if (m_store.isOpen() && !m_store.outbox().isEmpty()) {
+        emit notice(tr("Messages are still waiting to be sent"));
+        return true;
+    }
+    return false;
+}
+
+QVariantList MmClient::accounts() const
+{
+    // Für die Auswahl: Name und Server, ohne Token.
+    const QString current = m_serverUrl + "|" + m_userId;
+    const QVariantList list = savedAccounts();
+    QVariantList rows;
+    bool listed = false;
+    for (int i = 0; i < list.size(); ++i) {
+        const QVariantMap entry = list.at(i).toMap();
+        QVariantMap row;
+        row["key"] = entry.value("key").toString();
+        row["title"] = entry.value("username").toString() + " @ " + QUrl(entry.value("server").toString()).host();
+        row["current"] = row.value("key").toString() == current;
+        if (row.value("current").toBool())
+            listed = true;
+        rows.append(row);
+    }
+    if (!listed && m_loggedIn && !m_userId.isEmpty()) {
+        QVariantMap row;
+        row["key"] = current;
+        row["title"] = m_username + " @ " + QUrl(m_serverUrl).host();
+        row["current"] = true;
+        rows.prepend(row);
+    }
+    return rows;
+}
+
+void MmClient::addAccount()
+{
+    // Das aktive Konto bleibt gespeichert und angemeldet. Danach erscheint die Anmeldung für das nächste.
+    if (outboxBusy())
+        return;
+    rememberCurrent();
+    QSettings settings("hollweck", "mattermost");
+    settings.remove("token");
+    settings.remove("userId");
+    settings.remove("teamId");
+    resetSession();
+    ensureStore();
+    m_store.saveChannels(QVariantList());
+    setLoggedIn(false);
+    emit channelChanged();
+    emit sessionChanged();
+    emit channelsLoaded(QVariantList());
+    emit postsLoaded(QVariantList());
+    traceWrite("account add");
+    setStatus(tr("Sign in to the other account"));
+}
+
+void MmClient::switchAccount(const QString &key)
+{
+    if (key.isEmpty() || key == m_serverUrl + "|" + m_userId)
+        return;
+    QVariantMap entry;
+    const QVariantList list = savedAccounts();
+    for (int i = 0; i < list.size(); ++i) {
+        if (list.at(i).toMap().value("key").toString() == key)
+            entry = list.at(i).toMap();
+    }
+    if (entry.isEmpty() || outboxBusy())
+        return;
+    rememberCurrent();
+    resetSession();
+    ensureStore();
+    m_store.saveChannels(QVariantList());
+    m_serverUrl = entry.value("server").toString();
+    m_token = entry.value("token").toString();
+    m_userId = entry.value("userId").toString();
+    m_username = entry.value("username").toString();
+    QSettings settings("hollweck", "mattermost");
+    settings.setValue("serverUrl", m_serverUrl);
+    settings.setValue("token", m_token);
+    settings.setValue("userId", m_userId);
+    settings.setValue("username", m_username);
+    settings.remove("teamId");
+    emit channelChanged();
+    emit channelsLoaded(QVariantList());
+    emit postsLoaded(QVariantList());
+    setLoggedIn(true);
+    emit sessionChanged();
+    ensureLive();
+    loadMe();
+    traceWrite("account switch");
+    emit notice(tr("Switched to %1").arg(m_username));
+}
+
 void MmClient::logout()
 {
+    forgetCurrent();
     QSettings settings("hollweck", "mattermost");
     settings.remove("token");
     settings.remove("userId");
@@ -4145,6 +4290,7 @@ void MmClient::onFinished(QNetworkReply *reply)
         settings.setValue("username", m_username);
         settings.setValue("token", m_token);
         settings.setValue("userId", m_userId);
+        rememberCurrent();
         setLoggedIn(true);
         emit sessionChanged();
         ensureLive();
@@ -4212,6 +4358,7 @@ void MmClient::onFinished(QNetworkReply *reply)
         queueAvatar(m_userId);
         pumpFiles();
         loadFlagged();
+        rememberCurrent();
         loadTeams();
         // Der eigene Custom Status steht als JSON-Text in den Eigenschaften.
         m_statusEmoji.clear();
