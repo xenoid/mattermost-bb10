@@ -527,6 +527,22 @@ void MmClient::setNotifyMentions(bool on)
         syncInbox();
 }
 
+bool MmClient::darkTheme() const
+{
+    return QSettings("hollweck", "mattermost").value("darkTheme", false).toBool();
+}
+
+void MmClient::setDarkTheme(bool on)
+{
+    // Die Seiten werden beim Start gewählt. Der Wechsel wirkt deshalb erst nach einem Neustart.
+    if (darkTheme() == on)
+        return;
+    QSettings("hollweck", "mattermost").setValue("darkTheme", on);
+    traceWrite(on ? "theme dark" : "theme bright");
+    emit prefsChanged();
+    emit notice(tr("Restart Mattermost to change the design"));
+}
+
 void MmClient::setDebugLog(bool on)
 {
     if (m_debugLog == on)

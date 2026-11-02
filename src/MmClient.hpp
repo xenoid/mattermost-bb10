@@ -48,6 +48,7 @@ class MmClient : public QObject
     Q_PROPERTY(bool notifyHub READ notifyHub WRITE setNotifyHub NOTIFY prefsChanged)
     Q_PROPERTY(bool notifyMentions READ notifyMentions WRITE setNotifyMentions NOTIFY prefsChanged)
     Q_PROPERTY(bool debugLog READ debugLog WRITE setDebugLog NOTIFY prefsChanged)
+    Q_PROPERTY(bool darkTheme READ darkTheme WRITE setDarkTheme NOTIFY prefsChanged)
     Q_PROPERTY(QString presence READ presence NOTIFY presenceChanged)
     Q_PROPERTY(QString customText READ customText NOTIFY presenceChanged)
     Q_PROPERTY(QString customEmoji READ customEmoji NOTIFY presenceChanged)
@@ -92,6 +93,7 @@ public:
     bool notifyHub() const { return m_notifyHub; }
     bool notifyMentions() const { return m_notifyMentions; }
     bool debugLog() const { return m_debugLog; }
+    bool darkTheme() const;
     bool trustReady() const { return m_trustReady; }
     QString customText() const { return m_statusText; }
     QString customEmoji() const { return m_statusEmoji; }
@@ -105,6 +107,7 @@ public:
     void setNotifyHub(bool on);
     void setNotifyMentions(bool on);
     void setDebugLog(bool on);
+    void setDarkTheme(bool on);
     bool headlessLaunch() const;
 
     Q_INVOKABLE void login(const QString &serverUrl, const QString &user, const QString &password);

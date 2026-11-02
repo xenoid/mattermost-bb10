@@ -150,7 +150,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | --- | --- | --- |
 | 🟢 | Refresh, team, log out, preview, 24-hour clock, images, hub alerts, mentions only, protocol log | |
 | 🟡 | English and German | Other languages are a catalog. See README |
-| 🔴 | Dark theme | Colours into tokens first |
+| 🟡 | Dark theme | Built: Settings, DISPLAY, Dark design. tools/make-dark.py writes dark copies of the pages, and system controls switch to the Cascades dark style. Takes effect after a restart. Not yet tested on the device |
 | 🔴 | Disable animations | Android 2.31 |
 
 ## Security

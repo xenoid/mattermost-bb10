@@ -6,6 +6,8 @@
 #include <bb/cascades/Page>
 #include <bb/cascades/Label>
 #include <bb/cascades/Container>
+#include <bb/cascades/ThemeSupport>
+#include <bb/cascades/VisualStyle>
 
 #include <bb/Application>
 #include <QDebug>
@@ -23,6 +25,7 @@
 #include <QStringList>
 #include <QTextCodec>
 #include <QTranslator>
+#include <QSettings>
 
 using namespace bb::cascades;
 
@@ -119,7 +122,11 @@ Q_DECL_EXPORT int main(int argc, char **argv)
 
     MmClient *client = new MmClient(&app);
 
-    QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(&app);
+    // Dunkles Design: eigene Seiten mit dunkler Palette (tools/make-dark.py), Systemelemente dunkel.
+    const bool dark = QSettings("hollweck", "mattermost").value("darkTheme", false).toBool();
+    if (dark)
+        app.themeSupport()->setVisualStyle(VisualStyle::Dark);
+    QmlDocument *qml = QmlDocument::create(dark ? "asset:///dark/main.qml" : "asset:///main.qml").parent(&app);
     if (qml->hasErrors()) {
         const QList<QDeclarativeError> errors = qml->errors();
         QString text;

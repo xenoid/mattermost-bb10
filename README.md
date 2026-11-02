@@ -9,14 +9,14 @@ An unofficial [Mattermost](https://mattermost.com) client for the BlackBerry Cla
 Not affiliated with Mattermost, Inc. or BlackBerry.
 
 - **Package:** `com.hollweck.mattermost`, shown on the phone as **Mattermost**
-- **Version:** 1.0.0, build 157
+- **Version:** 1.0.0, build 158
 - **Source:** [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10)
 
 ## Status
 
 The app is usable for daily work: sign in, read, send, reply in threads, search, attach files, and get hub alerts. It works offline for sending, which queues messages until the phone is back online.
 
-The goal is the feature set of the official Android app, minus voice and video calls. [PARITY.md](PARITY.md) lists every feature and its state. At the time of writing, 32 of 90 tracked features are done, 31 are partly done, and 27 are open.
+The goal is the feature set of the official Android app, minus voice and video calls. [PARITY.md](PARITY.md) lists every feature and its state. At the time of writing, 32 of 90 tracked features are done, 32 are partly done, and 26 are open.
 
 ## Features
 
@@ -61,6 +61,12 @@ blackberry-nativepackager -package -configuration Device-Release Mattermost-rele
 ```
 
 `QNX_TARGET` must be set before `make`, because the hub binary links against it. The environment script sets it.
+
+The dark design uses copies of the pages in `assets/dark`. After changing any page in `assets`, regenerate them before packaging:
+
+```sh
+python3 tools/make-dark.py
+```
 
 ### TLS shim
 

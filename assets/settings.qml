@@ -912,6 +912,42 @@ Page {
                         spaceQuota: 1
                     }
                     Label {
+                        text: qsTr("Dark design")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#1b1f23")
+                        textStyle.fontSize: FontSize.Medium
+                    }
+                    Label {
+                        text: qsTr("Takes effect after a restart")
+                        textFormat: TextFormat.Plain
+                        textStyle.color: Color.create("#6b747d")
+                        textStyle.fontSize: FontSize.XSmall
+                    }
+                }
+                ToggleButton {
+                    verticalAlignment: VerticalAlignment.Center
+                    checked: _mm.darkTheme
+                    onCheckedChanged: {
+                        if (_mm.darkTheme != checked)
+                            _mm.darkTheme = checked
+                    }
+                }
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                leftPadding: 20
+                rightPadding: 20
+                topPadding: 16
+                bottomPadding: 16
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Container {
+                    verticalAlignment: VerticalAlignment.Center
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                    Label {
                         text: qsTr("Show images")
                         textFormat: TextFormat.Plain
                         textStyle.color: Color.create("#1b1f23")
