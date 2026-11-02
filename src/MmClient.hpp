@@ -172,6 +172,12 @@ public:
     Q_INVOKABLE void loadRuns();
     Q_INVOKABLE QVariantList runTasks(const QString &runId) const;
     Q_INVOKABLE void toggleTask(const QString &runId, int checklist, int item, bool done);
+    Q_INVOKABLE void loadPlaybooks();
+    Q_INVOKABLE void startRun(const QString &playbookId, const QString &name);
+    Q_INVOKABLE void postRunStatus(const QString &runId, const QString &message);
+    Q_INVOKABLE void updateRun(const QString &runId, const QString &field, const QString &text);
+    Q_INVOKABLE void finishRun(const QString &runId);
+    Q_INVOKABLE QString runField(const QString &runId, const QString &field) const;
     Q_INVOKABLE void testNotification();
     Q_INVOKABLE bool startRecording();
     Q_INVOKABLE QString stopRecording();
@@ -237,6 +243,7 @@ signals:
     void userFound(const QVariantMap &user);
     void bookmarksLoaded(const QVariantList &rows);
     void runsLoaded(const QVariantList &rows);
+    void playbooksLoaded(const QVariantList &rows);
     void notice(const QString &text);
     void recordingChanged();
     void shareChanged();
@@ -310,7 +317,9 @@ private:
         StepSchedule,
         StepCategories,
         StepRuns,
-        StepTaskState
+        StepTaskState,
+        StepRunAction,
+        StepPlaybooks
     };
 
     enum FileKind {
@@ -362,6 +371,7 @@ private:
     void finishMembers();
     QString pinHash(const QString &salt, const QString &pin) const;
     void sendScheduled(const QString &channelId, const QString &message);
+    void runAction(const QString &path, const QByteArray &verb, const QVariantMap &body, const QString &doneText);
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);

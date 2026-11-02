@@ -18,6 +18,7 @@
 
 #include <QCoreApplication>
 #include <QDebug>
+#include <QBuffer>
 #include <QDate>
 #include <QDateTime>
 #include <QDir>
@@ -1498,6 +1499,76 @@ void MmClient::loadRuns()
                         + "&per_page=50&sort=last_status_update_at&direction=desc");
 }
 
+void MmClient::runAction(const QString &path, const QByteArray &verb, const QVariantMap &body,
+                         const QString &doneText)
+{
+    QByteArray bytes;
+    if (!body.isEmpty()) {
+        JsonDataAccess json;
+        json.saveToBuffer(body, &bytes);
+    }
+    QNetworkReply *reply = start(StepRunAction, "/plugins/playbooks/api/v0" + path, bytes, verb);
+    reply->setProperty("doneText", doneText);
+}
+
+void MmClient::loadPlaybooks()
+{
+    if (!m_loggedIn || m_teamId.isEmpty()) {
+        emit playbooksLoaded(QVariantList());
+        return;
+    }
+    start(StepPlaybooks, "/plugins/playbooks/api/v0/playbooks?team_id=" + m_teamId + "&per_page=100");
+}
+
+void MmClient::startRun(const QString &playbookId, const QString &name)
+{
+    if (!m_loggedIn || playbookId.isEmpty() || name.trimmed().isEmpty())
+        return;
+    QVariantMap body;
+    body["name"] = name.trimmed();
+    body["owner_user_id"] = m_userId;
+    body["team_id"] = m_teamId;
+    body["playbook_id"] = playbookId;
+    runAction("/runs", "POST", body, tr("Run started"));
+}
+
+void MmClient::postRunStatus(const QString &runId, const QString &message)
+{
+    if (!m_loggedIn || runId.isEmpty() || message.trimmed().isEmpty())
+        return;
+    QVariantMap body;
+    body["message"] = message.trimmed();
+    runAction("/runs/" + runId + "/status", "POST", body, tr("Status update posted"));
+}
+
+void MmClient::updateRun(const QString &runId, const QString &field, const QString &text)
+{
+    // Name darf nicht leer sein, die Zusammenfassung schon.
+    const bool known = field == "name" || field == "summary";
+    if (!m_loggedIn || runId.isEmpty() || !known || (field == "name" && text.trimmed().isEmpty()))
+        return;
+    QVariantMap body;
+    body[field] = text.trimmed();
+    runAction("/runs/" + runId, "PATCH", body, tr("Run updated"));
+}
+
+void MmClient::finishRun(const QString &runId)
+{
+    if (!m_loggedIn || runId.isEmpty())
+        return;
+    runAction("/runs/" + runId + "/finish", "PUT", QVariantMap(), tr("Run finished"));
+}
+
+QString MmClient::runField(const QString &runId, const QString &field) const
+{
+    for (int r = 0; r < m_runs.size(); ++r) {
+        const QVariantMap run = m_runs.at(r).toMap();
+        if (run.value("id").toString() == runId)
+            return repairText(run.value(field).toString());
+    }
+    return QString();
+}
+
 QVariantList MmClient::runTasks(const QString &runId) const
 {
     QVariantList rows;
@@ -2248,7 +2319,14 @@ QNetworkReply *MmClient::start(Step step, const QString &path, const QByteArray 
         reply = m_net.deleteResource(request);
     else if (verb == "PUT")
         reply = m_net.put(request, body);
-    else
+    else if (verb == "PATCH") {
+        // Qt 4.8 kennt PATCH nur als eigene Anfrage. Der Puffer lebt so lange wie die Antwort.
+        QBuffer *buffer = new QBuffer;
+        buffer->setData(body);
+        buffer->open(QIODevice::ReadOnly);
+        reply = m_net.sendCustomRequest(request, "PATCH", buffer);
+        buffer->setParent(reply);
+    } else
         reply = m_net.get(request);
     reply->setProperty("step", int(step));
     reply->setProperty("silent", silent);
@@ -2316,8 +2394,9 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         emit notice(http == 404 ? tr("Playbooks are not available on this server") : tr("Could not load the runs"));
         emit runsLoaded(QVariantList());
         return;
-    case StepTaskState:
-        emit notice(tr("Could not change the task"));
+    case StepPlaybooks:
+        emit notice(tr("Could not load the playbooks"));
+        emit playbooksLoaded(QVariantList());
         return;
     case StepThreads:
         setStatus(tr("Could not load the threads"));
@@ -3528,6 +3607,20 @@ void MmClient::onFinished(QNetworkReply *reply)
                .arg(QString::fromUtf8(payload.left(300)).replace('\n', ' ')));
     if (m_debugLog)
         qDebug("mm-net step %d http %d net %d", int(step), http, netCode);
+    if (step == StepRunAction || step == StepTaskState) {
+        // Playbook-Antworten haben oft keinen Body. Erfolg erkennt man am HTTP-Code.
+        if (http >= 200 && http < 300 && netCode == 0) {
+            const QString done = reply->property("doneText").toString();
+            if (!done.isEmpty())
+                emit notice(done);
+            loadRuns();
+        } else if (step == StepTaskState) {
+            emit notice(tr("Could not change the task"));
+        } else {
+            emit notice(tr("Playbook action failed (HTTP %1)").arg(http));
+        }
+        return;
+    }
     if (step == StepSchedule) {
         // Geplante Nachricht: bei Erfolg nur eine Meldung, sonst kommt der Text zurück ins Eingabefeld.
         if (http >= 200 && http < 300 && netCode == 0) {
@@ -4338,6 +4431,20 @@ void MmClient::onFinished(QNetworkReply *reply)
         return;
     }
 
+    if (step == StepPlaybooks) {
+        const QVariantList items = parsed.toMap().value("items").toList();
+        QVariantList rows;
+        for (int i = 0; i < items.size(); ++i) {
+            const QVariantMap book = items.at(i).toMap();
+            QVariantMap row;
+            row["id"] = book.value("id").toString();
+            row["title"] = repairText(book.value("title").toString());
+            rows.append(row);
+        }
+        emit playbooksLoaded(rows);
+        return;
+    }
+
     if (step == StepRuns) {
         const QVariantList items = parsed.toMap().value("items").toList();
         m_runs.clear();
@@ -4370,11 +4477,6 @@ void MmClient::onFinished(QNetworkReply *reply)
             rows.append(row);
         }
         emit runsLoaded(rows);
-        return;
-    }
-
-    if (step == StepTaskState) {
-        loadRuns();
         return;
     }
 

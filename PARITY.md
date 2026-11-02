@@ -132,9 +132,9 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | | Feature | Notes |
 | --- | --- | --- |
 | 🟡 | View runs and tasks | Built: Settings, MESSAGES, Playbook runs lists running runs with done tasks; a tap shows the checklists. Needs the Playbooks plugin. Not yet tested on the device |
-| 🔴 | Create runs, post run updates, finish runs | Android 2.34 |
+| 🟡 | Create runs, post run updates, finish runs | Built: Playbook runs page starts a run from a playbook; a run page posts status updates and finishes the run. Reminders and run settings are missing. Not yet tested on the device |
 | 🟡 | Checklists, task editing, filters | Built: a tap on a task marks it done or opens it again. Editing task text and filters are missing. Not yet tested on the device |
-| 🔴 | Rename runs, edit attributes and summaries | Android 2.37 and 2.38 |
+| 🟡 | Rename runs, edit attributes and summaries | Built: a run page renames the run and edits its summary (PATCH). Custom run attributes are missing. Not yet tested on the device |
 
 ## AI Agents
 
