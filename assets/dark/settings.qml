@@ -49,6 +49,8 @@ Page {
             lines.push(user.position)
         if (user.email != "")
             lines.push(user.email)
+        if (user.extra)
+            lines.push(user.extra)
         userDialog.body = lines.join("\n")
         userDialog.show()
     }

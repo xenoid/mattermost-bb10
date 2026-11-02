@@ -9,14 +9,14 @@ An unofficial [Mattermost](https://mattermost.com) client for the BlackBerry Cla
 Not affiliated with Mattermost, Inc. or BlackBerry.
 
 - **Package:** `com.hollweck.mattermost`, shown on the phone as **Mattermost**
-- **Version:** 1.0.0, build 163
+- **Version:** 1.0.0, build 164
 - **Source:** [github.com/xenoid/mattermost-bb10](https://github.com/xenoid/mattermost-bb10)
 
 ## Status
 
 The app is usable for daily work: sign in, read, send, reply in threads, search, attach files, and get hub alerts. It works offline for sending, which queues messages until the phone is back online.
 
-The goal is the feature set of the official Android app, minus voice and video calls. [PARITY.md](PARITY.md) lists every feature and its state. At the time of writing, 32 of 89 tracked features are done, 42 are partly done, and 15 are open.
+The goal is the feature set of the official Android app, minus voice and video calls. [PARITY.md](PARITY.md) lists every feature and its state. At the time of writing, 32 of 89 tracked features are done, 44 are partly done, and 13 are open.
 
 ## Features
 

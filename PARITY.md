@@ -27,7 +27,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Choose a team | |
 | 🟡 | Join or leave a team | Built: join an open team and leave the current one, both from Settings, ACCOUNT. Invites to private teams are missing. Not yet tested on the device |
 | 🔴 | Several accounts or servers | `MmClient` is a singleton with fixed settings keys |
-| 🔴 | Authentication secret on server entry | Optional field, server setting |
+| 🟡 | Authentication secret on server entry | Built: optional field on the login page; sent as X-Mattermost-Preauth-Secret on every request (server 10.12+ behind a proxy). A proxy rejection shows a message. The websocket does not send it yet. Not yet tested on the device |
 | 🟡 | Sign in with GitLab, Google or Entra ID (OAuth) | Built: the login page opens the server's mobile OAuth login (GitLab, Google, Office 365/Entra ID, OpenID) in the browser; the mmauth:// callback brings the token back into the app. The server must allow mmauth:// (default). Not yet tested on the device |
 | 🟡 | SAML (Okta, OneLogin, ADFS) | Built: same browser flow with the server's SAML mobile login. Not yet tested on the device |
 | 🔴 | Magic link for guests | Server v11.3 and later |
@@ -125,7 +125,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Custom status with emoji and expiry | Built: text and clear, with the default emoji. No emoji picker and no expiry yet. Not yet tested on the device |
 | 🟡 | View a user profile | Built: Settings, MESSAGES, Look up a user by name. Shows name, nickname, position and email. Device test 2026-11-02: works with the exact username. Opening it from a message or a member is missing |
 | 🟡 | Edit own profile | Built: Settings, PROFILE. Name, nickname, position. Email and avatar missing. Not yet tested on the device |
-| 🔴 | Custom profile attributes | Server feature flag |
+| 🟡 | Custom profile attributes | Built: Look up a user also shows the server's custom profile fields (10.5+). Editing your own is missing. Not yet tested on the device |
 
 ## Playbooks
 

@@ -125,6 +125,7 @@ NavigationPane {
                 if (value != SystemUiResult.ItemSelection || selectedIndices.length == 0)
                     return
                 var services = ["gitlab", "google", "office365", "openid", "saml"]
+                _mm.setPreauthSecret(secretField.text)
                 _mm.startSso(serverField.text, services[selectedIndices[0]])
             }
         },
@@ -326,14 +327,21 @@ NavigationPane {
                     inputMode: TextFieldInputMode.Password
                     topMargin: 6
                     input.submitKey: SubmitKey.Go
-                    input.onSubmitted: _mm.login(serverField.text, userField.text, passField.text)
+                    input.onSubmitted: { _mm.setPreauthSecret(secretField.text); _mm.login(serverField.text, userField.text, passField.text) }
+                }
+                // Nur nötig, wenn ein Reverse Proxy vor dem Server ein Pre-Auth-Secret verlangt.
+                TextField {
+                    id: secretField
+                    hintText: qsTr("Authentication secret (optional)")
+                    inputMode: TextFieldInputMode.Password
+                    topMargin: 6
                 }
                 Button {
                     text: qsTr("Sign in")
                     color: Color.create("#6b9bf2")
                     horizontalAlignment: HorizontalAlignment.Fill
                     topMargin: 20
-                    onClicked: { if (Qt.mm) Qt.mm.traceLog("tap main.qml:268 onClicked"); _mm.login(serverField.text, userField.text, passField.text) }
+                    onClicked: { if (Qt.mm) Qt.mm.traceLog("tap main.qml:268 onClicked"); _mm.setPreauthSecret(secretField.text); _mm.login(serverField.text, userField.text, passField.text) }
                 }
                 Label {
                     text: qsTr("Forgot password?")

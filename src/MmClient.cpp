@@ -290,6 +290,7 @@ MmClient::MmClient(QObject *parent)
     g_traceOn = m_debugLog;
     m_recorder = 0;
     m_locked = !settings.value("lockHash").toString().isEmpty();
+    m_preauth = settings.value("preauthSecret").toString();
     loadClientCertificate();
     m_nextScheduleAt = 0;
     if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
@@ -2194,6 +2195,33 @@ void MmClient::clearClientCertificate()
     emit prefsChanged();
 }
 
+void MmClient::setPreauthSecret(const QString &secret)
+{
+    m_preauth = secret.trimmed();
+    QSettings settings("hollweck", "mattermost");
+    if (m_preauth.isEmpty())
+        settings.remove("preauthSecret");
+    else
+        settings.setValue("preauthSecret", m_preauth);
+}
+
+void MmClient::emitLookup()
+{
+    QStringList lines;
+    QMap<QString, QVariant>::const_iterator it = m_lookupAttrs.constBegin();
+    for (; it != m_lookupAttrs.constEnd(); ++it) {
+        const QString name = m_attrFields.value(it.key());
+        QString value = it.value().toString();
+        if (value.isEmpty() && it.value().type() == QVariant::List)
+            value = it.value().toStringList().join(", ");
+        if (!name.isEmpty() && !value.isEmpty())
+            lines.append(name + ": " + repairText(value));
+    }
+    QVariantMap user = m_lookupUser;
+    user["extra"] = lines.join("\n");
+    emit userFound(user);
+}
+
 void MmClient::startSso(const QString &serverUrl, const QString &service)
 {
     // Wie die Android-App: Anmeldung im Browser, der Server leitet mit dem Token auf mmauth:// zurück.
@@ -2453,6 +2481,8 @@ QNetworkRequest MmClient::makeRequest(const QString &path) const
     request.setRawHeader("Accept", "application/json");
     if (!m_token.isEmpty())
         request.setRawHeader("Authorization", QByteArray("Bearer ") + m_token.toUtf8());
+    if (!m_preauth.isEmpty())
+        request.setRawHeader("X-Mattermost-Preauth-Secret", m_preauth.toUtf8());
     applyTrust(request);
     return request;
 }
@@ -2531,6 +2561,10 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         return;
     case StepLookupUser:
         setStatus(http == 404 ? tr("No user with that name") : text);
+        return;
+    case StepProfileAttrs:
+    case StepProfileFields:
+        emit userFound(m_lookupUser);
         return;
     case StepAck:
         setStatus(tr("Could not acknowledge"));
@@ -3758,6 +3792,12 @@ void MmClient::onFinished(QNetworkReply *reply)
                .arg(QString::fromUtf8(payload.left(300)).replace('\n', ' ')));
     if (m_debugLog)
         qDebug("mm-net step %d http %d net %d", int(step), http, netCode);
+    if (http == 403 && reply->rawHeader("X-Reject-Reason") == "pre-auth") {
+        traceWrite("preauth rejected");
+        setStatus(tr("The authentication secret is missing or wrong"));
+        if (step == StepLogin)
+            return;
+    }
     if (step == StepNotice) {
         if (http >= 200 && http < 300 && netCode == 0)
             emit notice(reply->property("doneText").toString());
@@ -4236,7 +4276,34 @@ void MmClient::onFinished(QNetworkReply *reply)
         user["nickname"] = found.value("nickname").toString();
         user["position"] = found.value("position").toString();
         user["email"] = found.value("email").toString();
-        emit userFound(user);
+        // Benutzerdefinierte Profilfelder (ab Server 10.5). Fehlen sie, kommt das Profil ohne sie.
+        m_lookupUser = user;
+        start(StepProfileAttrs, "/api/v4/users/" + found.value("id").toString() + "/custom_profile_attributes",
+              QByteArray(), "GET", true);
+        return;
+    }
+
+    if (step == StepProfileAttrs) {
+        m_lookupAttrs = parsed.toMap();
+        if (m_lookupAttrs.isEmpty()) {
+            emit userFound(m_lookupUser);
+            return;
+        }
+        if (m_attrFields.isEmpty()) {
+            start(StepProfileFields, "/api/v4/custom_profile_attributes/fields", QByteArray(), "GET", true);
+            return;
+        }
+        emitLookup();
+        return;
+    }
+
+    if (step == StepProfileFields) {
+        const QVariantList fields = parsed.toList();
+        for (int i = 0; i < fields.size(); ++i) {
+            const QVariantMap field = fields.at(i).toMap();
+            m_attrFields.insert(field.value("id").toString(), repairText(field.value("name").toString()));
+        }
+        emitLookup();
         return;
     }
 

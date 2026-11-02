@@ -174,6 +174,7 @@ public:
     Q_INVOKABLE void openThreads();
     Q_INVOKABLE void loadRuns();
     Q_INVOKABLE void startSso(const QString &serverUrl, const QString &service);
+    Q_INVOKABLE void setPreauthSecret(const QString &secret);
     Q_INVOKABLE void inviteGuest(const QString &channelId, const QString &email);
     Q_INVOKABLE bool setClientCertificate(const QString &certPath, const QString &keyPath, const QString &passphrase);
     Q_INVOKABLE void clearClientCertificate();
@@ -327,7 +328,9 @@ private:
         StepTaskState,
         StepRunAction,
         StepPlaybooks,
-        StepNotice
+        StepNotice,
+        StepProfileAttrs,
+        StepProfileFields
     };
 
     enum FileKind {
@@ -384,6 +387,7 @@ private:
     void noticeAction(const QString &path, const QByteArray &verb, const QByteArray &body,
                       const QString &doneText, const QString &failText);
     void loadClientCertificate();
+    void emitLookup();
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);
@@ -548,6 +552,10 @@ private:
     qint64 m_nextScheduleAt;
     QVariantList m_categories;
     QVariantList m_runs;
+    QString m_preauth;
+    QVariantMap m_lookupUser;
+    QVariantMap m_lookupAttrs;
+    QHash<QString, QString> m_attrFields;
     bb::multimedia::AudioRecorder *m_recorder;
     QString m_recordPath;
     QString m_shareText;
