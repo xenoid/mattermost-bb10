@@ -34,6 +34,30 @@ Page {
         presenceDialog.show()
     }
 
+    // Zeigt das Profil, das der Server zum Benutzernamen liefert.
+    function showUser(user) {
+        var lines = ["@" + user.username]
+        var name = (user.firstName + " " + user.lastName).trim()
+        if (name != "")
+            lines.push(name)
+        if (user.nickname != "")
+            lines.push(user.nickname)
+        if (user.position != "")
+            lines.push(user.position)
+        if (user.email != "")
+            lines.push(user.email)
+        userDialog.body = lines.join("\n")
+        userDialog.show()
+    }
+
+    function dropSignals() {
+        _mm.userFound.disconnect(showUser)
+    }
+
+    onCreationCompleted: {
+        _mm.userFound.connect(showUser)
+    }
+
     function profileName() {
         var name = (_mm.profile.first + " " + _mm.profile.last).trim()
         return name != "" ? name : qsTr("Not set")
@@ -77,6 +101,25 @@ Page {
                 if (value == SystemUiResult.ConfirmButtonSelection)
                     _mm.createChannel(inputFieldTextEntry())
             }
+        },
+        SystemPrompt {
+            id: lookupPrompt
+            title: qsTr("Look up a user")
+            body: qsTr("Username of the person")
+            inputField.inputMode: SystemUiInputMode.Default
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Look up")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.lookupUser(inputFieldTextEntry())
+            }
+        },
+        SystemDialog {
+            id: userDialog
+            title: qsTr("Profile")
+            confirmButton.label: qsTr("OK")
+            cancelButton.label: qsTr("Cancel")
         },
         SystemPrompt {
             id: dmPrompt
@@ -427,6 +470,26 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: dmPrompt.show()
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Look up a user")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: lookupPrompt.show()
                     }
                 ]
             }

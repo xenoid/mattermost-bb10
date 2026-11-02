@@ -1538,6 +1538,19 @@ void MmClient::removeMember(const QString &channelId, const QString &userId)
     reply->setProperty("channelId", channelId);
 }
 
+void MmClient::lookupUser(const QString &username)
+{
+    // Nur das Profil anzeigen. Eine Direktnachricht startet dafür startDirect().
+    QString name = username.trimmed();
+    if (name.startsWith("@"))
+        name = name.mid(1);
+    if (!m_loggedIn || !QRegExp("^[A-Za-z0-9._-]+$").exactMatch(name)) {
+        setStatus(tr("No user with that name"));
+        return;
+    }
+    start(StepLookupUser, "/api/v4/users/username/" + name);
+}
+
 void MmClient::archiveChannel(const QString &channelId)
 {
     // DELETE auf einen Kanal archiviert ihn. Er verschwindet aus der Liste.
@@ -1878,6 +1891,9 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         return;
     case StepMemberRemove:
         setStatus(tr("Could not remove the member"));
+        return;
+    case StepLookupUser:
+        setStatus(http == 404 ? tr("No user with that name") : text);
         return;
     case StepSend:
     case StepUpload:
@@ -3373,6 +3389,20 @@ void MmClient::onFinished(QNetworkReply *reply)
             return;
         }
         offerTeams(teams);
+        return;
+    }
+
+    if (step == StepLookupUser) {
+        // Die Felder, die der Server für diesen Benutzer liefert. Leere Felder bleiben leer.
+        const QVariantMap found = parsed.toMap();
+        QVariantMap user;
+        user["username"] = found.value("username").toString();
+        user["firstName"] = found.value("first_name").toString();
+        user["lastName"] = found.value("last_name").toString();
+        user["nickname"] = found.value("nickname").toString();
+        user["position"] = found.value("position").toString();
+        user["email"] = found.value("email").toString();
+        emit userFound(user);
         return;
     }
 

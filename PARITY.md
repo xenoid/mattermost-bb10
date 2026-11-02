@@ -123,7 +123,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | --- | --- | --- |
 | 🟡 | Set status: online, away, do not disturb, offline | Built: Settings, STATUS. Not yet tested on the device |
 | 🟡 | Custom status with emoji and expiry | Built: text and clear, with the default emoji. No emoji picker and no expiry yet. Not yet tested on the device |
-| 🔴 | View a user profile | |
+| 🟡 | View a user profile | Built: Settings, MESSAGES, Look up a user by name. Shows name, nickname, position and email. Opening it from a message or a member is missing. Not yet tested on the device |
 | 🟡 | Edit own profile | Built: Settings, PROFILE. Name, nickname, position. Email and avatar missing. Not yet tested on the device |
 | 🔴 | Custom profile attributes | Server feature flag |
 
