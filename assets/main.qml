@@ -125,6 +125,20 @@ NavigationPane {
         _mm.openChannel(id, name)
     }
 
+    // Kopfzeile oder Zweck eines Kanals bearbeiten. Ein Fehler erscheint als Meldung, nicht still.
+    function askChannelText(channelId, field, current) {
+        try {
+            channelTextPrompt.title = field == "header" ? qsTr("Channel header") : qsTr("Channel purpose")
+            channelTextPrompt.channelTextId = channelId
+            channelTextPrompt.channelTextField = field
+            channelTextPrompt.inputField.defaultText = current ? current : ""
+            channelTextPrompt.show()
+        } catch (e) {
+            toast.body = String(e)
+            toast.show()
+        }
+    }
+
     // Seite erzeugen; bei QML-Fehlern den Text sichtbar machen statt still zu scheitern.
     function make(def) {
         var page = def.createObject()
@@ -431,24 +445,12 @@ NavigationPane {
                                         ActionItem {
                                             title: qsTr("Edit header")
                                             enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
-                                            onTriggered: {
-                                                channelTextPrompt.title = qsTr("Channel header")
-                                                channelTextPrompt.channelTextId = ListItemData.channelId
-                                                channelTextPrompt.channelTextField = "header"
-                                                channelTextPrompt.inputField.defaultText = ListItemData.header || ""
-                                                channelTextPrompt.show()
-                                            }
+                                            onTriggered: nav.askChannelText(ListItemData.channelId, "header", ListItemData.header)
                                         }
                                         ActionItem {
                                             title: qsTr("Edit purpose")
                                             enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
-                                            onTriggered: {
-                                                channelTextPrompt.title = qsTr("Channel purpose")
-                                                channelTextPrompt.channelTextId = ListItemData.channelId
-                                                channelTextPrompt.channelTextField = "purpose"
-                                                channelTextPrompt.inputField.defaultText = ListItemData.purpose || ""
-                                                channelTextPrompt.show()
-                                            }
+                                            onTriggered: nav.askChannelText(ListItemData.channelId, "purpose", ListItemData.purpose)
                                         }
                                     }
                                 ]
