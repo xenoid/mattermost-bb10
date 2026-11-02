@@ -1,11 +1,14 @@
 import bb.cascades 1.3
 import bb.system 1.2
+import bb.cascades.pickers 1.0
 
 // Konto, Anzeige und Diagnose. Die Aktionsleiste trägt nur den System-Chevron.
 Page {
     id: pageRoot
     objectName: "settings"
     property variant navPane: null
+    property string certPath: ""
+    property string keyPath: ""
 
     titleBar: TitleBar {
         title: qsTr("Settings")
@@ -179,6 +182,50 @@ Page {
                     position = typed
                 }
                 _mm.saveProfile(first, last, nick, position)
+            }
+        },
+        FilePicker {
+            id: certPicker
+            type: FileType.Other
+            mode: FilePickerMode.Picker
+            title: qsTr("Certificate (PEM)")
+            onFileSelected: {
+                pageRoot.certPath = selectedFiles[0]
+                keyPicker.open()
+            }
+        },
+        FilePicker {
+            id: keyPicker
+            type: FileType.Other
+            mode: FilePickerMode.Picker
+            title: qsTr("Private key (PEM)")
+            onFileSelected: {
+                pageRoot.keyPath = selectedFiles[0]
+                passPrompt.show()
+            }
+        },
+        SystemPrompt {
+            id: passPrompt
+            title: qsTr("Key passphrase")
+            body: qsTr("Leave empty if the key has none.")
+            inputField.inputMode: SystemUiInputMode.Password
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Save")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.setClientCertificate(pageRoot.certPath, pageRoot.keyPath, inputFieldTextEntry())
+            }
+        },
+        SystemDialog {
+            id: certOffDialog
+            title: qsTr("Client certificate")
+            body: qsTr("Remove the client certificate?")
+            confirmButton.label: qsTr("Remove")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.clearClientCertificate()
             }
         },
         SystemPrompt {
@@ -838,6 +885,43 @@ Page {
                                 lockOffDialog.show()
                             else
                                 pinPrompt.show()
+                        }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: StackLayout {
+                    orientation: LayoutOrientation.LeftToRight
+                }
+                Label {
+                    text: qsTr("Client certificate")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1b1f23")
+                    textStyle.fontSize: FontSize.Medium
+                    layoutProperties: StackLayoutProperties {
+                        spaceQuota: 1
+                    }
+                }
+                Label {
+                    text: _mm.clientCertInfo == "" ? qsTr("None") : _mm.clientCertInfo
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#6b747d")
+                    textStyle.fontSize: FontSize.Small
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: {
+                            if (Qt.mm) Qt.mm.traceLog("tap settings client certificate")
+                            if (_mm.clientCertInfo != "")
+                                certOffDialog.show()
+                            else
+                                certPicker.open()
                         }
                     }
                 ]

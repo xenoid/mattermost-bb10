@@ -96,6 +96,20 @@ NavigationPane {
                     _mm.selectTeam(teamIds[selectedIndices[0]])
             }
         },
+        SystemPrompt {
+            id: guestPrompt
+            property string channelId: ""
+            title: qsTr("Invite guest")
+            body: qsTr("Email address. The guest gets access to this channel only.")
+            inputField.inputMode: SystemUiInputMode.Email
+            inputOptions: SystemUiInputOption.None
+            confirmButton.label: qsTr("Invite")
+            cancelButton.label: qsTr("Cancel")
+            onFinished: {
+                if (value == SystemUiResult.ConfirmButtonSelection)
+                    _mm.inviteGuest(guestPrompt.channelId, inputFieldTextEntry())
+            }
+        },
         SystemListDialog {
             id: ssoDialog
             title: qsTr("Single sign-on")
@@ -460,6 +474,10 @@ NavigationPane {
                         page.load()
                         nav.push(page)
                     }
+                    function askGuest(channelId) {
+                        guestPrompt.channelId = channelId
+                        guestPrompt.show()
+                    }
                     function askLeave(channelId) {
                         leaveDialog.leaveId = channelId
                         leaveDialog.show()
@@ -520,6 +538,11 @@ NavigationPane {
                                         ActionItem {
                                             title: qsTr("Bookmarks")
                                             onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap main.qml bookmarks"); channelItem.ListItem.view.openBookmarks(ListItemData.channelId, ListItemData.title) }
+                                        }
+                                        ActionItem {
+                                            title: qsTr("Invite guest")
+                                            enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
+                                            onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap main.qml invite guest"); channelItem.ListItem.view.askGuest(ListItemData.channelId) }
                                         }
                                         ActionItem {
                                             title: qsTr("Leave channel")

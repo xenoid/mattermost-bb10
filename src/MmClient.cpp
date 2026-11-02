@@ -38,6 +38,7 @@
 #include <QSslError>
 #include <QSslSocket>
 #include <QUrl>
+#include <QSslKey>
 #include <QUuid>
 #include <QCryptographicHash>
 #include <QtAlgorithms>
@@ -128,6 +129,9 @@ QString uploadName(const QString &name)
 }
 
 QList<QSslCertificate> g_trust;
+// Client-Zertifikat für Server, die eines verlangen. Leer, solange keins eingerichtet ist.
+QSslCertificate g_clientCert;
+QSslKey g_clientKey;
 
 void applyTrust(QNetworkRequest &request)
 {
@@ -136,6 +140,10 @@ void applyTrust(QNetworkRequest &request)
     ssl.setSslOption(QSsl::SslOptionDisableServerNameIndication, false);
     if (!g_trust.isEmpty())
         ssl.setCaCertificates(g_trust);
+    if (!g_clientCert.isNull() && !g_clientKey.isNull()) {
+        ssl.setLocalCertificate(g_clientCert);
+        ssl.setPrivateKey(g_clientKey);
+    }
     request.setSslConfiguration(ssl);
 }
 
@@ -282,6 +290,7 @@ MmClient::MmClient(QObject *parent)
     g_traceOn = m_debugLog;
     m_recorder = 0;
     m_locked = !settings.value("lockHash").toString().isEmpty();
+    loadClientCertificate();
     m_nextScheduleAt = 0;
     if (!m_token.isEmpty() && !m_serverUrl.isEmpty()) {
         setLoggedIn(true);
@@ -2090,6 +2099,101 @@ void MmClient::onTick()
     flushOutbox();
 }
 
+void MmClient::noticeAction(const QString &path, const QByteArray &verb, const QByteArray &body,
+                            const QString &doneText, const QString &failText)
+{
+    QNetworkReply *reply = start(StepNotice, path, body, verb);
+    reply->setProperty("doneText", doneText);
+    reply->setProperty("failText", failText);
+}
+
+void MmClient::inviteGuest(const QString &channelId, const QString &email)
+{
+    // Gäste brauchen Gastkonten auf dem Server. Sie bekommen nur diesen Kanal.
+    const QString address = email.trimmed();
+    if (!m_loggedIn || m_teamId.isEmpty() || channelId.isEmpty() || !address.contains("@")) {
+        emit notice(tr("Enter an email address"));
+        return;
+    }
+    QVariantMap body;
+    body["emails"] = QVariantList() << address;
+    body["channels"] = QVariantList() << channelId;
+    body["message"] = QString();
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    noticeAction("/api/v4/teams/" + m_teamId + "/invite-guests/email", "POST", bytes,
+                 tr("Invitation sent"), tr("Could not invite the guest (HTTP %1)"));
+}
+
+void MmClient::loadClientCertificate()
+{
+    QFile cert(QDir::homePath() + "/client-cert.pem");
+    QFile key(QDir::homePath() + "/client-key.pem");
+    if (!cert.open(QIODevice::ReadOnly) || !key.open(QIODevice::ReadOnly))
+        return;
+    g_clientCert = QSslCertificate(cert.readAll(), QSsl::Pem);
+    const QByteArray keyData = key.readAll();
+    g_clientKey = QSslKey(keyData, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+    if (g_clientKey.isNull())
+        g_clientKey = QSslKey(keyData, QSsl::Dsa, QSsl::Pem, QSsl::PrivateKey);
+}
+
+QString MmClient::clientCertInfo() const
+{
+    if (g_clientCert.isNull())
+        return QString();
+    const QString name = g_clientCert.subjectInfo(QSslCertificate::CommonName);
+    return name.isEmpty() ? tr("Set") : name;
+}
+
+bool MmClient::setClientCertificate(const QString &certPath, const QString &keyPath, const QString &passphrase)
+{
+    // PEM-Dateien vom Gerät. Der Schlüssel wird entschlüsselt in den geschützten Datenordner der App gelegt.
+    QFile certFile(localPath(certPath));
+    QFile keyFile(localPath(keyPath));
+    if (!certFile.open(QIODevice::ReadOnly) || !keyFile.open(QIODevice::ReadOnly)) {
+        emit notice(tr("Could not read the certificate files"));
+        return false;
+    }
+    const QSslCertificate cert(certFile.readAll(), QSsl::Pem);
+    const QByteArray keyData = keyFile.readAll();
+    QSslKey key(keyData, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey, passphrase.toUtf8());
+    if (key.isNull())
+        key = QSslKey(keyData, QSsl::Dsa, QSsl::Pem, QSsl::PrivateKey, passphrase.toUtf8());
+    if (cert.isNull() || key.isNull()) {
+        traceWrite(QString("client cert invalid cert=%1 key=%2").arg(cert.isNull() ? 0 : 1).arg(key.isNull() ? 0 : 1));
+        emit notice(tr("Certificate or key not readable (PEM, RSA or DSA)"));
+        return false;
+    }
+    QFile outCert(QDir::homePath() + "/client-cert.pem");
+    QFile outKey(QDir::homePath() + "/client-key.pem");
+    if (!outCert.open(QIODevice::WriteOnly | QIODevice::Truncate) || !outKey.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        emit notice(tr("Could not store the certificate"));
+        return false;
+    }
+    outCert.write(cert.toPem());
+    outKey.write(key.toPem());
+    outCert.close();
+    outKey.close();
+    g_clientCert = cert;
+    g_clientKey = key;
+    traceWrite("client cert set");
+    emit prefsChanged();
+    emit notice(tr("Client certificate is set"));
+    return true;
+}
+
+void MmClient::clearClientCertificate()
+{
+    QFile::remove(QDir::homePath() + "/client-cert.pem");
+    QFile::remove(QDir::homePath() + "/client-key.pem");
+    g_clientCert = QSslCertificate();
+    g_clientKey = QSslKey();
+    traceWrite("client cert removed");
+    emit prefsChanged();
+}
+
 void MmClient::startSso(const QString &serverUrl, const QString &service)
 {
     // Wie die Android-App: Anmeldung im Browser, der Server leitet mit dem Token auf mmauth:// zurück.
@@ -3654,6 +3758,13 @@ void MmClient::onFinished(QNetworkReply *reply)
                .arg(QString::fromUtf8(payload.left(300)).replace('\n', ' ')));
     if (m_debugLog)
         qDebug("mm-net step %d http %d net %d", int(step), http, netCode);
+    if (step == StepNotice) {
+        if (http >= 200 && http < 300 && netCode == 0)
+            emit notice(reply->property("doneText").toString());
+        else
+            emit notice(reply->property("failText").toString().arg(http));
+        return;
+    }
     if (step == StepRunAction || step == StepTaskState) {
         // Playbook-Antworten haben oft keinen Body. Erfolg erkennt man am HTTP-Code.
         if (http >= 200 && http < 300 && netCode == 0) {

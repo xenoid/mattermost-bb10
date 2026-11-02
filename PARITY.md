@@ -32,7 +32,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | SAML (Okta, OneLogin, ADFS) | Built: same browser flow with the server's SAML mobile login. Not yet tested on the device |
 | 🔴 | Magic link for guests | Server v11.3 and later |
 | 🟡 | Forgot-password link | Built: opens `/reset_password` of the server in the browser. Not yet tested on the device |
-| 🔴 | AD/LDAP | Probably works through password login. To verify |
+| 🟡 | AD/LDAP | The password login sends login_id, which the server also accepts for AD/LDAP accounts. Not tested: no LDAP server at hand |
 | ⚪ | Sign in with Microsoft under Intune | MDM, iOS only in the docs |
 
 ## Teams and channels
@@ -48,7 +48,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Admin-managed sidebar categories | Built: the channel list follows the server's sidebar categories (favourites, custom and admin-managed ones) in their order. Collapsing and moving channels are missing. Not yet tested on the device |
 | 🟡 | Channel bookmarks | Built: read-only list from the channel long-press menu, a tap opens the link. Not yet tested on the device |
 | 🟡 | Channel banners | Built: the banner text shows at the top of the channel. The banner colour from the server is not used. Not tested: no channel with a banner on the test server |
-| 🔴 | Guest invitations | |
+| 🟡 | Guest invitations | Built: channel long-press menu, Invite guest by email for that channel. Needs guest accounts on the server. Not yet tested on the device |
 | 🔴 | Shared-channel system messages | Low priority |
 
 ## Messages
@@ -151,14 +151,14 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Refresh, team, log out, preview, 24-hour clock, images, hub alerts, mentions only, protocol log | |
 | 🟡 | English and German | Other languages are a catalog. See README |
 | 🟡 | Dark theme | Built: Settings, DISPLAY, Dark design. tools/make-dark.py writes dark copies of the pages, and system controls switch to the Cascades dark style. Takes effect after a restart. Not yet tested on the device |
-| 🔴 | Disable animations | Android 2.31 |
+| ⚪ | Disable animations | Cascades has no switch for its page and list transitions, and the app adds no animations of its own |
 
 ## Security
 
 | | Feature | Notes |
 | --- | --- | --- |
 | 🟢 | Server certificate checked against a current CA bundle | `assets/cacert.pem` |
-| 🔴 | Client certificates | `QSslConfiguration`, import screen needed |
+| 🟡 | Client certificates | Built: Settings, ACCOUNT, Client certificate takes a PEM certificate and an RSA or DSA key (with passphrase) and sends them on every TLS connection. PKCS#12 import is missing, Qt 4.8 cannot read it. Not yet tested on the device |
 | 🟡 | App lock | Built: Settings, ACCOUNT, App lock with a PIN (stored as salted hash). Asked at start and after the app was in the background. No biometrics on BlackBerry 10. Not yet tested on the device |
 | ⚪ | Root and jailbreak blocking, screen-capture prevention | MDM |
 | ⚪ | Intune app protection, Zero Persistence Mode, Offline Persistence Timer, wipe notifications | MDM |

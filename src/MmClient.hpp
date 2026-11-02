@@ -50,6 +50,7 @@ class MmClient : public QObject
     Q_PROPERTY(bool notifyMentions READ notifyMentions WRITE setNotifyMentions NOTIFY prefsChanged)
     Q_PROPERTY(bool debugLog READ debugLog WRITE setDebugLog NOTIFY prefsChanged)
     Q_PROPERTY(bool darkTheme READ darkTheme WRITE setDarkTheme NOTIFY prefsChanged)
+    Q_PROPERTY(QString clientCertInfo READ clientCertInfo NOTIFY prefsChanged)
     Q_PROPERTY(QString presence READ presence NOTIFY presenceChanged)
     Q_PROPERTY(QString customText READ customText NOTIFY presenceChanged)
     Q_PROPERTY(QString customEmoji READ customEmoji NOTIFY presenceChanged)
@@ -95,6 +96,7 @@ public:
     bool notifyMentions() const { return m_notifyMentions; }
     bool debugLog() const { return m_debugLog; }
     bool darkTheme() const;
+    QString clientCertInfo() const;
     bool trustReady() const { return m_trustReady; }
     QString customText() const { return m_statusText; }
     QString customEmoji() const { return m_statusEmoji; }
@@ -172,6 +174,9 @@ public:
     Q_INVOKABLE void openThreads();
     Q_INVOKABLE void loadRuns();
     Q_INVOKABLE void startSso(const QString &serverUrl, const QString &service);
+    Q_INVOKABLE void inviteGuest(const QString &channelId, const QString &email);
+    Q_INVOKABLE bool setClientCertificate(const QString &certPath, const QString &keyPath, const QString &passphrase);
+    Q_INVOKABLE void clearClientCertificate();
     Q_INVOKABLE QVariantList runTasks(const QString &runId) const;
     Q_INVOKABLE void toggleTask(const QString &runId, int checklist, int item, bool done);
     Q_INVOKABLE void loadPlaybooks();
@@ -321,7 +326,8 @@ private:
         StepRuns,
         StepTaskState,
         StepRunAction,
-        StepPlaybooks
+        StepPlaybooks,
+        StepNotice
     };
 
     enum FileKind {
@@ -375,6 +381,9 @@ private:
     void sendScheduled(const QString &channelId, const QString &message);
     void runAction(const QString &path, const QByteArray &verb, const QVariantMap &body, const QString &doneText);
     void finishSso(const QUrl &url);
+    void noticeAction(const QString &path, const QByteArray &verb, const QByteArray &body,
+                      const QString &doneText, const QString &failText);
+    void loadClientCertificate();
     void enqueueMutate(const QString &kind, const QString &postId, const QString &message);
     bool flagOn(const QString &postId, const QString &key) const;
     void paintFlag(const QString &postId, const QString &key, const QString &value);
