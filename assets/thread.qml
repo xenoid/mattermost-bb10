@@ -1359,6 +1359,15 @@ Page {
             return
         draftDone = true
         composer.text = _mm.draftFor(_mm.channelId)
+        // Aus einer anderen App geteilt: Text ins Eingabefeld, Datei als Anhang.
+        if (_mm.hasShare) {
+            var shared = _mm.takeShareText()
+            if (shared != "")
+                composer.text = composer.text == "" ? shared : composer.text + " " + shared
+            var sharedPath = _mm.takeSharePath()
+            if (sharedPath != "")
+                holdFile(sharedPath)
+        }
     }
 
     // Ruft main.qml auf, wenn die Seite fertig eingeblendet ist. Vorher greift der Fokus nicht.

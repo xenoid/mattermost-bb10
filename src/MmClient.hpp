@@ -54,6 +54,7 @@ class MmClient : public QObject
     Q_PROPERTY(QString nextPriority READ nextPriority NOTIFY nextPriorityChanged)
     Q_PROPERTY(QString channelBanner READ channelBanner NOTIFY channelChanged)
     Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged)
+    Q_PROPERTY(bool hasShare READ hasShare NOTIFY shareChanged)
     Q_PROPERTY(QVariantMap profile READ profile NOTIFY profileChanged)
     Q_PROPERTY(bool trustReady READ trustReady CONSTANT)
     Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
@@ -69,6 +70,7 @@ public:
     QString channelName() const { return m_channelName; }
     QString channelBanner() const;
     bool recording() const { return !m_recordPath.isEmpty(); }
+    bool hasShare() const { return !m_shareText.isEmpty() || !m_sharePath.isEmpty(); }
     QString teamName() const { return m_teamName; }
     QString iconSend() const { return m_iconSend; }
     QString iconSearch() const { return m_iconSearch; }
@@ -160,6 +162,8 @@ public:
     Q_INVOKABLE void testNotification();
     Q_INVOKABLE bool startRecording();
     Q_INVOKABLE QString stopRecording();
+    Q_INVOKABLE QString takeShareText();
+    Q_INVOKABLE QString takeSharePath();
     Q_INVOKABLE void copyProblemReport();
     Q_INVOKABLE void saveDraft(const QString &channelId, const QString &text);
     Q_INVOKABLE QString draftFor(const QString &channelId) const;
@@ -217,6 +221,7 @@ signals:
     void bookmarksLoaded(const QVariantList &rows);
     void notice(const QString &text);
     void recordingChanged();
+    void shareChanged();
 
 private slots:
     void onFinished(QNetworkReply *reply);
@@ -495,6 +500,8 @@ private:
     QString m_nextPriority;
     bb::multimedia::AudioRecorder *m_recorder;
     QString m_recordPath;
+    QString m_shareText;
+    QString m_sharePath;
     QString m_lastPostId;
     QString m_postsSig;
     QString m_threadRoot;

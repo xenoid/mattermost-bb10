@@ -1473,6 +1473,23 @@ void MmClient::openThreads()
     start(StepThreads, "/api/v4/users/" + m_userId + "/teams/" + m_teamId + "/threads?per_page=30");
 }
 
+QString MmClient::takeShareText()
+{
+    const QString text = m_shareText;
+    m_shareText.clear();
+    if (m_sharePath.isEmpty())
+        emit shareChanged();
+    return text;
+}
+
+QString MmClient::takeSharePath()
+{
+    const QString path = m_sharePath;
+    m_sharePath.clear();
+    emit shareChanged();
+    return path;
+}
+
 QString MmClient::channelBanner() const
 {
     for (int i = 0; i < m_channelRows.size(); ++i) {
@@ -1807,6 +1824,20 @@ void MmClient::onTick()
 
 void MmClient::onInvoked(const bb::system::InvokeRequest &request)
 {
+    if (request.target() == QLatin1String("com.hollweck.mattermost.share")) {
+        // Geteilter Text oder Datei wartet, bis der Nutzer einen Kanal öffnet.
+        const QString uri = request.uri().toString();
+        QString text = QString::fromUtf8(request.data()).trimmed();
+        if (uri.startsWith("file://"))
+            m_sharePath = QUrl(uri).toLocalFile();
+        else if (text.isEmpty() && uri.startsWith("http"))
+            text = uri;
+        m_shareText = text;
+        traceWrite(QString("share in mime=%1 uri=%2 chars=%3").arg(request.mimeType(), uri).arg(text.size()));
+        emit shareChanged();
+        emit notice(tr("Choose a channel to share into"));
+        return;
+    }
     if (request.target() != QLatin1String("com.hollweck.mattermost.open"))
         return;
     const QString id = QString::fromUtf8(request.data()).trimmed();

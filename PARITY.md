@@ -47,7 +47,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | New direct message | Built: Settings, MESSAGES, enter a username. Group messages still missing. Not yet tested on the device |
 | 🔴 | Admin-managed sidebar categories | Android 2.41 |
 | 🟡 | Channel bookmarks | Built: read-only list from the channel long-press menu, a tap opens the link. Not yet tested on the device |
-| 🟡 | Channel banners | Built: the banner text shows at the top of the channel. The banner colour from the server is not used. Not yet tested on the device |
+| 🟡 | Channel banners | Built: the banner text shows at the top of the channel. The banner colour from the server is not used. Not tested: no channel with a banner on the test server |
 | 🔴 | Guest invitations | |
 | 🔴 | Shared-channel system messages | Low priority |
 
@@ -91,10 +91,10 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Open other files | |
 | 🟢 | Upload under the original name | |
 | 🟢 | Show images, on or off | Setting |
-| 🟡 | Audio playback in chat | Open attachment hands audio files to the system player. No player inside the chat. To verify on the device |
-| 🟡 | Video playback in chat | Open attachment hands video files to the system player. No player inside the chat. To verify on the device |
-| 🟡 | Voice message recording | Built: the + page records an AAC voice message and attaches it to the next message. Not yet tested on the device |
-| 🔴 | Share into the app from other apps | Invoke target for `bb.action.SHARE` |
+| 🟢 | Audio playback in chat | Open attachment plays audio in the system player, not inside the chat. Device 2026-11-02: works |
+| 🟢 | Video playback in chat | Open attachment plays video in the system player, not inside the chat. Device 2026-11-02: works |
+| 🟢 | Voice message recording | The + page records an AAC voice message and attaches it. Device 2026-11-02: sending works |
+| 🟡 | Share into the app from other apps | Built: Mattermost appears in the BlackBerry Share menu for text and files. The next channel you open gets the text in the composer and the file as attachment. Not yet tested on the device |
 
 ## Notifications and background
 
