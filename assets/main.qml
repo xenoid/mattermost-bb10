@@ -435,7 +435,7 @@ NavigationPane {
                                                 channelTextPrompt.title = qsTr("Channel header")
                                                 channelTextPrompt.channelTextId = ListItemData.channelId
                                                 channelTextPrompt.channelTextField = "header"
-                                                channelTextPrompt.inputField.defaultText = ListItemData.header
+                                                channelTextPrompt.inputField.defaultText = ListItemData.header || ""
                                                 channelTextPrompt.show()
                                             }
                                         }
@@ -446,7 +446,7 @@ NavigationPane {
                                                 channelTextPrompt.title = qsTr("Channel purpose")
                                                 channelTextPrompt.channelTextId = ListItemData.channelId
                                                 channelTextPrompt.channelTextField = "purpose"
-                                                channelTextPrompt.inputField.defaultText = ListItemData.purpose
+                                                channelTextPrompt.inputField.defaultText = ListItemData.purpose || ""
                                                 channelTextPrompt.show()
                                             }
                                         }

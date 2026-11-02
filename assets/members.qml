@@ -1,4 +1,5 @@
 import bb.cascades 1.3
+import bb.system 1.2
 
 // Mitglieder eines Kanals. Hinzufügen per Benutzername, Entfernen per Tipp und Bestätigung.
 Page {

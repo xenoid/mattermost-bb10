@@ -42,7 +42,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Channel list: public, private, direct, unread, mentions | |
 | 🟢 | Hide the channel subtitle | |
 | 🟡 | Create a channel | Built: Settings, MESSAGES, New channel. Public channels only. Not yet tested on the device |
-| 🟡 | Show, add and remove members | Built: show members from the long-press menu, add by username, remove by tap and confirm. Only public and private channels. Device test 2026-11-02: opening the member list shows an error. Being investigated |
+| 🟡 | Show, add and remove members | Built: show members from the long-press menu, add by username, remove by tap and confirm. Only public and private channels. Device test 2026-11-02: opening the member list showed "SystemPrompt is not a type" (missing `import bb.system`). Fixed in 1.0.0.142, waiting for a new device test |
 | 🟡 | Leave, archive, edit header and purpose | Built: leave, archive, edit header and purpose from the long-press menu. Device test 2026-11-02: edit header and purpose do nothing in the channel tried. The menu entries are greyed out for direct messages; not yet checked for a public or private channel |
 | 🟡 | New direct message | Built: Settings, MESSAGES, enter a username. Group messages still missing. Not yet tested on the device |
 | 🔴 | Admin-managed sidebar categories | Android 2.41 |
