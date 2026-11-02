@@ -151,6 +151,8 @@ public:
     Q_INVOKABLE void copyText(const QString &text);
     Q_INVOKABLE void acknowledgePost(const QString &postId);
     Q_INVOKABLE void loadBookmarks(const QString &channelId);
+    Q_INVOKABLE void openThreads();
+    Q_INVOKABLE void testNotification();
     Q_INVOKABLE void copyProblemReport();
     Q_INVOKABLE void saveDraft(const QString &channelId, const QString &text);
     Q_INVOKABLE QString draftFor(const QString &channelId) const;
@@ -271,7 +273,8 @@ private:
         StepMemberRemove,
         StepLookupUser,
         StepAck,
-        StepBookmarks
+        StepBookmarks,
+        StepThreads
     };
 
     enum FileKind {

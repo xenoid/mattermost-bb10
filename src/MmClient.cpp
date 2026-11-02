@@ -1461,6 +1461,27 @@ void MmClient::loadBookmarks(const QString &channelId)
     start(StepBookmarks, "/api/v4/channels/" + channelId + "/bookmarks");
 }
 
+void MmClient::openThreads()
+{
+    // Verfolgte Threads des Teams, neueste Antwort zuerst. Die Liste nutzt die Suchseite.
+    if (!m_loggedIn || m_userId.isEmpty() || m_teamId.isEmpty())
+        return;
+    setStatus(tr("Searching…"));
+    start(StepThreads, "/api/v4/users/" + m_userId + "/teams/" + m_teamId + "/threads?per_page=30");
+}
+
+void MmClient::testNotification()
+{
+    // Eine lokale Meldung im Hub, ohne Server. Zeigt, ob Benachrichtigungen am Gerät ankommen.
+    bb::platform::Notification note(QString("mm-test"));
+    note.setTitle(QString("Mattermost"));
+    note.setBody(tr("Test notification"));
+    note.setType(bb::platform::NotificationType::Default);
+    const bool ok = note.notify() == bb::platform::NotificationError::None;
+    traceWrite(QString("notification test ok=%1").arg(ok ? 1 : 0));
+    emit notice(ok ? tr("Test notification sent to the hub") : tr("Notification failed"));
+}
+
 void MmClient::copyText(const QString &text)
 {
     bb::system::Clipboard clipboard;
@@ -2009,6 +2030,11 @@ void MmClient::failed(Step step, bool silent, int http, int netCode)
         setStatus(tr("Could not load the bookmarks"));
         emit bookmarksLoaded(QVariantList());
         return;
+    case StepThreads:
+        setStatus(tr("Could not load the threads"));
+        m_searchRows.clear();
+        finishSearch();
+        return;
     case StepSend:
     case StepUpload:
         return;
@@ -2542,6 +2568,29 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
         priorityText = tr("Urgent");
     else if (priority == "important")
         priorityText = tr("Important");
+    // Anhänge von Bots und Integrationen: Vortext, Titel, Text und Felder als einfacher Text.
+    QStringList botLines;
+    const QVariantList attachments = post.value("props").toMap().value("attachments").toList();
+    for (int i = 0; i < attachments.size(); ++i) {
+        const QVariantMap att = attachments.at(i).toMap();
+        const int before = botLines.size();
+        const char *keys[] = { "pretext", "title", "text" };
+        for (int k = 0; k < 3; ++k) {
+            const QString part = repairText(att.value(keys[k]).toString()).trimmed();
+            if (!part.isEmpty())
+                botLines.append(part);
+        }
+        const QVariantList fields = att.value("fields").toList();
+        for (int f = 0; f < fields.size(); ++f) {
+            const QVariantMap field = fields.at(f).toMap();
+            const QString label = repairText(field.value("title").toString()).trimmed();
+            const QString value = repairText(field.value("value").toString()).trimmed();
+            if (!label.isEmpty() || !value.isEmpty())
+                botLines.append(label.isEmpty() ? value : label + ": " + value);
+        }
+        if (botLines.size() == before && !att.value("fallback").toString().isEmpty())
+            botLines.append(repairText(att.value("fallback").toString()));
+    }
     QString previewText;
     const QVariantList embeds = meta.value("embeds").toList();
     for (int i = 0; i < embeds.size(); ++i) {
@@ -2615,6 +2664,7 @@ QVariantMap MmClient::makePostRow(const QVariantMap &post, const QVariantMap &al
     row["linkOnly"] = linkOnly;
     row["priority"] = priorityText;
     row["preview"] = previewText;
+    row["botText"] = botLines.join("\n");
     row["ackAsk"] = ackAsked ? QString("1") : QString();
     row["ackMine"] = ackMine ? QString("1") : QString();
     row["ackInfo"] = ackAsked ? tr("Acknowledged by %1").arg(acks.size()) : QString();
@@ -3928,6 +3978,37 @@ void MmClient::onFinished(QNetworkReply *reply)
         finishSearch();
         return;
     }
+
+    if (step == StepThreads) {
+        // Jeder Thread bringt seinen Wurzelbeitrag mit. Kanal, Antworten und Ungelesenes stehen in der Zeile darüber.
+        const QVariantList threads = parsed.toMap().value("threads").toList();
+        m_searchRows.clear();
+        QStringList ids;
+        for (int i = 0; i < threads.size(); ++i) {
+            const QVariantMap thread = threads.at(i).toMap();
+            const QVariantMap post = thread.value("post").toMap();
+            if (post.value("id").toString().isEmpty())
+                continue;
+            QVariantMap row = makePostRow(post, QVariantMap());
+            row["type"] = QString("result");
+            QString info = channelTitle(row.value("channelId").toString());
+            info += QString::fromUtf8(" · ") + tr("%1 replies").arg(thread.value("reply_count").toInt());
+            const int unread = thread.value("unread_replies").toInt();
+            if (unread > 0)
+                info += QString::fromUtf8(" · ") + tr("%1 new").arg(unread);
+            row["channelTitle"] = info;
+            m_searchRows.append(row);
+            const QString uid = row.value("userId").toString();
+            if (!uid.isEmpty() && !ids.contains(uid))
+                ids.append(uid);
+        }
+        const QStringList missing = unknownUsers(ids);
+        if (missing.isEmpty())
+            finishSearch();
+        else
+            loadUsers(missing, StepSearchUsers);
+        return;
+    }
 }
 
 // ---------------------------------------------------------------- Threads, Reaktionen, Ausgangskorb
@@ -4040,6 +4121,7 @@ QVariantMap MmClient::pendingRow(const OutItem &item, bool inThread) const
     row["pending"] = QString("1");
     row["priority"] = QString();
     row["preview"] = QString();
+    row["botText"] = QString();
     row["ackAsk"] = QString();
     row["ackMine"] = QString();
     row["ackInfo"] = QString();

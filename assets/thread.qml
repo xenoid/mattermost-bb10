@@ -402,6 +402,15 @@ Page {
                                 }
 
                                 Label {
+                                    visible: ListItemData.botText ? true : false
+                                    text: ListItemData.botText
+                                    textFormat: TextFormat.Plain
+                                    multiline: true
+                                    textStyle.color: Color.create("#3b4248")
+                                    textStyle.fontSize: FontSize.Small
+                                }
+
+                                Label {
                                     visible: ListItemData.ackInfo ? true : false
                                     text: ListItemData.ackInfo + (ListItemData.ackMine == "1" ? " ✓" : "")
                                     textFormat: TextFormat.Plain
@@ -1224,7 +1233,7 @@ Page {
         heldPath = staged
         heldName = fileLabel(source)
         heldImage = _mm.fileIsImage(staged)
-        composer.focused = true
+        composer.requestFocus()
         return true
     }
 
@@ -1303,7 +1312,7 @@ Page {
 
     function pickSlash(trigger) {
         composer.text = "/" + trigger + " "
-        composer.focused = true
+        composer.requestFocus()
         refreshSlash(composer.text)
     }
 
@@ -1325,14 +1334,19 @@ Page {
         composer.text = composer.text + glyph
     }
 
-    // Der Entwurf eines Kanals kommt zurück, und der Cursor steht im Eingabefeld, sobald der
-    // Kanal offen ist. Nur einmal pro Seite, damit ein gerade gesendeter Text nicht wieder erscheint.
+    // Der Entwurf eines Kanals kommt zurück, sobald der Kanal offen ist. Nur einmal pro Seite,
+    // damit ein gerade gesendeter Text nicht wieder erscheint.
     function restoreDraft() {
         if (rootId != "" || draftDone || _mm.channelId == "")
             return
         draftDone = true
         composer.text = _mm.draftFor(_mm.channelId)
-        composer.focused = true
+    }
+
+    // Ruft main.qml auf, wenn die Seite fertig eingeblendet ist. Vorher greift der Fokus nicht.
+    function focusComposer() {
+        _mm.traceLog("focus composer")
+        composer.requestFocus()
     }
 
     function saveDraft() {

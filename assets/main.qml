@@ -170,6 +170,12 @@ NavigationPane {
             teamDialog.show()
     }
 
+    // Im Chat steht der Cursor sofort im Eingabefeld.
+    onPushTransitionEnded: {
+        if (page && page.focusComposer)
+            page.focusComposer()
+    }
+
     onPopTransitionEnded: {
         if (page && page.saveDraft)
             page.saveDraft()

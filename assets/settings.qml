@@ -562,6 +562,36 @@ Page {
                 layout: DockLayout {
                 }
                 Label {
+                    text: qsTr("Threads")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: {
+                            if (Qt.mm) Qt.mm.traceLog("tap settings threads")
+                            if (!navPane)
+                                return
+                            var page = navPane.make(mentionsDef)
+                            if (!page)
+                                return
+                            page.heading = qsTr("Threads")
+                            navPane.push(page)
+                            _mm.openThreads()
+                        }
+                    }
+                ]
+            }
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
                     text: qsTr("New channel")
                     verticalAlignment: VerticalAlignment.Center
                     textFormat: TextFormat.Plain
@@ -983,6 +1013,27 @@ Page {
                             _mm.debugLog = checked
                     }
                 }
+            }
+
+            Container {
+                horizontalAlignment: HorizontalAlignment.Fill
+                preferredHeight: 88
+                leftPadding: 20
+                rightPadding: 20
+                layout: DockLayout {
+                }
+                Label {
+                    text: qsTr("Test notification")
+                    verticalAlignment: VerticalAlignment.Center
+                    textFormat: TextFormat.Plain
+                    textStyle.color: Color.create("#1c58d9")
+                    textStyle.fontSize: FontSize.Medium
+                }
+                gestureHandlers: [
+                    TapHandler {
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings test notification"); _mm.testNotification() }
+                    }
+                ]
             }
 
             Container {

@@ -68,13 +68,13 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Reactions | Swipe, twelve names, chips. Swipe not confirmed on the device since build 123 |
 | 🟡 | Emoji panel with server emoji | No flags, skin tones or ZWJ sequences |
 | 🟡 | Date and time formats | 24-hour setting exists. Full regional formats to verify |
-| 🔴 | Collapsed reply threads and global threads list | Thread page exists. List and follow logic missing. To verify |
+| 🟡 | Collapsed reply threads and global threads list | Built: Settings, MESSAGES, Threads lists followed threads with reply and unread counts; a tap opens the root post. Follow and unfollow are missing. Not yet tested on the device |
 | 🔴 | Scheduled posts | Server API |
 | 🟡 | Drafts tab | Built: one draft per channel stays on the phone and comes back when the channel opens. Device test 2026-11-02: works. The list of all drafts is missing |
 | 🟡 | Copy code block, copy email address | Built: Copy text in the post long-press menu copies the whole message. Copying only a code block or an address is missing. Not yet tested on the device |
 | 🔴 | Edit or delete attachments on existing posts | Android 2.31 |
 | 🟡 | Link and permalink previews | Built: the title of an Open Graph preview shows under the message. Device test 2026-11-02: no preview shows for a Reddit link. Not yet checked whether the server sends previews. Image and permalink previews are missing |
-| 🔴 | Message attachments and interactive buttons | `mmaction://` links |
+| 🟡 | Message attachments and interactive buttons | Built: bot attachments (pretext, title, text, fields) show as text under the message. Buttons and menus are missing. Not yet tested on the device |
 | 🔴 | Interactive dialogs | Multiselect, dynamic search, several steps |
 | 🔴 | Mattermost Blocks | Android 2.43 |
 | 🟡 | Post priority | Built: shows the Urgent and Important labels; the + page sets Important or Urgent for the next channel message. Not for replies or files. Sending not yet tested on the device |
@@ -105,7 +105,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟢 | Background refresh every six minutes | Hub process |
 | 🔴 | Realtime in background over websocket | Hub holds the socket. Costs battery. Needs a setting |
 | 🟡 | Notification settings per channel | Built: long-press a channel, then Notifications (push, desktop, mark as unread). Hub honours desktop setting. Not yet tested on the device |
-| 🔴 | Test notification tool | Low priority |
+| 🟡 | Test notification tool | Built: Settings, DIAGNOSTICS, Test notification puts a local alert in the Hub. Not yet tested on the device |
 | ⚪ | Push notifications | No FCM on BlackBerry 10 |
 
 ## Search and navigation
