@@ -265,7 +265,7 @@ NavigationPane {
                     color: Color.create("#1c58d9")
                     horizontalAlignment: HorizontalAlignment.Fill
                     topMargin: 20
-                    onClicked: { _mm.traceLog("tap main.qml:268 onClicked"); _mm.login(serverField.text, userField.text, passField.text) }
+                    onClicked: { if (Qt.mm) Qt.mm.traceLog("tap main.qml:268 onClicked"); _mm.login(serverField.text, userField.text, passField.text) }
                 }
                 Label {
                     text: qsTr("Forgot password?")
@@ -277,7 +277,7 @@ NavigationPane {
                     gestureHandlers: [
                         TapHandler {
                             onTapped: {
-                                _mm.traceLog("tap main.qml:279 onTapped")
+                                if (Qt.mm) Qt.mm.traceLog("tap main.qml:279 onTapped")
                                 // Der Link öffnet die Zurücksetzen-Seite des eingetragenen Servers im Browser.
                                 var server = serverField.text.trim().replace(/\/+$/, "")
                                 if (server.indexOf("http") == 0)
@@ -380,6 +380,24 @@ NavigationPane {
                         page.load()
                         nav.push(page)
                     }
+                    // Listeneinträge sehen keine äußeren IDs. Dialoge und Seiten öffnet deshalb die Liste.
+                    function askLeave(channelId) {
+                        leaveDialog.leaveId = channelId
+                        leaveDialog.show()
+                    }
+                    function askArchive(channelId) {
+                        archiveDialog.archiveId = channelId
+                        archiveDialog.show()
+                    }
+                    function editText(channelId, kind, field, current) {
+                        _mm.traceLog("editText field=" + field + " kind=" + kind + " channel=" + channelId)
+                        if (kind == "O" || kind == "P") {
+                            nav.openChannelText(channelId, field, current)
+                        } else {
+                            toast.body = qsTr("Not possible in direct messages")
+                            toast.show()
+                        }
+                    }
                     listItemComponents: [
                         ListItemComponent {
                             type: "header"
@@ -414,54 +432,40 @@ NavigationPane {
                                         title: ListItemData.title
                                         ActionItem {
                                             title: qsTr("Notifications")
-                                            onTriggered: { _mm.traceLog("tap main.qml:416 onTriggered"); channelItem.ListItem.view.openNotify(ListItemData.channelId, ListItemData.title) }
+                                            onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap main.qml:416 onTriggered"); channelItem.ListItem.view.openNotify(ListItemData.channelId, ListItemData.title) }
                                         }
                                         ActionItem {
                                             title: qsTr("Members")
-                                            onTriggered: { _mm.traceLog("tap main.qml:420 onTriggered"); channelItem.ListItem.view.openMembers(ListItemData.channelId, ListItemData.title, ListItemData.kind) }
+                                            onTriggered: { if (Qt.mm) Qt.mm.traceLog("tap main.qml:420 onTriggered"); channelItem.ListItem.view.openMembers(ListItemData.channelId, ListItemData.title, ListItemData.kind) }
                                         }
                                         ActionItem {
                                             title: qsTr("Leave channel")
                                             enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
                                             onTriggered: {
-                                                _mm.traceLog("tap main.qml:425 onTriggered")
-                                                leaveDialog.leaveId = ListItemData.channelId
-                                                leaveDialog.show()
+                                                if (Qt.mm) Qt.mm.traceLog("tap main.qml:425 onTriggered")
+                                                channelItem.ListItem.view.askLeave(ListItemData.channelId)
                                             }
                                         }
                                         ActionItem {
                                             title: qsTr("Archive channel")
                                             enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
                                             onTriggered: {
-                                                _mm.traceLog("tap main.qml:433 onTriggered")
-                                                archiveDialog.archiveId = ListItemData.channelId
-                                                archiveDialog.show()
+                                                if (Qt.mm) Qt.mm.traceLog("tap main.qml:433 onTriggered")
+                                                channelItem.ListItem.view.askArchive(ListItemData.channelId)
                                             }
                                         }
                                         ActionItem {
                                             title: qsTr("Edit header")
                                             onTriggered: {
-                                                _mm.traceLog("tap main.qml:440 onTriggered")
-                                                _mm.traceLog("menu: Edit header tapped kind=" + ListItemData.kind + " channel=" + ListItemData.channelId)
-                                                if (ListItemData.kind == "O" || ListItemData.kind == "P")
-                                                    nav.openChannelText(ListItemData.channelId, "header", ListItemData.header)
-                                                else {
-                                                    toast.body = qsTr("Not possible in direct messages")
-                                                    toast.show()
-                                                }
+                                                if (Qt.mm) Qt.mm.traceLog("tap main.qml:440 onTriggered")
+                                                channelItem.ListItem.view.editText(ListItemData.channelId, ListItemData.kind, "header", ListItemData.header)
                                             }
                                         }
                                         ActionItem {
                                             title: qsTr("Edit purpose")
                                             onTriggered: {
-                                                _mm.traceLog("tap main.qml:452 onTriggered")
-                                                _mm.traceLog("menu: Edit purpose tapped kind=" + ListItemData.kind + " channel=" + ListItemData.channelId)
-                                                if (ListItemData.kind == "O" || ListItemData.kind == "P")
-                                                    nav.openChannelText(ListItemData.channelId, "purpose", ListItemData.purpose)
-                                                else {
-                                                    toast.body = qsTr("Not possible in direct messages")
-                                                    toast.show()
-                                                }
+                                                if (Qt.mm) Qt.mm.traceLog("tap main.qml:452 onTriggered")
+                                                channelItem.ListItem.view.editText(ListItemData.channelId, ListItemData.kind, "purpose", ListItemData.purpose)
                                             }
                                         }
                                     }
@@ -621,7 +625,7 @@ NavigationPane {
                         }
                     ]
                     onTriggered: {
-                        _mm.traceLog("tap main.qml:618 onTriggered")
+                        if (Qt.mm) Qt.mm.traceLog("tap main.qml:618 onTriggered")
                         var item = channelModel.data(indexPath)
                         if (!item)
                             return
@@ -713,6 +717,8 @@ NavigationPane {
     }
 
     onCreationCompleted: {
+        // Listeneinträge erreichen _mm nicht direkt. Über das globale Qt-Objekt können sie protokollieren.
+        Qt.mm = _mm
         _mm.traceLog("app start, main page created")
         applyPreview()
         _mm.prefsChanged.connect(applyPreview)

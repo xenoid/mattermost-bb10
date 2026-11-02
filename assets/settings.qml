@@ -243,7 +243,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:246 onTapped"); showPresence() }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:246 onTapped"); showPresence() }
                     }
                 ]
             }
@@ -281,7 +281,7 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: {
-                            _mm.traceLog("tap settings.qml:283 onTapped")
+                            if (Qt.mm) Qt.mm.traceLog("tap settings.qml:283 onTapped")
                             customPrompt.inputField.defaultText = _mm.customText
                             customPrompt.show()
                         }
@@ -305,7 +305,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:307 onTapped"); _mm.clearCustomStatus() }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:307 onTapped"); _mm.clearCustomStatus() }
                     }
                 ]
             }
@@ -359,7 +359,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:361 onTapped"); editProfile("name", qsTr("Name"), (_mm.profile.first + " " + _mm.profile.last).trim()) }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:361 onTapped"); editProfile("name", qsTr("Name"), (_mm.profile.first + " " + _mm.profile.last).trim()) }
                     }
                 ]
             }
@@ -396,7 +396,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:398 onTapped"); editProfile("nickname", qsTr("Nickname"), _mm.profile.nickname) }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:398 onTapped"); editProfile("nickname", qsTr("Nickname"), _mm.profile.nickname) }
                     }
                 ]
             }
@@ -433,7 +433,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:435 onTapped"); editProfile("position", qsTr("Position"), _mm.profile.position) }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:435 onTapped"); editProfile("position", qsTr("Position"), _mm.profile.position) }
                     }
                 ]
             }
@@ -470,7 +470,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:472 onTapped"); dmPrompt.show() }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:472 onTapped"); dmPrompt.show() }
                     }
                 ]
             }
@@ -490,7 +490,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:492 onTapped"); lookupPrompt.show() }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:492 onTapped"); lookupPrompt.show() }
                     }
                 ]
             }
@@ -511,7 +511,7 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: {
-                            _mm.traceLog("tap settings.qml:512 onTapped")
+                            if (Qt.mm) Qt.mm.traceLog("tap settings.qml:512 onTapped")
                             if (!navPane)
                                 return
                             var page = navPane.make(mentionsDef)
@@ -541,7 +541,7 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: {
-                            _mm.traceLog("tap settings.qml:541 onTapped")
+                            if (Qt.mm) Qt.mm.traceLog("tap settings.qml:541 onTapped")
                             if (!navPane)
                                 return
                             var page = navPane.make(mentionsDef)
@@ -570,7 +570,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:570 onTapped"); channelPrompt.show() }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:570 onTapped"); channelPrompt.show() }
                     }
                 ]
             }
@@ -608,7 +608,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:608 onTapped"); _mm.refresh() }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:608 onTapped"); _mm.refresh() }
                     }
                 ]
             }
@@ -641,7 +641,7 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: {
-                            _mm.traceLog("tap settings.qml:640 onTapped")
+                            if (Qt.mm) Qt.mm.traceLog("tap settings.qml:640 onTapped")
                             if (navPane)
                                 navPane.showTeams()
                         }
@@ -665,7 +665,7 @@ Page {
                 gestureHandlers: [
                     TapHandler {
                         onTapped: {
-                            _mm.traceLog("tap settings.qml:663 onTapped")
+                            if (Qt.mm) Qt.mm.traceLog("tap settings.qml:663 onTapped")
                             if (!navPane)
                                 return
                             var page = navPane.make(joinTeamDef)
@@ -693,7 +693,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:691 onTapped"); _mm.logout() }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:691 onTapped"); _mm.logout() }
                     }
                 ]
             }
@@ -713,7 +713,7 @@ Page {
                 }
                 gestureHandlers: [
                     TapHandler {
-                        onTapped: { _mm.traceLog("tap settings.qml:711 onTapped"); leaveTeamDialog.show() }
+                        onTapped: { if (Qt.mm) Qt.mm.traceLog("tap settings.qml:711 onTapped"); leaveTeamDialog.show() }
                     }
                 ]
             }

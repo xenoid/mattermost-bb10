@@ -92,7 +92,7 @@ Page {
             ]
 
             onTriggered: {
-                _mm.traceLog("tap jointeam.qml:94 onTriggered")
+                if (Qt.mm) Qt.mm.traceLog("tap jointeam.qml:94 onTriggered")
                 var item = resultModel.data(indexPath)
                 if (item && item.id)
                     _mm.joinTeam(item.id)
