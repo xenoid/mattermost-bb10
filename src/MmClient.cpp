@@ -2437,6 +2437,22 @@ void MmClient::answerToolCalls(const QString &postId, const QStringList &accepte
                  tr("The agent did not accept it (HTTP %1)"));
 }
 
+void MmClient::rewriteDraft(const QString &text, const QString &action, const QString &rootId)
+{
+    // Wie die Android-App: der Server lässt den Entwurf vom Agenten umschreiben.
+    if (!m_loggedIn || text.trimmed().isEmpty())
+        return;
+    QVariantMap body;
+    body["message"] = text;
+    body["action"] = action;
+    JsonDataAccess json;
+    QByteArray bytes;
+    json.saveToBuffer(body, &bytes);
+    QNetworkReply *reply = start(StepRewrite, "/api/v4/posts/rewrite", bytes, "POST");
+    reply->setProperty("root", rootId);
+    emit notice(tr("Rewriting…"));
+}
+
 void MmClient::loadAgents()
 {
     // Erst die Agenten des KI-Plugins, sonst alle Bots, die der Server zeigt.
@@ -4139,6 +4155,25 @@ void MmClient::onFinished(QNetworkReply *reply)
         setStatus(tr("The authentication secret is missing or wrong"));
         if (step == StepLogin)
             return;
+    }
+    if (step == StepRewrite) {
+        // Die Antwort ist JSON mit rewritten_text oder schlicht der neue Text.
+        if (http >= 200 && http < 300 && netCode == 0) {
+            JsonDataAccess answerJson;
+            const QVariant answer = answerJson.loadFromBuffer(payload);
+            QString text = answer.toMap().value("rewritten_text").toString();
+            if (text.isEmpty() && answer.type() == QVariant::String)
+                text = answer.toString();
+            if (text.isEmpty() && answerJson.hasError())
+                text = QString::fromUtf8(payload).trimmed();
+            if (text.isEmpty())
+                emit notice(tr("The agent returned no text"));
+            else
+                emit draftRewritten(reply->property("root").toString(), text);
+        } else {
+            emit notice(tr("Rewrite failed (HTTP %1)").arg(http));
+        }
+        return;
     }
     if (step == StepDialogSubmit) {
         // Der Server antwortet mit 200, auch wenn die Integration Feldfehler meldet.

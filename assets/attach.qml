@@ -18,6 +18,26 @@ Page {
     actionBarVisibility: ChromeVisibility.Default
 
     attachedObjects: [
+        SystemListDialog {
+            id: rewriteDialog
+            title: qsTr("Rewrite with AI")
+            dismissOnSelection: true
+            onCreationCompleted: {
+                appendItem(qsTr("Shorten"))
+                appendItem(qsTr("Elaborate"))
+                appendItem(qsTr("Improve writing"))
+                appendItem(qsTr("Fix spelling"))
+                appendItem(qsTr("Simplify"))
+            }
+            onFinished: {
+                if (value != SystemUiResult.ItemSelection || selectedIndices.length == 0)
+                    return
+                var actions = ["shorten", "elaborate", "improve_writing", "fix_spelling", "simplify"]
+                _mm.rewriteDraft(caption, actions[selectedIndices[0]], replyRoot)
+                if (navPane)
+                    navPane.pop()
+            }
+        },
         SystemPrompt {
             id: schedulePrompt
             title: qsTr("Send later")
@@ -117,6 +137,35 @@ Page {
             preferredHeight: 1
             background: Color.create("#e6eaee")
             horizontalAlignment: HorizontalAlignment.Fill
+        }
+
+        // KI-Umformulierung des Entwurfs (braucht Agents auf dem Server).
+        Container {
+            visible: caption != ""
+            horizontalAlignment: HorizontalAlignment.Fill
+            preferredHeight: 100
+            layout: StackLayout {
+                orientation: LayoutOrientation.LeftToRight
+            }
+            gestureHandlers: [
+                TapHandler {
+                    onTapped: { _mm.traceLog("tap attach.qml rewrite"); rewriteDialog.show() }
+                }
+            ]
+            Container {
+                preferredWidth: 8
+                preferredHeight: 48
+                background: Color.create("#1c58d9")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+            }
+            Label {
+                text: qsTr("Rewrite with AI")
+                verticalAlignment: VerticalAlignment.Center
+                leftMargin: 32
+                textStyle.fontSize: FontSize.Large
+                textStyle.color: Color.create("#1b1f23")
+            }
         }
 
         // Sprachnachricht: erster Tipp startet, zweiter beendet und hängt die Datei an.

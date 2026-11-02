@@ -81,7 +81,7 @@ The percentage counts 🟢, 🟡 and 🔴 rows only. ⏸ and ⚪ are not in the 
 | 🟡 | Acknowledgements | Built: posts that ask for it show how many acknowledged, and the long-press menu has Acknowledge. Asking for acknowledgement when sending is missing. Not yet tested on the device |
 | 🔴 | Burn on read | Enterprise Advanced. Display and send. To verify |
 | 🔴 | Auto-translation of messages | Enterprise Advanced beta |
-| 🔴 | AI rewrite of a draft | Only with Agents on the server |
+| 🟡 | AI rewrite of a draft | Built: the + page offers Rewrite with AI (shorten, elaborate, improve, fix spelling, simplify) through POST /api/v4/posts/rewrite, as the Android app does; the result replaces the draft. Custom prompt and agent choice are missing. Not yet tested on the device |
 
 ## Files and media
 

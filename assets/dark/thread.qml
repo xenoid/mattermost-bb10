@@ -1719,6 +1719,12 @@ Page {
         postList.showImages = _mm.showImages
     }
 
+    // KI-Umformulierung aus dem Plus-Menü. Nur die Seite mit demselben Thread übernimmt den Text.
+    function takeRewrite(root, text) {
+        if (root == rootId)
+            composer.text = text
+    }
+
     // Wartende Tool-Aufrufe eines Agenten: alle erlauben oder alle ablehnen.
     function takeToolCalls(postId, calls) {
         var ids = []
@@ -1750,6 +1756,7 @@ Page {
         _mm.sendFailed.disconnect(restoreText)
         _mm.channelChanged.disconnect(restoreDraft)
         _mm.toolCallsLoaded.disconnect(takeToolCalls)
+        _mm.draftRewritten.disconnect(takeRewrite)
     }
 
     onCreationCompleted: {
@@ -1768,5 +1775,6 @@ Page {
         _mm.sendFailed.connect(restoreText)
         _mm.channelChanged.connect(restoreDraft)
         _mm.toolCallsLoaded.connect(takeToolCalls)
+        _mm.draftRewritten.connect(takeRewrite)
     }
 }
