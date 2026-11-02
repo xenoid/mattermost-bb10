@@ -29,6 +29,10 @@ NavigationPane {
             id: membersDef
             source: "asset:///members.qml"
         },
+        ComponentDefinition {
+            id: channelTextDef
+            source: "asset:///channeltext.qml"
+        },
         SystemToast {
             id: toast
         },
@@ -54,19 +58,6 @@ NavigationPane {
             onFinished: {
                 if (value == SystemUiResult.ConfirmButtonSelection)
                     _mm.archiveChannel(archiveId)
-            }
-        },
-        SystemPrompt {
-            id: channelTextPrompt
-            property string channelTextId: ""
-            property string channelTextField: ""
-            inputField.inputMode: SystemUiInputMode.Default
-            inputOptions: SystemUiInputOption.None
-            confirmButton.label: qsTr("Save")
-            cancelButton.label: qsTr("Cancel")
-            onFinished: {
-                if (value == SystemUiResult.ConfirmButtonSelection)
-                    _mm.setChannelText(channelTextId, channelTextField, inputFieldTextEntry())
             }
         },
         SystemListDialog {
@@ -125,18 +116,16 @@ NavigationPane {
         _mm.openChannel(id, name)
     }
 
-    // Kopfzeile oder Zweck eines Kanals bearbeiten. Ein Fehler erscheint als Meldung, nicht still.
-    function askChannelText(channelId, field, current) {
-        try {
-            channelTextPrompt.title = field == "header" ? qsTr("Channel header") : qsTr("Channel purpose")
-            channelTextPrompt.channelTextId = channelId
-            channelTextPrompt.channelTextField = field
-            channelTextPrompt.inputField.defaultText = current ? current : ""
-            channelTextPrompt.show()
-        } catch (e) {
-            toast.body = String(e)
-            toast.show()
-        }
+    // Kopfzeile oder Zweck eines Kanals in einer eigenen Seite bearbeiten.
+    function openChannelText(channelId, field, current) {
+        var page = make(channelTextDef)
+        if (!page)
+            return
+        page.channelId = channelId
+        page.field = field
+        page.current = current ? current : ""
+        page.navPane = nav
+        nav.push(page)
     }
 
     // Seite erzeugen; bei QML-Fehlern den Text sichtbar machen statt still zu scheitern.
@@ -445,12 +434,12 @@ NavigationPane {
                                         ActionItem {
                                             title: qsTr("Edit header")
                                             enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
-                                            onTriggered: nav.askChannelText(ListItemData.channelId, "header", ListItemData.header)
+                                            onTriggered: nav.openChannelText(ListItemData.channelId, "header", ListItemData.header)
                                         }
                                         ActionItem {
                                             title: qsTr("Edit purpose")
                                             enabled: ListItemData.kind == "O" || ListItemData.kind == "P"
-                                            onTriggered: nav.askChannelText(ListItemData.channelId, "purpose", ListItemData.purpose)
+                                            onTriggered: nav.openChannelText(ListItemData.channelId, "purpose", ListItemData.purpose)
                                         }
                                     }
                                 ]
